@@ -1,0 +1,24 @@
+# deps
+node_modules/
+
+# OS / editor
+.DS_Store
+*.log
+Thumbs.db
+
+# datos crudos y sensibles — NUNCA al repo
+# (los exports de MeLi/TN tienen ventas y datos de compradores)
+*.xlsx
+*.xls
+*.csv
+Tablero Buyer Naku/
+
+# credenciales / config local
+.env
+.env.*
+appsscript/.clasp.json
+appsscript/.clasprc.json
+
+# temporales
+*.tmp
+scratchpad/

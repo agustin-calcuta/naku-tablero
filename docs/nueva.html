@@ -1,0 +1,419 @@
+<meta charset="utf-8">
+<title>NAKU · Tablero de compradores</title>
+<style>
+  :root{
+    --paper:#F1F2EC; --panel:#FBFBF7; --panel2:#F6F7F1;
+    --ink:#191E19; --muted:#6C726A; --faint:#98A08F; --line:#D5D8CD; --line2:#E4E6DE;
+    --accent:#12564A; --accent-soft:#E1EBE4;
+    --juan:#2E6C8C; --martin:#1F6A5A; --lucho:#BC6E38; --mariana:#8B5388; --mario:#A9832C; --sin:#98A08F;
+    --good:#2E7D5B; --warn:#BC6E38; --crit:#A8443A;
+    --serif:"Iowan Old Style","Palatino Linotype",Palatino,"Book Antiqua",Georgia,serif;
+    --sans:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    --mono:ui-monospace,"SF Mono","Cascadia Mono",Menlo,Consolas,monospace;
+    --sp:22px;
+  }
+  *{box-sizing:border-box}
+  .wrap{
+    font-family:var(--sans); color:var(--ink); background:var(--paper);
+    background-image:linear-gradient(var(--line2) 1px,transparent 1px),linear-gradient(90deg,var(--line2) 1px,transparent 1px);
+    background-size:26px 26px; background-position:-1px -1px;
+    -webkit-font-smoothing:antialiased; line-height:1.5; min-height:100%;
+  }
+  .sheet{max-width:1120px;margin:0 auto;padding:0 24px 72px}
+  .tnum{font-variant-numeric:tabular-nums}
+  .mono{font-family:var(--mono)}
+
+  /* header */
+  header.top{position:sticky;top:0;z-index:20;background:rgba(241,242,236,.9);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+  .topin{max-width:1120px;margin:0 auto;padding:14px 24px;display:flex;align-items:center;gap:18px;flex-wrap:wrap}
+  .brand{display:flex;align-items:baseline;gap:10px;font-weight:800;letter-spacing:-.02em;font-size:19px}
+  .brand b{font-weight:800}
+  .brand .k{font-family:var(--mono);font-weight:600;font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--accent);border:1px solid var(--accent);border-radius:3px;padding:2px 6px}
+  .stamp{margin-left:auto;font-family:var(--mono);font-size:11px;color:var(--muted);letter-spacing:.02em;text-align:right}
+  .stamp b{color:var(--ink);font-weight:600}
+  .tabs{display:flex;gap:2px;background:var(--panel2);border:1px solid var(--line);border-radius:7px;padding:3px}
+  .tabs button{font-family:var(--sans);font-size:13px;font-weight:600;color:var(--muted);background:none;border:0;padding:6px 14px;border-radius:5px;cursor:pointer}
+  .tabs button[aria-selected="true"]{background:var(--ink);color:var(--paper)}
+  .tabs button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+  /* eyebrow / ticks */
+  .eyebrow{display:flex;align-items:center;gap:12px;margin:40px 0 18px}
+  .eyebrow .lab{font-family:var(--mono);font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);white-space:nowrap}
+  .ruler{flex:1;height:9px;position:relative;opacity:.7}
+  .ruler::before{content:"";position:absolute;left:0;right:0;bottom:0;height:1px;background:var(--line)}
+  .ruler::after{content:"";position:absolute;left:0;right:0;bottom:0;height:9px;background-image:linear-gradient(90deg,var(--line) 1px,transparent 1px);background-size:26px 9px}
+
+  /* ---------- CONTEXTO (voz editorial, serif) ---------- */
+  #contexto{display:none}
+  #contexto.on{display:block}
+  .lede{font-family:var(--serif);max-width:62ch}
+  .lede h1{font-family:var(--serif);font-weight:600;font-size:clamp(30px,4.6vw,46px);line-height:1.08;letter-spacing:-.01em;text-wrap:balance;margin:.2em 0 .5em}
+  .lede h1 em{font-style:italic;color:var(--accent)}
+  .lede p{font-family:var(--serif);font-size:19px;line-height:1.6;color:#2c322c;margin:0 0 18px}
+  .lede .drop::first-letter{font-size:3.1em;line-height:.78;float:left;padding:6px 10px 0 0;font-weight:600;color:var(--accent)}
+  .hard{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin:30px 0 8px}
+  .hard .cell{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:16px}
+  .hard .n{font-family:var(--mono);font-weight:600;font-size:26px;letter-spacing:-.02em}
+  .hard .c{font-family:var(--sans);font-size:12.5px;color:var(--muted);margin-top:3px;line-height:1.35}
+  .personas-lede{margin-top:34px;display:grid;gap:2px;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:var(--line)}
+  .pl-row{display:grid;grid-template-columns:150px 1fr;gap:18px;background:var(--panel);padding:16px 18px;align-items:baseline}
+  .pl-row .who{font-family:var(--serif);font-size:20px;font-weight:600;display:flex;align-items:baseline;gap:9px}
+  .pl-row .who i{width:9px;height:9px;border-radius:50%;display:inline-block;transform:translateY(-1px)}
+  .pl-row .who small{font-family:var(--mono);font-size:10.5px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);font-weight:400}
+  .pl-row p{margin:0;font-family:var(--serif);font-size:16.5px;color:#2c322c;line-height:1.5}
+  .sources{margin-top:28px;font-family:var(--mono);font-size:11.5px;color:var(--muted);line-height:1.9}
+  .sources b{color:var(--ink);letter-spacing:.1em}
+
+  /* ---------- NEGOCIO (voz instrumento) ---------- */
+  #negocio{display:none}
+  #negocio.on{display:block}
+  .neg-head{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin:38px 0 6px}
+  .neg-head h2{font-size:15px;font-weight:700;letter-spacing:.01em;margin:0}
+  .seg{display:flex;gap:2px;background:var(--panel2);border:1px solid var(--line);border-radius:7px;padding:3px;margin-left:auto}
+  .seg button{font-family:var(--mono);font-size:11.5px;font-weight:600;letter-spacing:.02em;color:var(--muted);background:none;border:0;padding:5px 11px;border-radius:5px;cursor:pointer}
+  .seg button[aria-pressed="true"]{background:var(--panel);color:var(--ink);box-shadow:0 0 0 1px var(--line)}
+  .seg button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+  .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin:16px 0 6px}
+  .kpi{background:var(--panel);border:1px solid var(--line);border-radius:9px;padding:15px 16px;position:relative}
+  .kpi .lab{font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+  .kpi .val{font-family:var(--mono);font-weight:600;font-size:27px;letter-spacing:-.02em;margin-top:6px}
+  .kpi .val small{font-size:14px;color:var(--muted);font-weight:600}
+  .kpi .sub{font-size:11.5px;color:var(--muted);margin-top:2px}
+
+  .grid2{display:grid;grid-template-columns:minmax(300px,1fr) minmax(360px,1.35fr);gap:22px;margin-top:22px;align-items:start}
+
+  /* ranking */
+  .rank{display:flex;flex-direction:column;gap:8px}
+  .prow{text-align:left;width:100%;background:var(--panel);border:1px solid var(--line);border-radius:9px;padding:12px 14px;cursor:pointer;display:grid;grid-template-columns:1fr auto;gap:6px 10px;font-family:inherit}
+  .prow:hover{border-color:var(--faint)}
+  .prow[aria-current="true"]{border-color:var(--ink);box-shadow:inset 3px 0 0 var(--pc,var(--ink))}
+  .prow:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+  .prow .nm{font-weight:700;font-size:15px;display:flex;align-items:center;gap:8px}
+  .prow .nm i{width:9px;height:9px;border-radius:2px;background:var(--pc)}
+  .prow .nm small{font-family:var(--mono);font-weight:500;font-size:10.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+  .prow .fac{font-family:var(--mono);font-weight:600;font-size:15px;text-align:right}
+  .prow .shr{font-family:var(--mono);font-size:11px;color:var(--muted);text-align:right}
+  .split{grid-column:1/-1;height:7px;border-radius:4px;overflow:hidden;display:flex;background:var(--line2);margin-top:3px}
+  .split i{height:100%}
+  .split .ml{background:var(--pc)}
+  .split .tn{background:var(--pc);opacity:.4}
+  .legend{display:flex;gap:16px;font-family:var(--mono);font-size:10.5px;color:var(--muted);margin-top:4px;padding-left:2px}
+  .legend span{display:flex;align-items:center;gap:5px}
+  .legend i{width:9px;height:9px;border-radius:2px;background:var(--muted)}
+  .legend i.o{opacity:.4}
+
+  /* detail */
+  .detail{background:var(--panel);border:1px solid var(--line);border-radius:11px;padding:18px 18px 20px;position:sticky;top:74px}
+  .dt-head{display:flex;align-items:flex-start;gap:12px;border-bottom:1px solid var(--line);padding-bottom:14px}
+  .dt-head .dot{width:14px;height:14px;border-radius:3px;background:var(--pc);margin-top:5px;flex:none}
+  .dt-head h3{margin:0;font-size:21px;font-weight:800;letter-spacing:-.01em}
+  .dt-head .tag{font-family:var(--serif);font-style:italic;font-size:15px;color:var(--muted)}
+  .dt-sub{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;background:var(--line);border:1px solid var(--line);border-radius:8px;overflow:hidden;margin:14px 0 6px}
+  .dt-sub div{background:var(--panel);padding:9px 11px}
+  .dt-sub .l{font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+  .dt-sub .v{font-family:var(--mono);font-weight:600;font-size:16px;margin-top:2px}
+
+  .fam-head{display:flex;align-items:center;gap:10px;margin:18px 0 8px}
+  .fam-head .t{font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+  .sortbtns{margin-left:auto;display:flex;gap:2px;background:var(--panel2);border:1px solid var(--line);border-radius:6px;padding:2px}
+  .sortbtns button{font-family:var(--mono);font-size:10.5px;font-weight:600;color:var(--muted);background:none;border:0;padding:4px 9px;border-radius:4px;cursor:pointer}
+  .sortbtns button[aria-pressed="true"]{background:var(--pc);color:#fff}
+  .sortbtns button:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+
+  .fam{border:1px solid var(--line);border-radius:8px;overflow:hidden;margin-bottom:7px;background:var(--panel)}
+  .fam>summary{list-style:none;cursor:pointer;padding:11px 13px;display:grid;grid-template-columns:1fr auto;gap:3px 10px;align-items:center}
+  .fam>summary::-webkit-details-marker{display:none}
+  .fam>summary:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
+  .fam .fn{font-weight:700;font-size:13.5px;display:flex;align-items:center;gap:8px}
+  .fam .fn .chev{font-family:var(--mono);color:var(--muted);font-size:11px;transition:transform .15s}
+  .fam[open] .fn .chev{transform:rotate(90deg)}
+  .fam .fn small{font-family:var(--mono);font-weight:500;color:var(--muted);font-size:10.5px}
+  .fam .ff{font-family:var(--mono);font-weight:600;font-size:14px;text-align:right}
+  .fam .fbar{grid-column:1/-1;height:6px;border-radius:3px;background:var(--line2);overflow:hidden;margin-top:2px}
+  .fam .fbar i{display:block;height:100%;background:var(--pc)}
+  .fam .fmeta{grid-column:1/-1;font-family:var(--mono);font-size:10.5px;color:var(--muted);margin-top:3px;display:flex;gap:14px}
+  .prods{border-top:1px solid var(--line2);background:var(--panel2)}
+  .prod{display:grid;grid-template-columns:1fr repeat(3,auto);gap:6px 12px;padding:9px 13px;border-bottom:1px solid var(--line2);align-items:baseline}
+  .prod:last-child{border-bottom:0}
+  .prod .pn{font-size:12.5px;line-height:1.35}
+  .prod .pn .sku{font-family:var(--mono);font-size:10px;color:var(--muted);letter-spacing:.02em;display:inline-block;border:1px solid var(--line);border-radius:3px;padding:0 4px;margin-left:4px}
+  .prod .m{font-family:var(--mono);font-size:12px;text-align:right;white-space:nowrap}
+  .prod .m .h{font-size:9px;color:var(--faint);text-transform:uppercase;letter-spacing:.08em;display:block}
+  .prod .m.hi{font-weight:700}
+  .prod .colhdr{color:var(--muted)}
+
+  /* complementarios / oportunidades */
+  .xsell{margin-top:18px;border-top:1px dashed var(--line);padding-top:14px}
+  .xs-lab{font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
+  .xs-lab b{color:var(--pc);font-weight:700}
+  .bundle{display:grid;grid-template-columns:1fr auto;gap:4px 10px;align-items:center;padding:8px 11px;border:1px solid var(--line);border-radius:7px;margin-bottom:6px;background:var(--panel2)}
+  .bundle .bx{font-size:12px;line-height:1.35}
+  .bundle .bx .h{color:var(--muted);font-family:var(--mono);font-size:10px;text-transform:uppercase;letter-spacing:.06em}
+  .bundle .bx .s{font-weight:700}
+  .bundle .bx .arw{color:var(--pc);font-weight:700;margin:0 5px}
+  .bundle .cnt{font-family:var(--mono);font-size:10.5px;color:var(--muted);white-space:nowrap;border:1px solid var(--line);border-radius:20px;padding:2px 9px}
+  .chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:2px}
+  .chip{font-size:12px;border:1px dashed var(--pc);color:var(--ink);background:var(--panel2);border-radius:20px;padding:4px 11px}
+  .xs-note{font-family:var(--mono);font-size:10px;color:var(--faint);margin-top:9px;line-height:1.5}
+
+  /* coverage callout */
+  .cov{margin-top:26px;background:var(--panel);border:1px solid var(--line);border-left:4px solid var(--warn);border-radius:10px;padding:18px}
+  .cov h4{margin:0 0 4px;font-size:14px;font-weight:700}
+  .cov p{margin:0 0 12px;font-size:13px;color:var(--muted);max-width:70ch}
+  .cov .un{display:grid;grid-template-columns:repeat(2,1fr);gap:2px;background:var(--line);border:1px solid var(--line);border-radius:8px;overflow:hidden}
+  .cov .u{background:var(--panel);padding:9px 12px;display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+  .cov .u .un-n{font-size:12px;line-height:1.3}
+  .cov .u .un-n .sku{font-family:var(--mono);font-size:10px;color:var(--warn);font-weight:600}
+  .cov .u .un-f{font-family:var(--mono);font-weight:600;font-size:12.5px;white-space:nowrap}
+
+  .foot{margin-top:40px;padding-top:16px;border-top:1px solid var(--line);font-family:var(--mono);font-size:11px;color:var(--muted);line-height:1.7;display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap}
+
+  @media(max-width:860px){
+    .hard,.kpis{grid-template-columns:repeat(2,1fr)}
+    .grid2{grid-template-columns:1fr}
+    .detail{position:static}
+    .pl-row{grid-template-columns:1fr}
+    .stamp{margin-left:0;text-align:left;width:100%;order:5}
+  }
+  @media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <div class="topin">
+      <div class="brand"><span class="k">Naku</span> <b>Tablero de compradores</b></div>
+      <div class="tabs" role="tablist" aria-label="Vista">
+        <button id="tab-contexto" role="tab" aria-selected="false" aria-controls="contexto">Contexto</button>
+        <button id="tab-negocio" role="tab" aria-selected="true" aria-controls="negocio">El negocio</button>
+      </div>
+      <div class="stamp">ventana <b>jun 2025 – jun 2026</b><br>MercadoLibre + TiendaNube · corte 16 jun 2026</div>
+    </div>
+  </header>
+
+  <div class="sheet">
+
+    <!-- ================= CONTEXTO ================= -->
+    <section id="contexto" role="tabpanel" aria-labelledby="tab-contexto">
+      <div class="eyebrow"><span class="lab">Contexto / por qué estos cinco</span><span class="ruler"></span></div>
+      <div class="lede">
+        <h1>El comprador argentino de 2026 es <em>pragmático, cuotero y apurado</em>.</h1>
+        <p class="drop">No compra marcas: compra soluciones a un problema puntual, en cuotas, y quiere que llegue para el finde. NAKU no vende “bazar”: le resuelve la casa, la oficina, el finde afuera y el mostrador. Por eso el catálogo se lee mejor a través de <strong>cinco compradores</strong> que a través de categorías sueltas.</p>
+        <p>Este tablero separa a propósito dos cosas que en el material anterior venían mezcladas: el <strong>contexto</strong> —quiénes son y por qué— vive acá; los <strong>números del negocio</strong> —qué se vende, a quién, por qué canal— viven en la otra pestaña, donde se actualizan solos con cada export.</p>
+      </div>
+
+      <div class="hard">
+        <div class="cell"><div class="n tnum">$4.158 M</div><div class="c">Facturación analizada (14 meses, ambos canales)</div></div>
+        <div class="cell"><div class="n tnum">99.028</div><div class="c">Órdenes procesadas</div></div>
+        <div class="cell"><div class="n tnum">3,1–4,1</div><div class="c">Cuotas promedio según persona</div></div>
+        <div class="cell"><div class="n tnum">91,5%</div><div class="c">De la facturación ya asignada a una persona</div></div>
+      </div>
+
+      <div class="eyebrow"><span class="lab">Los cinco</span><span class="ruler"></span></div>
+      <div class="personas-lede" id="plede"></div>
+
+      <div class="sources">
+        <b>FUENTES</b> &nbsp;·&nbsp; Exports de venta MercadoLibre + Mercado Shops (seller 570069001) &nbsp;·&nbsp; Export de órdenes TiendaNube (nakstuff) &nbsp;·&nbsp; Maestro SKU→comprador de la agencia (209 productos).<br>
+        <b>NOTA</b> &nbsp;·&nbsp; Los shares se calculan sobre la facturación ya asignada. El 8,5% “sin asignar” se detalla en la pestaña del negocio para completarlo.
+      </div>
+    </section>
+
+    <!-- ================= NEGOCIO ================= -->
+    <section id="negocio" class="on" role="tabpanel" aria-labelledby="tab-negocio">
+      <div class="neg-head">
+        <div class="eyebrow" style="margin:38px 0 6px;flex:1"><span class="lab">El negocio / reparto por comprador</span><span class="ruler"></span></div>
+      </div>
+      <div class="neg-head" style="margin-top:6px">
+        <h2>Facturación por comprador</h2>
+        <div class="seg" role="group" aria-label="Canal">
+          <button data-canal="Ambos" aria-pressed="true">Ambos</button>
+          <button data-canal="MercadoLibre" aria-pressed="false">MercadoLibre</button>
+          <button data-canal="TiendaNube" aria-pressed="false">TiendaNube</button>
+        </div>
+      </div>
+
+      <div class="kpis" id="kpis"></div>
+
+      <div class="grid2">
+        <div>
+          <div class="rank" id="rank"></div>
+          <div class="legend"><span><i></i> MercadoLibre</span><span><i class="o"></i> TiendaNube</span><span style="margin-left:auto">clic para ver el detalle →</span></div>
+        </div>
+        <div class="detail" id="detail"></div>
+      </div>
+
+      <div class="eyebrow"><span class="lab">Cobertura del maestro</span><span class="ruler"></span></div>
+      <div class="cov" id="cov"></div>
+
+      <div class="foot">
+        <div>NAKU · tablero de compradores · maqueta v2<br>Números reales calculados por el motor sobre los exports.</div>
+        <div>Ranking por <b>facturación</b> (impacto = unidades × precio).<br>El toggle Facturación/Unidades muestra por qué el volumen engaña.</div>
+      </div>
+    </section>
+  </div>
+</div>
+
+<script>
+const DATA = {"meta":{"ventana":"jun 2025 – jun 2026","updated":"2026-06-16"},"totales":{"facturacion":4157581386,"cobertura":91.5,"ordenes":99028,"ticket":41984},"personas":[{"key":"Juan","facturacion":1426774575,"share":34.3,"ml":1367601509,"tn":59173066,"unidades":36658,"ordenes":33037,"ticket":43189,"cuotas":3.1,"familias":[{"familia":"Móviles con Brazo","facturacion":834141609,"sharePct":58.5,"unidades":23453,"precioProm":35567,"nProd":22,"productos":[{"nombre":"Soporte Articulado Naku SP-446 de Pared Para TV de 32\" a 75\"","sku":"SP-446","facturacion":187195142,"unidades":4727,"precioProm":39601},{"nombre":"Soporte Articulado Naku SH-446 de Pared Para TV de 32\" a 75\"","sku":"SH-446","facturacion":177049284,"unidades":4514,"precioProm":39222},{"nombre":"Soporte Articulado Naku SE-446 de Pared Para TV de 20\" a 75\"","sku":"SE-446","facturacion":128270199,"unidades":4145,"precioProm":30946},{"nombre":"Soporte Articulado Naku SSP-223L de Pared Para TV de 15\" a 55\"","sku":"SSP-223L","facturacion":70658048,"unidades":2330,"precioProm":30325}]},{"familia":"Herramientas y equipamiento","facturacion":263856704,"sharePct":18.5,"unidades":2835,"precioProm":93071,"nProd":6,"productos":[{"nombre":"Escalera Naku ESC-001 de Aluminio Multipropósito 12 Escalones","sku":"ESC-001","facturacion":130410790,"unidades":1472,"precioProm":88594},{"nombre":"Escalera Naku ESC-003 de Aluminio Telescópica 9 Escalones 3,5 m","sku":"ESC-003","facturacion":77233659,"unidades":869,"precioProm":88876},{"nombre":"Escalera Naku ESC-002 de Aluminio Multipropósito 16 Escalones","sku":"ESC-002","facturacion":52566391,"unidades":429,"precioProm":122532},{"nombre":"Escalera Plegable y Compacta de Aluminio 2x4 Peldaños","sku":"ESC-005","facturacion":2284082,"unidades":22,"precioProm":103822}]},{"familia":"Rack y Stand TV","facturacion":116721938,"sharePct":8.2,"unidades":1727,"precioProm":67587,"nProd":3,"productos":[{"nombre":"Rack MTV-001 de Mesa Para TV de 32\" a 75\" con Base de Vidrio","sku":"MTV-001","facturacion":52440147,"unidades":1150,"precioProm":45600},{"nombre":"Rack Pedestal Naku TVR-004 con Ruedas y Estantes","sku":"TVR-004","facturacion":52281840,"unidades":448,"precioProm":116701},{"nombre":"Soporte Rack Naku TVR-001 con Ruedas y Estante","sku":"TVR-001","facturacion":11999951,"unidades":129,"precioProm":93023}]},{"familia":"Seguridad y vigilancia","facturacion":62031534,"sharePct":4.3,"unidades":1138,"precioProm":54509,"nProd":21,"productos":[{"nombre":"Kit x2 Cámara Seguridad Doble Lente WiFi Naku CV-002 Full HD 3MP","sku":"CV-002 X2","facturacion":12716987,"unidades":178,"precioProm":71444},{"nombre":"Kit x3 Cámara Seguridad WiFi Naku CV-001 Full HD 4MP","sku":"CV-001 X3","facturacion":11525168,"unidades":135,"precioProm":85372},{"nombre":"Kit x3 Cámara Seguridad Doble Lente WiFi Naku CV-002 3MP","sku":"CV-002 X3","facturacion":9561749,"unidades":93,"precioProm":102815},{"nombre":"Kit x2 Cámara Seguridad WiFi Naku CV-001 Full HD 4MP","sku":"CV-001 X2","facturacion":7645188,"unidades":135,"precioProm":56631}]},{"familia":"Techo","facturacion":57172472,"sharePct":4,"unidades":1272,"precioProm":44947,"nProd":4,"productos":[{"nombre":"Soporte de Techo Naku PLB-CE344 Para TV de 32\" a 75\"","sku":"PLB-CE344","facturacion":32826492,"unidades":809,"precioProm":40577},{"nombre":"Soporte de Techo Eléctrico Smart para TV hasta 75\"","sku":"ST-466","facturacion":13349249,"unidades":49,"precioProm":272434},{"nombre":"Soporte de Techo Naku S-504A Para TV de 15\" a 48\"","sku":"S-504A","facturacion":7372225,"unidades":305,"precioProm":24171},{"nombre":"Soporte de Techo Naku S-CM244 Rebatible 17\" a 60\"","sku":"S-CM244","facturacion":3624506,"unidades":109,"precioProm":33252}]}]},{"key":"Mariana","facturacion":655590231,"share":15.8,"ml":604534206,"tn":51056025,"unidades":19065,"ordenes":17558,"ticket":37300,"cuotas":3.4,"familias":[{"familia":"Máquinas de coser","facturacion":272193150,"sharePct":41.5,"unidades":7518,"precioProm":36206,"nProd":3,"productos":[{"nombre":"Máquina de Coser MC-002 Mini 12 Puntadas con Pedal y Luz LED","sku":"MC-002","facturacion":247739386,"unidades":6507,"precioProm":38073},{"nombre":"Mini Máquina de Coser Naku MC-001 Portátil 1 Puntada","sku":"MC-001","facturacion":12950791,"unidades":804,"precioProm":16108},{"nombre":"Máquina de Coser Naku MC-003 Profesional 12 Puntadas","sku":"MC-003","facturacion":11502973,"unidades":207,"precioProm":55570}]},{"familia":"Organizadores multiuso","facturacion":208489745,"sharePct":31.8,"unidades":6827,"precioProm":30539,"nProd":14,"productos":[{"nombre":"Carrito Organizador Auxiliar con Ruedas","sku":"ORG-004","facturacion":34964620,"unidades":1666,"precioProm":20987},{"nombre":"Estantería Plegable 5 niveles con Ruedas","sku":"ORG-008","facturacion":29161799,"unidades":446,"precioProm":65385},{"nombre":"Estantería Plegable 3 niveles con Ruedas Naku ORG-006","sku":"ORG-006","facturacion":28888252,"unidades":561,"precioProm":51494},{"nombre":"Carrito Organizador Auxiliar con Ruedas (Blanco)","sku":"ORG-004 BLANCO","facturacion":23492531,"unidades":1154,"precioProm":20357}]},{"familia":"Organización de ropa","facturacion":117673522,"sharePct":17.9,"unidades":3207,"precioProm":36693,"nProd":16,"productos":[{"nombre":"Organizador Zapatero Giratorio Naku ZAP-003 Melamina Blanco","sku":"ZAP-003","facturacion":53113830,"unidades":255,"precioProm":208290},{"nombre":"Perchero Metálico con Zapatero y Doble Barra Naku PER-005","sku":"PER-005","facturacion":10374207,"unidades":294,"precioProm":35286},{"nombre":"Organizador Botas y Zapatos 9 Niveles 27 Pares (Negro)","sku":"ZAP-002","facturacion":9439483,"unidades":485,"precioProm":19463},{"nombre":"Organizador Botas y Zapatos 9 Niveles 27 Pares (Gris)","sku":"ZAP-001","facturacion":9026577,"unidades":495,"precioProm":18236}]},{"familia":"Exterior y aire libre","facturacion":28410489,"sharePct":4.3,"unidades":101,"precioProm":281292,"nProd":4,"productos":[{"nombre":"Cama Elástica Naku CE-03 con Red 3.66m de Diámetro","sku":"CE-3","facturacion":13017315,"unidades":36,"precioProm":361592},{"nombre":"Cama Elástica Naku CE-01 con Red 1.8m de Diámetro","sku":"CE-1","facturacion":9322928,"unidades":48,"precioProm":194228},{"nombre":"Cama Elástica Naku CE-02 con Red 3.05m de Diámetro","sku":"CE-2","facturacion":5731246,"unidades":16,"precioProm":358203}]}]},{"key":"Lucho","facturacion":318216132,"share":7.7,"ml":290714739,"tn":27501393,"unidades":6034,"ordenes":5898,"ticket":53946,"cuotas":2.9,"familias":[{"familia":"Exterior y aire libre","facturacion":268520025,"sharePct":84.4,"unidades":5381,"precioProm":49902,"nProd":24,"productos":[{"nombre":"Mesa Plegable MP-002 para Camping/Playa/Pesca con Bolso","sku":"MP-002","facturacion":77305850,"unidades":2559,"precioProm":30209},{"nombre":"Combo x2 Reposera con Reposapiés + Gazebo + Mesa Chica","sku":"GZB-002 A","facturacion":49901331,"unidades":376,"precioProm":132716},{"nombre":"Mesa Plegable Picnic 180x70 cm","sku":"MP-001","facturacion":46743033,"unidades":862,"precioProm":54226},{"nombre":"Combo x2 Reposera Gravedad Cero + Gazebo + Mesa Chica","sku":"REP-001 x2","facturacion":17093020,"unidades":232,"precioProm":73677}]},{"familia":"Gazebos","facturacion":42249894,"sharePct":13.3,"unidades":351,"precioProm":120370,"nProd":2,"productos":[{"nombre":"Gazebo Naku Rojo 3x3 Plegable con Paredes Impermeable","sku":"GZB-002 R","facturacion":34301636,"unidades":260,"precioProm":131929},{"nombre":"Gazebo Impermeable 3x3 Plegable Sker Rojo","sku":"GZB-001 R","facturacion":7948258,"unidades":91,"precioProm":87343}]},{"familia":"Sombrillas","facturacion":6574309,"sharePct":2.1,"unidades":290,"precioProm":22670,"nProd":2,"productos":[{"nombre":"Sombrilla Sker Som-02 Reclinable 1,9m Reforzada Roja","sku":"SOM-2 R","facturacion":6545810,"unidades":288,"precioProm":22729},{"nombre":"Sombrilla Naku Som-001 Reclinable 1,8m Reforzada Roja","sku":"SOM-1R","facturacion":28499,"unidades":2,"precioProm":14249}]}]},{"key":"Martin","facturacion":1141568912,"share":27.5,"ml":975979876,"tn":165589036,"unidades":21686,"ordenes":19194,"ticket":59576,"cuotas":4.1,"familias":[{"familia":"Soportes de monitor","facturacion":689450450,"sharePct":60.4,"unidades":19336,"precioProm":35656,"nProd":10,"productos":[{"nombre":"Soporte Hidráulico Monitor 13-32\" VESA 75x100","sku":"SS-1032M","facturacion":293703441,"unidades":8960,"precioProm":32779},{"nombre":"Soporte Doble Monitor Hidráulico SS-C024D 13-32\"","sku":"SS-C024D","facturacion":199480483,"unidades":3354,"precioProm":59475},{"nombre":"Soporte Brazo Articulado Naku SM-C012 de Mesa 13-32\"","sku":"SM-C012","facturacion":96428523,"unidades":3805,"precioProm":25343},{"nombre":"Soporte Articulado Naku SM-C024 de Mesa 13-32\"","sku":"SM-C024","facturacion":62251855,"unidades":2128,"precioProm":29254}]},{"familia":"Escritorios ergonómicos","facturacion":428201894,"sharePct":37.5,"unidades":1634,"precioProm":262057,"nProd":17,"productos":[{"nombre":"Escritorio Eléctrico Sit-Stand 135x60 Negro","sku":"22D-BEL NEGRO","facturacion":113276202,"unidades":439,"precioProm":258032},{"nombre":"Escritorio Eléctrico Sit-Stand 135x60 Madera","sku":"22D-BEL MADERA","facturacion":80630635,"unidades":274,"precioProm":294272},{"nombre":"Estructura Eléctrica Regulable 135x60 (sin tabla)","sku":"22D-BEL/ST","facturacion":54659315,"unidades":228,"precioProm":239734},{"nombre":"Escritorio Regulable Manual 135x60 con Manivela Madera","sku":"22D-B MADERA","facturacion":44460435,"unidades":193,"precioProm":230365}]},{"familia":"Soportes de micrófono","facturacion":13583869,"sharePct":1.2,"unidades":315,"precioProm":43123,"nProd":3,"productos":[{"nombre":"Soporte de Pared Naku SB-51 Para Parlantes Pack x2","sku":"SB-51","facturacion":13091542,"unidades":290,"precioProm":45143},{"nombre":"Soporte Articulado Naku S-M1 de Mesa Para Micrófono","sku":"S-M1","facturacion":344103,"unidades":16,"precioProm":21506}]}]},{"key":"Mario","facturacion":261364471,"share":6.3,"ml":254320391,"tn":7044080,"unidades":8644,"ordenes":7888,"ticket":33035,"cuotas":2.9,"familias":[{"familia":"Comercio","facturacion":239567367,"sharePct":91.7,"unidades":8085,"precioProm":29631,"nProd":17,"productos":[{"nombre":"Gaveta Dinero Electrónica CR-001 5 Compartimientos","sku":"CR-001","facturacion":80106155,"unidades":1220,"precioProm":65661},{"nombre":"Selladora Cortadora Naku SB-400 40cm Profesional","sku":"SB-400","facturacion":52617897,"unidades":1729,"precioProm":30433},{"nombre":"Selladora Cortadora SB-200 20cm con Repuesto","sku":"SB-200","facturacion":44843542,"unidades":2683,"precioProm":16714},{"nombre":"Selladora Cortadora SB-300 30cm con Repuesto","sku":"SB-300","facturacion":20448546,"unidades":982,"precioProm":20823}]},{"familia":"Herramientas y equipamiento","facturacion":21797104,"sharePct":8.3,"unidades":559,"precioProm":38993,"nProd":5,"productos":[{"nombre":"Escalera Plegable 4 Peldaños Antideslizante","sku":"ESC-009","facturacion":6304372,"unidades":169,"precioProm":37304},{"nombre":"Escalera Plegable y Compacta de Aluminio 2x5 Peldaños","sku":"ESC-006","facturacion":5990801,"unidades":52,"precioProm":115208},{"nombre":"Escalera Plegable 3 Peldaños Antideslizante","sku":"ESC-008","facturacion":4771722,"unidades":167,"precioProm":28573}]}]}],"sinAsignar":{"facturacion":354067065,"share":8.5,"top":[{"sku":"EARTH 2S","nombre":"Balde Mopa Centrífugo Lampazo Trapeador Escurridor","facturacion":78841319,"lines":4239},{"sku":"EARTH 4S","nombre":"Trapeador Mopa Plana Sker con Balde Escurridor 360°","facturacion":75819476,"lines":4244},{"sku":"S-46B","nombre":"Soporte S-46B Basculante Para TV/Monitor 37-86\"","facturacion":25850833,"lines":1349},{"sku":"VP-001N","nombre":"Proyector Velador Luz Galaxia LED Parlante Negro","facturacion":15234308,"lines":915},{"sku":"VP-001B","nombre":"Proyector Velador Luz Galaxia LED Parlante Blanco","facturacion":14663343,"lines":839},{"sku":"SOM-1 A","nombre":"Sombrilla Som-01 Reclinable 1,8m Reforzada Azul","facturacion":13585391,"lines":600}]}};
+
+const META = {
+  Juan:   {color:'var(--juan)',   tag:'El que resuelve la casa', blurb:'Soportes de TV, escaleras, racks. Entra a arreglar o instalar algo y se va con la solución. Es el #1 en volumen y facturación.'},
+  Martin: {color:'var(--martin)', tag:'El home office',          blurb:'Monitores y escritorios sit-stand. Ergonomía como argumento; el ticket más alto de los cinco. Manda en TiendaNube.'},
+  Lucho:  {color:'var(--lucho)',  tag:'El de afuera',            blurb:'Camping, playa, pesca. Gazebos, reposeras y mesas plegables. Estacional: llega para el finde.'},
+  Mariana:{color:'var(--mariana)',tag:'La que organiza',         blurb:'Máquinas de coser, organizadores, zapateros y perchas. Ordena la casa y el lavadero.'},
+  Mario:  {color:'var(--mario)',  tag:'El del mostrador',        blurb:'Gavetas de dinero, selladoras. No compra para su casa: compra para su comercio.'},
+};
+const PC = {Juan:'#2E6C8C',Martin:'#1F6A5A',Lucho:'#BC6E38',Mariana:'#8B5388',Mario:'#A9832C'};
+
+// Combos naturales (co-compra real en la misma orden — señal baja pero real)
+const XSELL = {
+  Juan:[{h:'Soporte de pared para TV',s:'Soporte de techo para TV',n:6},{h:'Soporte articulado de TV',s:'Organizador plástico multiuso',n:3}],
+  Martin:[{h:'Soporte hidráulico de monitor',s:'Escritorio eléctrico sit-stand',n:9},{h:'Soporte doble de monitor',s:'Escritorio eléctrico sit-stand',n:6}],
+  Mariana:[{h:'Carrito organizador',s:'Perchas de terciopelo',n:8},{h:'Carrito organizador',s:'Balde/mopa de limpieza',n:5}],
+  Lucho:[{h:'Mesa plegable de picnic',s:'Estantería plegable con ruedas',n:2},{h:'Combo asador (mesa + reposera)',s:'Set de limpieza',n:2}],
+  Mario:[{h:'Escalera plegable',s:'Estantería con ruedas',n:2},{h:'Escalera plegable',s:'Carrito organizador',n:2}],
+};
+// "Deberías ofrecerle": sugerencia EDITABLE de la agencia (no sale de los datos)
+const COMPL = {
+  Juan:['Taladro y herramientas eléctricas','Tornillería y fijaciones','Organización de cables (canaletas, HDMI)','Nivel láser'],
+  Martin:['Sillas ergonómicas','Teclado y mouse inalámbrico','Lámpara LED de escritorio','Alfombra/pad de escritorio','Reposapiés'],
+  Mariana:['Cajas y contenedores herméticos','Bolsas de guardado al vacío','Ganchos adhesivos','Etiquetadora'],
+  Lucho:['Conservadora / heladera portátil','Set de mate y termo','Carpa','Farol / linterna de camping'],
+  Mario:['Impresora de tickets','Lector de código de barras','Etiquetadora de precios','Rollos y consumibles'],
+};
+
+const state = {tab:'negocio', canal:'Ambos', persona:'Juan', sort:'facturacion'};
+
+const nf = new Intl.NumberFormat('es-AR');
+function money(n){
+  if(n>=1e9) return '$'+(n/1e6).toLocaleString('es-AR',{maximumFractionDigits:0})+' M';
+  if(n>=1e6) return '$'+(n/1e6).toLocaleString('es-AR',{maximumFractionDigits:1})+' M';
+  return '$'+nf.format(Math.round(n));
+}
+function facFor(p){ return state.canal==='MercadoLibre'?p.ml : state.canal==='TiendaNube'?p.tn : p.facturacion; }
+const UNASSIGNED = {Ambos:354067065, MercadoLibre:346275416, TiendaNube:7791649};
+function canalTotal(){ return DATA.personas.reduce((a,p)=>a+facFor(p),0) + UNASSIGNED[state.canal]; }
+
+// ---- Contexto: personas lede
+function renderLede(){
+  document.getElementById('plede').innerHTML = DATA.personas.map(p=>{
+    const m=META[p.key];
+    return `<div class="pl-row"><div class="who"><i style="background:${PC[p.key]}"></i>${p.key}<small>${m.tag}</small></div><p>${m.blurb}</p></div>`;
+  }).join('');
+}
+
+// ---- KPIs
+function renderKPIs(){
+  const ps=DATA.personas;
+  const total = canalTotal();
+  const ord = DATA.totales.ordenes;
+  const lead = [...ps].sort((a,b)=>facFor(b)-facFor(a))[0];
+  const canalLbl = state.canal==='Ambos'?'ambos canales':state.canal;
+  document.getElementById('kpis').innerHTML = `
+    <div class="kpi"><div class="lab">Facturación</div><div class="val tnum">${money(total)}</div><div class="sub">${canalLbl} · 14 meses</div></div>
+    <div class="kpi"><div class="lab">Comprador #1</div><div class="val tnum" style="color:${PC[lead.key]}">${lead.key}</div><div class="sub">${(100*facFor(lead)/total).toFixed(1)}% de la facturación</div></div>
+    <div class="kpi"><div class="lab">Cobertura maestro</div><div class="val tnum">91,5<small>%</small></div><div class="sub">8,5% sin asignar ↓</div></div>
+    <div class="kpi"><div class="lab">Órdenes</div><div class="val tnum">${nf.format(ord)}</div><div class="sub">ticket prom. ${money(DATA.totales.ticket)}</div></div>`;
+}
+
+// ---- Ranking
+function renderRank(){
+  const ps=[...DATA.personas].sort((a,b)=>facFor(b)-facFor(a));
+  const totAsig = canalTotal();
+  document.getElementById('rank').innerHTML = ps.map(p=>{
+    const f=facFor(p), pc=PC[p.key], sh=(100*f/totAsig).toFixed(1);
+    const mlp = p.facturacion? 100*p.ml/(p.ml+p.tn):0;
+    const splitHtml = state.canal==='Ambos'
+      ? `<div class="split"><i class="ml" style="width:${mlp}%;background:${pc}"></i><i class="tn" style="width:${100-mlp}%;background:${pc}"></i></div>` : '';
+    return `<button class="prow" data-p="${p.key}" style="--pc:${pc}" aria-current="${state.persona===p.key}">
+      <div class="nm"><i></i>${p.key} <small>${META[p.key].tag}</small></div>
+      <div class="fac tnum">${money(f)}</div>
+      <div class="shr tnum">${sh}%</div>
+      ${splitHtml}
+    </button>`;
+  }).join('');
+  document.querySelectorAll('.prow').forEach(b=>b.addEventListener('click',()=>{state.persona=b.dataset.p;renderRank();renderDetail();}));
+}
+
+// ---- Detail
+function renderDetail(){
+  const p=DATA.personas.find(x=>x.key===state.persona), pc=PC[p.key], m=META[p.key];
+  const fams=[...p.familias].sort((a,b)=>b.facturacion-a.facturacion);
+  const maxFam=fams[0].facturacion;
+  const famHtml=fams.map((f,i)=>{
+    const prods=[...f.productos].sort((a,b)=>state.sort==='unidades'?b.unidades-a.unidades:b.facturacion-a.facturacion);
+    const rows=prods.map(pr=>`<div class="prod">
+        <div class="pn">${pr.nombre}<span class="sku">${pr.sku}</span></div>
+        <div class="m ${state.sort==='unidades'?'hi':''}"><span class="h">unid.</span>${nf.format(pr.unidades)}</div>
+        <div class="m"><span class="h">precio</span>${money(pr.precioProm)}</div>
+        <div class="m ${state.sort==='facturacion'?'hi':''}"><span class="h">factura</span>${money(pr.facturacion)}</div>
+      </div>`).join('');
+    const extra=f.nProd>f.productos.length?`<div class="prod"><div class="pn" style="color:var(--muted)">+ ${f.nProd-f.productos.length} productos más en esta familia</div><div></div><div></div><div></div></div>`:'';
+    return `<details class="fam" ${i===0?'open':''} style="--pc:${pc}">
+      <summary>
+        <div class="fn"><span class="chev">›</span>${f.familia} <small>· ${f.nProd} SKU</small></div>
+        <div class="ff tnum">${money(f.facturacion)}</div>
+        <div class="fbar"><i style="width:${100*f.facturacion/maxFam}%"></i></div>
+        <div class="fmeta"><span>${f.sharePct}% de ${p.key}</span><span>${nf.format(f.unidades)} u</span><span>precio prom. ${money(f.precioProm)}</span></div>
+      </summary>
+      <div class="prods"><div class="prod colhdr"><div class="pn" style="font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)">Producto</div><div class="m"></div><div class="m"></div><div class="m"></div></div>${rows}${extra}</div>
+    </details>`;
+  }).join('');
+
+  document.getElementById('detail').style.setProperty('--pc',pc);
+  document.getElementById('detail').innerHTML = `
+    <div class="dt-head"><span class="dot"></span><div><h3>${p.key}</h3><div class="tag">${m.tag}</div></div></div>
+    <div class="dt-sub">
+      <div><div class="l">Facturación</div><div class="v">${money(p.facturacion)}</div></div>
+      <div><div class="l">Ticket prom.</div><div class="v">${money(p.ticket)}</div></div>
+      <div><div class="l">Cuotas prom.</div><div class="v">${p.cuotas.toString().replace('.',',')}</div></div>
+      <div><div class="l">Unidades</div><div class="v">${nf.format(p.unidades)}</div></div>
+      <div><div class="l">Órdenes</div><div class="v">${nf.format(p.ordenes)}</div></div>
+      <div><div class="l">ML / TN</div><div class="v" style="font-size:12.5px">${money(p.ml)} · ${money(p.tn)}</div></div>
+    </div>
+    <div class="fam-head"><span class="t">Top familias · clic para abrir</span>
+      <div class="sortbtns" role="group" aria-label="Ordenar productos" style="--pc:${pc}">
+        <button data-sort="facturacion" aria-pressed="${state.sort==='facturacion'}">Facturación</button>
+        <button data-sort="unidades" aria-pressed="${state.sort==='unidades'}">Unidades</button>
+      </div>
+    </div>
+    ${famHtml}
+    <p style="font-family:var(--mono);font-size:10.5px;color:var(--muted);margin:10px 2px 0;line-height:1.5">El ranking ordena por <b>facturación</b> (impacto). Cambiá a <b>Unidades</b> y mirá cómo se reordena: los productos de mucho volumen y poco precio suben, pero no son los que más facturan.</p>
+    <div class="xsell">
+      <div class="xs-lab">Complementarios para <b>${p.key}</b> · qué más ofrecerle</div>
+      ${(XSELL[p.key]||[]).map(x=>`<div class="bundle"><div class="bx"><span class="h">compra</span> ${x.s ? `${x.h} <span class="arw">→</span> <span class="s">${x.s}</span>`:x.h}</div><div class="cnt">${x.n}× juntos</div></div>`).join('')}
+      <div class="xs-lab" style="margin-top:13px">Deberías ofrecerle <span style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--faint)">· hace a su perfil, hoy no lo vende</span></div>
+      <div class="chips">${(COMPL[p.key]||[]).map(c=>`<span class="chip">${c}</span>`).join('')}</div>
+      <div class="xs-note">Combos naturales = productos comprados en la misma orden (señal real, baja). “Deberías ofrecerle” = sugerencia editable de la agencia, no sale de los datos de venta.</div>
+    </div>`;
+
+  document.querySelectorAll('.sortbtns button').forEach(b=>b.addEventListener('click',()=>{state.sort=b.dataset.sort;renderDetail();}));
+}
+
+// ---- Coverage
+function renderCov(){
+  const s=DATA.sinAsignar;
+  document.getElementById('cov').innerHTML = `
+    <h4>Cobertura ${DATA.totales.cobertura}% — faltan ${money(s.facturacion)} por asignar (${s.share}%)</h4>
+    <p>Estos SKU se vendieron pero todavía no están mapeados a un comprador en el maestro. No se descartan: caen en “Sin asignar” para que el total cuadre. Ordenados por lo que más facturan — completá estos primero y el share sube. (Ej.: los baldes/mopas <b>EARTH</b> son claramente de Mariana.)</p>
+    <div class="un">${s.top.map(u=>`<div class="u"><div class="un-n">${u.nombre}<br><span class="sku">${u.sku}</span> · ${nf.format(u.lines)} ventas</div><div class="un-f">${money(u.facturacion)}</div></div>`).join('')}</div>`;
+}
+
+// ---- tabs & canal
+function setTab(t){
+  state.tab=t;
+  document.getElementById('tab-contexto').setAttribute('aria-selected',t==='contexto');
+  document.getElementById('tab-negocio').setAttribute('aria-selected',t==='negocio');
+  document.getElementById('contexto').classList.toggle('on',t==='contexto');
+  document.getElementById('negocio').classList.toggle('on',t==='negocio');
+}
+document.getElementById('tab-contexto').addEventListener('click',()=>setTab('contexto'));
+document.getElementById('tab-negocio').addEventListener('click',()=>setTab('negocio'));
+document.querySelectorAll('.seg button').forEach(b=>b.addEventListener('click',()=>{
+  state.canal=b.dataset.canal;
+  document.querySelectorAll('.seg button').forEach(x=>x.setAttribute('aria-pressed',x===b));
+  renderKPIs();renderRank();
+}));
+
+renderLede();renderKPIs();renderRank();renderDetail();renderCov();
+</script>

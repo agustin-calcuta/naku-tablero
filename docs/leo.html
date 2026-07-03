@@ -1,0 +1,1021 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NAKU · Los 5 Personajes que nos compran</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root{--naku:#084AD6;--naku-l:#E8EFFC;--naku-d:#052E85;--naku-s:#F4F7FE;--bg:#FAFAFA;--w:#fff;--t:#0A0A0A;--tm:#5B6573;--ts:#9CA3AF;--b:#E5E7EB;--bs:#F0F1F4;--wm:#FF6B35;--gn:#10B981;--yl:#F59E0B;--rd:#EF4444}
+*{box-sizing:border-box;margin:0;padding:0}html{scroll-behavior:smooth}
+body{font-family:'Inter',-apple-system,sans-serif;background:var(--bg);color:var(--t);line-height:1.55;-webkit-font-smoothing:antialiased}
+.c{max-width:1280px;margin:0 auto;padding:0 32px}
+.hero{background:var(--w);padding:80px 0 60px;position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;top:-100px;right:-100px;width:400px;height:400px;background:radial-gradient(circle,var(--naku-l) 0%,transparent 70%);z-index:0}
+.hg{display:grid;grid-template-columns:1.2fr 1fr;gap:60px;align-items:center;position:relative;z-index:1}
+.logo{display:inline-flex;align-items:center;gap:8px;margin-bottom:24px;font-weight:900;font-size:22px;letter-spacing:-0.02em}
+.lm{width:30px;height:30px;background:var(--naku);border-radius:50%;position:relative}
+.lm::after{content:'';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:14px;height:14px;background:var(--w);border-radius:50%}
+.eb{display:inline-block;font-size:12px;font-weight:700;letter-spacing:1.5px;color:var(--naku);text-transform:uppercase;margin-bottom:16px;padding:6px 12px;background:var(--naku-l);border-radius:999px}
+.hero h1{font-size:60px;font-weight:900;line-height:1.02;letter-spacing:-0.025em;margin-bottom:28px}
+.hero h1 .bl{color:var(--naku)}
+.hero h1 em{font-style:normal;background:linear-gradient(180deg,transparent 60%,#FEF3C7 60%);padding:0 4px}
+.hs{font-size:19px;color:var(--tm);line-height:1.6;margin-bottom:32px}
+.hm{display:flex;flex-wrap:wrap;gap:20px;font-size:13px;color:var(--tm);font-weight:500}
+.hm span{display:inline-flex;align-items:center;gap:8px;background:var(--bg);padding:8px 16px;border-radius:999px;border:1px solid var(--bs)}
+.pc{background:linear-gradient(135deg,var(--naku) 0%,var(--naku-d) 100%);color:var(--w);padding:44px;border-radius:28px;position:relative;overflow:hidden}
+.pc::before{content:'"';position:absolute;top:-40px;right:20px;font-size:240px;font-weight:900;opacity:.1;line-height:1}
+.pl{font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;opacity:.7;margin-bottom:18px}
+.pq{font-size:22px;font-weight:600;line-height:1.4;margin-bottom:18px;position:relative;z-index:2}
+.pt{font-size:14px;opacity:.85;position:relative;z-index:2;padding-top:18px;border-top:1px solid rgba(255,255,255,.15)}
+.s{padding:80px 0}.s.a{background:var(--w)}
+.sh{margin-bottom:48px;max-width:800px}
+.se{display:inline-block;font-size:11px;font-weight:700;letter-spacing:2px;color:var(--naku);text-transform:uppercase;margin-bottom:14px;padding:5px 12px;background:var(--naku-l);border-radius:999px}
+.s h2{font-size:42px;font-weight:800;line-height:1.1;letter-spacing:-0.02em;margin-bottom:16px}
+.s h2 em{font-style:normal;color:var(--naku)}
+.si{font-size:18px;color:var(--tm);line-height:1.6}
+.mg{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:20px}
+.k{background:var(--w);border:1px solid var(--b);border-radius:18px;padding:26px;transition:all .2s}
+.k:hover{border-color:var(--naku);transform:translateY(-2px);box-shadow:0 12px 24px rgba(8,74,214,.06)}
+.ke{font-size:22px;margin-bottom:8px}
+.kl{font-size:11px;font-weight:700;letter-spacing:1px;color:var(--ts);text-transform:uppercase;margin-bottom:10px}
+.kv{font-size:38px;font-weight:800;letter-spacing:-0.025em;margin-bottom:8px;color:var(--naku);line-height:1}
+.kv.r{color:var(--rd)}.kv.g{color:var(--gn)}.kv.w{color:var(--wm)}.kv.d{color:var(--t)}
+.kd{font-size:13px;color:var(--tm);line-height:1.45}
+.kp{display:inline-block;font-size:11px;font-weight:600;padding:3px 10px;border-radius:999px;margin-top:10px}
+.kp.dg{background:#FEE2E2;color:#991B1B}.kp.sc{background:#D1FAE5;color:#065F46}.kp.wn{background:#FEF3C7;color:#92400E}.kp.in{background:var(--naku-l);color:var(--naku)}
+.ins{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:40px}
+.in{background:var(--w);border-radius:18px;padding:28px;border:1px solid var(--b);position:relative;transition:all .2s}
+.in:hover{border-color:var(--naku)}
+.inn{position:absolute;top:24px;right:24px;font-size:50px;font-weight:900;color:var(--naku-l);line-height:1;letter-spacing:-0.05em}
+.ii{font-size:28px;margin-bottom:12px}
+.in h4{font-size:17px;font-weight:700;margin-bottom:10px;letter-spacing:-0.01em;position:relative;z-index:2;max-width:80%}
+.in p{font-size:14px;color:var(--tm);line-height:1.6;position:relative;z-index:2}
+.bc{display:grid;grid-template-columns:repeat(5,1fr);gap:16px;margin-bottom:32px}
+@media(max-width:1100px){.bc{grid-template-columns:repeat(2,1fr)}}
+.bm{background:var(--w);border:2px solid var(--b);border-radius:20px;padding:28px 20px;text-align:center;cursor:pointer;transition:all .25s;position:relative;overflow:hidden}
+.bm:hover{border-color:var(--naku);transform:translateY(-4px);box-shadow:0 16px 32px rgba(8,74,214,.1)}
+.bme{font-size:56px;margin-bottom:12px;line-height:1}
+.bmn{font-size:20px;font-weight:800;letter-spacing:-0.01em;margin-bottom:4px}
+.bmt{font-size:12px;color:var(--tm);margin-bottom:18px;min-height:32px}
+.bms{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding-top:16px;border-top:1px solid var(--bs)}
+.bmst{text-align:center}
+.bmsv{font-size:18px;font-weight:800;color:var(--naku);display:block}
+.bmsl{font-size:10px;color:var(--ts);text-transform:uppercase;letter-spacing:.5px;font-weight:600;margin-top:2px;display:block}
+.bmc{display:inline-block;font-size:12px;font-weight:600;color:var(--naku);margin-top:16px;padding-top:14px;border-top:1px solid var(--bs);width:100%}
+.ct{background:var(--w);border:1px solid var(--b);border-radius:20px;overflow:hidden}
+.cr{display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr 1fr 1fr;gap:16px;padding:20px 28px;align-items:center;border-bottom:1px solid var(--bs);font-size:14px}
+.cr:last-child{border-bottom:none}
+.cr.h{background:var(--t);color:var(--w);font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase}
+.cn{display:flex;align-items:center;gap:12px;font-weight:700}
+.cem{font-size:24px}
+.cv{font-weight:700;font-size:16px}
+.cv small{display:block;font-size:11px;font-weight:500;color:var(--ts);margin-top:2px}
+.bar{background:var(--bs);height:6px;border-radius:3px;overflow:hidden;margin-top:6px}
+.bf{background:var(--naku);height:100%}
+.bn{position:sticky;top:0;background:rgba(250,250,250,.96);backdrop-filter:blur(12px);z-index:100;padding:14px 0;border-bottom:1px solid var(--b)}
+.bt{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none}.bt::-webkit-scrollbar{display:none}
+.bta{padding:10px 18px;background:var(--w);border:1px solid var(--b);border-radius:999px;font-size:13px;font-weight:600;color:var(--tm);white-space:nowrap;cursor:pointer;transition:all .15s;display:inline-flex;align-items:center;gap:8px}
+.bta:hover{border-color:var(--naku);color:var(--naku)}
+.bta.ac{background:var(--naku);border-color:var(--naku);color:var(--w)}
+.bte{font-size:18px}
+.bd{display:none;animation:si .35s ease}.bd.ac{display:block}
+@keyframes si{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+.bh{display:grid;grid-template-columns:1fr 1.3fr;gap:36px;margin-bottom:48px;align-items:stretch}
+.bca{background:linear-gradient(160deg,var(--naku) 0%,var(--naku-d) 100%);color:var(--w);border-radius:28px;padding:40px;text-align:center;position:relative;overflow:hidden}
+.bca::before{content:'';position:absolute;top:-100px;right:-100px;width:300px;height:300px;background:radial-gradient(circle,rgba(255,255,255,.1) 0%,transparent 60%)}
+.bcae{font-size:100px;line-height:1;margin-bottom:16px;position:relative;z-index:2}
+.bcan{font-size:38px;font-weight:900;letter-spacing:-0.02em;margin-bottom:6px;position:relative;z-index:2}
+.bcat{font-size:14px;opacity:.8;margin-bottom:28px;font-weight:500;position:relative;z-index:2}
+.bcq{font-size:17px;font-weight:600;font-style:italic;margin-bottom:28px;padding:16px;background:rgba(255,255,255,.1);border-radius:12px;position:relative;z-index:2;line-height:1.4}
+.bcs{display:grid;grid-template-columns:1fr 1fr;gap:16px;text-align:left;padding-top:24px;border-top:1px solid rgba(255,255,255,.15);position:relative;z-index:2}
+.bcsl{font-size:10px;opacity:.7;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;font-weight:600}
+.bcsv{font-size:15px;font-weight:700}
+.bk{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.bki{background:var(--w);border:1px solid var(--b);border-radius:18px;padding:22px;display:flex;flex-direction:column;justify-content:space-between}
+.bkl{font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--ts);margin-bottom:8px}
+.bkv{font-size:34px;font-weight:800;letter-spacing:-0.025em;line-height:1;margin-bottom:6px}
+.bkv.b{color:var(--naku)}.bkv.w{color:var(--wm)}.bkv.r{color:var(--rd)}.bkv.g{color:var(--gn)}
+.bkd{font-size:12px;color:var(--tm);line-height:1.4}
+.cc{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px}
+.ch{background:var(--bg);padding:10px 14px;border-radius:10px;border-left:3px solid var(--naku)}
+.chl{font-size:10px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--ts);margin-bottom:2px}
+.chv{font-size:16px;font-weight:700}
+.eh{margin:48px 0 24px}
+.et{font-size:28px;font-weight:800;letter-spacing:-0.015em;margin-bottom:6px}
+.es{font-size:15px;color:var(--tm)}
+.eg{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.ec{background:var(--w);border:1px solid var(--b);border-radius:18px;padding:28px;transition:all .2s}
+.ec:hover{border-color:var(--naku);box-shadow:0 8px 24px rgba(8,74,214,.06)}
+.ech{display:flex;align-items:center;gap:14px;margin-bottom:18px}
+.ei{width:48px;height:48px;border-radius:12px;background:var(--naku-l);display:flex;align-items:center;justify-content:center;font-size:24px}
+.ecl{font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--naku);margin-bottom:2px}
+.ecq{font-size:18px;font-weight:700;letter-spacing:-0.005em;color:var(--t)}
+.el{list-style:none;display:flex;flex-direction:column;gap:10px}
+.el li{font-size:14px;line-height:1.55;padding-left:18px;position:relative}
+.el li::before{content:'';position:absolute;left:0;top:9px;width:6px;height:6px;border-radius:50%;background:var(--naku)}
+.el li strong{font-weight:700}
+.qb{background:var(--naku-l);border-radius:12px;padding:14px 18px;margin-top:16px;font-style:italic;font-size:14px;color:var(--naku-d);font-weight:500;border-left:3px solid var(--naku);line-height:1.5}
+.ec.pn{background:#FFF7F7;border-color:#FECACA}
+.ec.pn .ei{background:#FECACA}.ec.pn .ecl{color:#991B1B}.ec.pn .el li::before{background:var(--rd)}
+.ec.gn{background:#F7FDF9;border-color:#BBF7D0}
+.ec.gn .ei{background:#BBF7D0}.ec.gn .ecl{color:#065F46}.ec.gn .el li::before{background:var(--gn)}
+.sb{background:var(--naku-s);border-radius:24px;padding:36px;margin-bottom:48px}
+.sbt{font-size:24px;font-weight:800;margin-bottom:8px;letter-spacing:-0.01em}
+.sbs{font-size:14px;color:var(--tm);margin-bottom:24px}
+.sg{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.sc{background:var(--w);border-radius:16px;padding:24px;border:1px solid var(--b)}
+.sct{display:inline-block;font-size:11px;font-weight:700;padding:4px 10px;background:var(--naku);color:var(--w);border-radius:999px;margin-bottom:12px;letter-spacing:.5px}
+.sc h5{font-size:18px;font-weight:700;margin-bottom:8px;letter-spacing:-0.005em}
+.sc p{font-size:13px;color:var(--tm);line-height:1.5}
+.dg{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
+.dg.th{grid-template-columns:repeat(3,1fr)}
+.dc{background:var(--w);border:1px solid var(--b);border-radius:18px;padding:28px}
+.dch{display:flex;align-items:center;gap:10px;margin-bottom:18px}
+.dce{font-size:22px}
+.dcl{font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--naku)}
+.dc h4{font-size:17px;font-weight:700;margin-bottom:12px;letter-spacing:-0.005em}
+.dc p{font-size:14px;color:var(--tm);line-height:1.55}
+.sl{list-style:none;display:flex;flex-direction:column;gap:8px}
+.sli{display:grid;grid-template-columns:1fr auto auto;gap:12px;padding:12px 14px;background:var(--bg);border-radius:10px;border:1px solid var(--bs);font-size:13px;align-items:center}
+.skc{font-family:'SF Mono',Monaco,monospace;font-weight:700;font-size:12px;background:var(--naku);color:var(--w);padding:3px 8px;border-radius:6px;letter-spacing:.5px}
+.skn{color:var(--t);font-weight:500}
+.sku{font-weight:700;color:var(--naku);font-size:13px}
+.skp{font-weight:600;color:var(--tm);font-size:12px}
+.hc{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;align-items:end;height:100px;margin-top:14px}
+.hco{display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%}
+.hb{width:80%;background:var(--naku);border-radius:4px 4px 0 0;min-height:4px}
+.hb.pk{background:var(--wm)}
+.hl{font-size:9px;color:var(--ts);margin-top:4px;font-weight:600;text-align:center;line-height:1.1}
+.se2{display:grid;grid-template-columns:repeat(12,1fr);gap:3px;align-items:end;height:80px;margin-top:12px}
+.seo{display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%}
+.sba{width:80%;background:var(--b);border-radius:3px 3px 0 0;min-height:4px}
+.sba.md{background:var(--naku-l)}.sba.hi{background:var(--naku)}.sba.pk{background:var(--wm)}
+.sel{font-size:9px;color:var(--ts);margin-top:4px;font-weight:600;text-transform:uppercase}
+.gl{list-style:none;display:flex;flex-direction:column;gap:8px}
+.gi{display:grid;grid-template-columns:auto 1fr auto;gap:12px;align-items:center;padding:10px 14px;background:var(--bg);border-radius:10px;font-size:13px}
+.gr{font-weight:800;color:var(--naku);font-size:16px;min-width:24px}
+.gn{font-weight:600}
+.gp{font-weight:700;color:var(--tm);font-size:12px}
+.cp{display:grid;grid-template-columns:1fr auto 1fr auto;gap:12px;align-items:center;padding:14px 18px;background:var(--bg);border-radius:12px;margin-bottom:8px}
+.cp .skc{text-align:center}
+.car{font-size:16px;color:var(--naku);font-weight:700}
+.cco{background:var(--naku-l);color:var(--naku-d);padding:4px 12px;border-radius:999px;font-size:12px;font-weight:700}
+.st{background:linear-gradient(135deg,var(--naku) 0%,var(--naku-d) 100%);color:var(--w);padding:44px;border-radius:24px;margin:32px 0;position:relative;overflow:hidden}
+.st::before{content:'⚡';position:absolute;top:30px;right:30px;font-size:100px;opacity:.08;line-height:1}
+.stl{display:inline-block;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;opacity:.8;margin-bottom:14px;padding:5px 12px;background:rgba(255,255,255,.15);border-radius:999px}
+.st h3{font-size:28px;font-weight:800;line-height:1.2;letter-spacing:-0.015em;margin-bottom:16px;max-width:800px;position:relative;z-index:2}
+.st p{font-size:16px;opacity:.9;line-height:1.6;max-width:750px;position:relative;z-index:2}
+.np{background:linear-gradient(135deg,#FEF3C7 0%,#FED7AA 100%);border-radius:24px;padding:36px;margin-bottom:24px}
+.npl{font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#92400E;margin-bottom:8px}
+.np h4{font-size:24px;font-weight:800;margin-bottom:8px;letter-spacing:-0.01em;color:#78350F}
+.npd{font-size:14px;color:#78350F;margin-bottom:20px;opacity:.85}
+.npg{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+@media(max-width:900px){.npg{grid-template-columns:1fr}}
+.npi{background:var(--w);padding:12px 16px;border-radius:10px;font-size:13px;font-weight:500;display:flex;align-items:center;gap:8px}
+.npe{font-size:16px}
+.ft{background:var(--t);color:var(--w);padding:60px 0 36px}
+.ft h3{font-size:13px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:18px;opacity:.5}
+.fg{display:grid;grid-template-columns:2fr 1fr 1fr;gap:60px;margin-bottom:36px}
+.ft ul{list-style:none;display:flex;flex-direction:column;gap:8px;font-size:13px;opacity:.7;line-height:1.5}
+.ft ul li{padding-left:14px;position:relative}
+.ft ul li::before{content:'·';position:absolute;left:0;font-weight:700;opacity:.6}
+.fl{font-size:28px;font-weight:900;letter-spacing:-0.02em;margin-bottom:14px;display:flex;align-items:center;gap:10px}
+.fl .mk{width:28px;height:28px;background:var(--naku);border-radius:50%;position:relative}
+.fl .mk::after{content:'';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:13px;height:13px;background:var(--t);border-radius:50%}
+.fb{border-top:1px solid rgba(255,255,255,.1);padding-top:24px;font-size:12px;opacity:.5;display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px}
+.ft p{font-size:14px;opacity:.7;line-height:1.6;max-width:380px}
+.hb2{background:linear-gradient(135deg,#FEF3C7 0%,#FDE68A 100%);border-left:4px solid var(--wm);padding:20px 24px;border-radius:0 14px 14px 0;margin:16px 0;font-size:14px;color:#78350F;line-height:1.55}
+.hb2 strong{color:#78350F;font-weight:700}
+.sh1{display:flex;flex-direction:column;gap:10px;margin-top:12px}
+.sh1 div{display:flex;justify-content:space-between;padding:10px 14px;background:var(--bg);border-radius:10px}
+.sh1 span:first-child{font-weight:600}
+.sh1 span:last-child{font-weight:700;color:var(--naku)}
+.ca{border:1px solid var(--bs);border-radius:12px;margin-bottom:8px;background:var(--w);overflow:hidden;transition:all .2s}
+.ca:hover{border-color:var(--naku)}
+.ca.op{border-color:var(--naku);box-shadow:0 4px 12px rgba(8,74,214,.06)}
+.cah{display:flex;align-items:center;gap:12px;padding:14px 16px;cursor:pointer;user-select:none;transition:background .15s}
+.cah:hover{background:var(--naku-s)}
+.cae{font-size:22px;line-height:1;flex-shrink:0}
+.cai{flex:1;min-width:0}
+.can{font-size:14px;font-weight:700;letter-spacing:-0.005em;color:var(--t);margin-bottom:2px}
+.cam{font-size:11px;color:var(--tm);font-weight:500}
+.car2{font-size:10px;color:var(--naku);transition:transform .2s;flex-shrink:0}
+.ca.op .car2{transform:rotate(180deg)}
+.cab{max-height:0;overflow:hidden;transition:max-height .3s ease,padding .3s ease}
+.ca.op .cab{max-height:400px;padding:0 12px 14px}
+.cab .sli{background:var(--naku-s)}
+@media(max-width:900px){.c{padding:0 20px}.hg,.bh,.fg{grid-template-columns:1fr;gap:32px}.hero h1{font-size:38px}.s h2{font-size:30px}.mg,.ins,.eg,.dg,.sg{grid-template-columns:1fr}.cr{grid-template-columns:1fr 1fr;padding:16px 20px;gap:8px}.cr.h{display:none}.bcae{font-size:70px}.bcan{font-size:30px}.se2,.hc{grid-template-columns:repeat(6,1fr)}}
+</style>
+</head>
+<body>
+<section class="hero"><div class="c">
+<div class="logo"><span class="lm"></span>NAKU</div>
+<div class="hg"><div>
+<span class="eb">👥 Buyer Personas · Argentina 2026</span>
+<h1>Los <span class="bl">5 personajes</span> que <em>nos compran</em>.</h1>
+<p class="hs">Un mapa de empatía completo cruzando <strong>89.617 ventas de Mercado Libre</strong> + <strong>2.390 de Tienda Nube</strong> (mayo 2025 – junio 2026) con el contexto político, económico y social de Argentina 2026.</p>
+<div class="hm"><span>📊 92.007 ventas</span><span>🛒 ML + TN</span><span>🇦🇷 Argentina 2026</span><span>📅 Junio 2026</span></div>
+</div><div class="pc"><div class="pl">✨ Propósito NAKU</div>
+<div class="pq">"Cosas accesorias pero necesarias. Compras puntuales que simplifican la vida. Lo práctico no debería ser complicado."</div>
+<div class="pt">Todas las cosas que hacen tu vida más fácil y práctica en un solo lugar, simple y confiable.</div>
+</div></div></div></section>
+
+<section class="s a"><div class="c">
+<div class="sh"><span class="se">🇦🇷 Contexto macro</span>
+<h2>El argentino de 2026 es <em>pragmático, infiel y endeudado</em>.</h2>
+<p class="si">La macro mejora (inflación baja, dólar estable) pero el bolsillo sigue golpeado. El consumidor compra distinto, no menos: canastas chicas, comparación quirúrgica de precios y "triple infidelidad" — al canal, a la marca y al origen.</p></div>
+
+<div class="mg">
+<div class="k"><div class="ke">📉</div><div class="kl">Inflación interanual</div><div class="kv g">33,2%</div><div class="kd">Mayo 2026 · acumulado 14,7% en 5 meses · REM dic: 30,5%</div><span class="kp sc">↓ vs 2024</span></div>
+<div class="k"><div class="ke">📊</div><div class="kl">Pobreza (INDEC)</div><div class="kv w">28,2%</div><div class="kd">2do sem 2025 · La más baja desde 2018 · UCA ~36%</div><span class="kp sc">↓ desde 53%</span></div>
+<div class="k"><div class="ke">💸</div><div class="kl">Salario real (SMVM)</div><div class="kv r">–39%</div><div class="kd">Pérdida acumulada desde nov 2023 · Bajo nivel 2001</div><span class="kp dg">↓ doloroso</span></div>
+<div class="k"><div class="ke">💳</div><div class="kl">Mora en tarjetas</div><div class="kv r">11,7%</div><div class="kd">Máximo en 20 años · Familias 11,5% (vs 2,9% un año antes)</div><span class="kp dg">↑ alarmante</span></div>
+</div>
+
+<div class="mg">
+<div class="k"><div class="ke">🛒</div><div class="kl">E-commerce 2025</div><div class="kv">+55%</div><div class="kd">$34.033 M · 25,1M compradores · ticket $134.519</div><span class="kp in">↑ vs inflación</span></div>
+<div class="k"><div class="ke">📦</div><div class="kl">Courier importado</div><div class="kv w">+123%</div><div class="kd">USD 402M a abr 2026 · Shein, Temu, AliExpress</div><span class="kp wn">⚠ amenaza</span></div>
+<div class="k"><div class="ke">📱</div><div class="kl">Compras desde cel</div><div class="kv">79,5%</div><div class="kd">Mobile-first · WhatsApp 94% diario · IG superó a FB</div><span class="kp in">→ mobile</span></div>
+<div class="k"><div class="ke">✂️</div><div class="kl">Redujo gastos</div><div class="kv w">61%</div><div class="kd">75% se endeudó · 88% espera que las marcas "acompañen"</div><span class="kp wn">↑ pragmatismo</span></div>
+</div>
+
+<div class="ins">
+<div class="in"><div class="inn">01</div><div class="ii">💳</div><h4>La cuota sin interés es decisiva, pero más cara y riesgosa</h4><p>8 de cada 10 priorizan poder pagar en cuotas. Cuotas 3-6 explican +50% de ventas online. Pero la mora trepó al 11,7%, nivel no visto en 20 años. NAKU lo usa bien: Martín 4,2 cuotas / Mario 2,5.</p></div>
+<div class="in"><div class="inn">02</div><div class="ii">🌎</div><h4>Shein/Temu/AliExpress son la amenaza estructural</h4><p>4 de cada 10 argentinos ya compraron por courier. Las compras al exterior pasaron del 37% al 47% en un año. El diferencial de NAKU NO es precio: es <strong>inmediatez + confianza + postventa local</strong>.</p></div>
+<div class="in"><div class="inn">03</div><div class="ii">🎯</div><h4>NAKU es para quien le faltan 5 para el peso</h4><p>No ABC1 (los ricos se mandan muebles a medida). Solo el 42% mira primeras marcas (vs 73% en 2024). El argentino busca productos que <em>resuelvan ya</em> y duren. Eso es lo que NAKU promete.</p></div>
+</div>
+</div></section>
+<section class="s"><div class="c">
+<div class="sh"><span class="se">👋 Conocelos</span>
+<h2>Estos son <em>los 5</em>.</h2>
+<p class="si">Cada uno con su nombre, su escena, su platita y su forma de comprar. Hacé click en cada tarjeta.</p></div>
+
+<div class="bc">
+<div class="bm" onclick="sw(1)"><div class="bme">💼</div><div class="bmn">Martín</div><div class="bmt">El del Home Office</div><div class="bms"><div class="bmst"><span class="bmsv">$203K</span><span class="bmsl">Ticket TN</span></div><div class="bmst"><span class="bmsv">4,2</span><span class="bmsl">Cuotas</span></div></div><div class="bmc">Ver perfil →</div></div>
+<div class="bm" onclick="sw(2)"><div class="bme">🏠</div><div class="bmn">Mariana</div><div class="bmt">La Organizadora del Hogar</div><div class="bms"><div class="bmst"><span class="bmsv">66%</span><span class="bmsl">Mujeres</span></div><div class="bmst"><span class="bmsv">$81K</span><span class="bmsl">Ticket</span></div></div><div class="bmc">Ver perfil →</div></div>
+<div class="bm" onclick="sw(3)"><div class="bme">🔧</div><div class="bmn">Juan</div><div class="bmt">El que Resuelve solo</div><div class="bms"><div class="bmst"><span class="bmsv">36%</span><span class="bmsl">de ML</span></div><div class="bmst"><span class="bmsv">$83K</span><span class="bmsl">Ticket</span></div></div><div class="bmc">Ver perfil →</div></div>
+<div class="bm" onclick="sw(4)"><div class="bme">🏕️</div><div class="bmn">Lucho</div><div class="bmt">El Aventurero Familiar</div><div class="bms"><div class="bmst"><span class="bmsv">5,5%</span><span class="bmsl">Recompra</span></div><div class="bmst"><span class="bmsv">$104K</span><span class="bmsl">Ticket</span></div></div><div class="bmc">Ver perfil →</div></div>
+<div class="bm" onclick="sw(5)"><div class="bme">🏪</div><div class="bmn">Mario</div><div class="bmt">El Comerciante de Barrio</div><div class="bms"><div class="bmst"><span class="bmsv">2,5</span><span class="bmsl">Cuotas</span></div><div class="bmst"><span class="bmsv">$51K</span><span class="bmsl">Ticket</span></div></div><div class="bmc">Ver perfil →</div></div>
+</div>
+
+<div style="margin-top:48px"><div class="sh" style="margin-bottom:24px"><h2 style="font-size:28px">📊 Cómo se reparten</h2><p class="si" style="font-size:15px">El ranking cambia según cómo lo mires: por volumen, por facturación o por ticket.</p></div>
+<div class="ct">
+<div class="cr h"><div>Personaje</div><div>% Ventas (ML)</div><div>Facturación</div><div>Ticket prom.</div><div>Cuotas</div><div>Tipo</div></div>
+<div class="cr" onclick="sw(3)" style="cursor:pointer"><div class="cn"><span class="cem">🔧</span> Juan</div><div><div class="cv">35,8%<small>el #1 en volumen</small></div><div class="bar"><div class="bf" style="width:100%"></div></div></div><div class="cv">$1.389 M<small>ML</small></div><div class="cv">$83K<small>medio</small></div><div class="cv">3,1<small>moderadas</small></div><div><span class="kp wn">Resolvedor</span></div></div>
+<div class="cr" onclick="sw(2)" style="cursor:pointer"><div class="cn"><span class="cem">🏠</span> Mariana</div><div><div class="cv">25,4%</div><div class="bar"><div class="bf" style="width:71%"></div></div></div><div class="cv">$723 M<small>ML</small></div><div class="cv">$81K</div><div class="cv">3,4</div><div><span class="kp in">Inversora</span></div></div>
+<div class="cr" onclick="sw(1)" style="cursor:pointer"><div class="cn"><span class="cem">💼</span> Martín</div><div><div class="cv">19,1%</div><div class="bar"><div class="bf" style="width:53%"></div></div></div><div class="cv">$771 M<small>ML · top TN</small></div><div class="cv">$203K<small>el más alto</small></div><div class="cv">4,2<small>la más alta</small></div><div><span class="kp in">Inversor</span></div></div>
+<div class="cr" onclick="sw(5)" style="cursor:pointer"><div class="cn"><span class="cem">🏪</span> Mario</div><div><div class="cv">6,7%</div><div class="bar"><div class="bf" style="width:19%"></div></div></div><div class="cv">$169 M<small>ML</small></div><div class="cv">$51K<small>el más bajo</small></div><div class="cv">2,5<small>paga rápido</small></div><div><span class="kp wn">Resolvedor</span></div></div>
+<div class="cr" onclick="sw(4)" style="cursor:pointer"><div class="cn"><span class="cem">🏕️</span> Lucho</div><div><div class="cv">6,2%</div><div class="bar"><div class="bf" style="width:17%"></div></div></div><div class="cv">$335 M<small>ML</small></div><div class="cv">$104K</div><div class="cv">3,0</div><div><span class="kp wn">Resolvedor</span></div></div>
+</div>
+<div class="hb2"><strong>💡 Insight clave:</strong> <strong>Juan + Mariana suman el 61% del volumen</strong>. Son la base operativa. Martín, con solo 19%, explica <strong>el 66% de la facturación en Tienda Nube</strong>. Lucho y Mario son chicos pero estratégicos.</div>
+</div></div></section>
+
+<div class="bn"><div class="c"><div class="bt">
+<div class="bta ac" onclick="sw(1)"><span class="bte">💼</span> Martín · Home Office</div>
+<div class="bta" onclick="sw(2)"><span class="bte">🏠</span> Mariana · Organizadora</div>
+<div class="bta" onclick="sw(3)"><span class="bte">🔧</span> Juan · El que Resuelve</div>
+<div class="bta" onclick="sw(4)"><span class="bte">🏕️</span> Lucho · El Aventurero</div>
+<div class="bta" onclick="sw(5)"><span class="bte">🏪</span> Mario · El Comerciante</div>
+</div></div></div>
+
+<section class="s" style="padding-top:48px"><div class="c">
+<div class="bd ac" id="b1">
+<div class="bh"><div class="bca"><div class="bcae">💼</div><div class="bcan">Martín</div><div class="bcat">El profesional Home Office · 25–45 años</div><div class="bcq">"Si voy a estar 8 horas acá, que valga la pena. Me cuido la espalda y rindo más."</div>
+<div class="bcs"><div><div class="bcsl">Género</div><div class="bcsv">66% hombres</div></div><div><div class="bcsl">Pico</div><div class="bcsv">Mayo · Noviembre</div></div><div><div class="bcsl">Compra</div><div class="bcsv">9-12hs · Lunes</div></div><div><div class="bcsl">Envío</div><div class="bcsv">23% Full</div></div></div></div>
+<div class="bk">
+<div class="bki"><div><div class="bkl">💰 Facturación TN</div><div class="bkv b">66%</div></div><div class="bkd">Con solo 19% del volumen, <strong>2/3 de la facturación</strong> en Tienda Nube. La palanca de crecimiento.</div></div>
+<div class="bki"><div><div class="bkl">🏷️ Ticket promedio</div><div class="bkv">$203K</div></div><div class="bkd">El más alto. Escritorios sit-stand $300K+. <strong>4,2 cuotas</strong> (la más alta).</div><div class="cc"><div class="ch"><div class="chl">ML</div><div class="chv">$47K</div></div><div class="ch"><div class="chl">TN</div><div class="chv">$203K</div></div></div></div>
+<div class="bki"><div><div class="bkl">📊 Volumen ML</div><div class="bkv">18.820</div></div><div class="bkd">Ventas 12 meses · #3 volumen pero #2 facturación · Tendencia ↑</div></div>
+<div class="bki"><div><div class="bkl">📈 Recompra</div><div class="bkv">3,9%</div></div><div class="bkd">84% vuelve al mismo buyer · 10% pasa a Juan (Home Office + soporte TV)</div></div>
+</div></div>
+
+<div class="sb"><div class="sbt">🎭 Los 2 Martín</div><div class="sbs">Mismo buyer, dos sub-perfiles con motivaciones distintas:</div>
+<div class="sg">
+<div class="sc"><span class="sct">SUB 1</span><h5>🏡 El Home Office puro</h5><p><strong>Palabra: CONFORT.</strong> Trabaja desde casa. No romperse la espalda, tener setup digno para Meets. Tiene FOMO (ve los setups de sus pares en Slack y Zoom).</p></div>
+<div class="sc"><span class="sct">SUB 2</span><h5>🏢 El Office (pyme)</h5><p><strong>Palabra: PROFESIONALIZACIÓN.</strong> Compra para la oficina pyme. A veces CUIT para descontar IVA (15% de Martín es CUIT empresa, no revendedor).</p></div>
+</div></div>
+
+<div class="eh"><div class="et">🧠 ¿Cómo piensa Martín?</div><div class="es">Las 6 preguntas del mapa de empatía, aplicadas al contexto argentino 2026.</div></div>
+<div class="eg">
+<div class="ec"><div class="ech"><div class="ei">💭</div><div><div class="ecl">Piensa & siente</div><div class="ecq">"Tengo que estar cómodo si paso 8 horas acá"</div></div></div>
+<ul class="el">
+<li>Quiere <strong>profesionalizar/conformar</strong> su espacio: buen setup = productividad + salud.</li>
+<li><strong>Ansiedad 2026:</strong> estabilidad laboral (+300.000 empleos formales perdidos).</li>
+<li>Presión de "vuelta a la oficina" pero quiere defender el home office.</li>
+<li>Le pesa el costo de la luz (+130% en AMBA): más horas en casa = más consumo.</li>
+<li><strong>Siente FOMO:</strong> ve a sus pares en Meet con buenas sillas. No quiere quedarse atrás.</li>
+</ul>
+<div class="qb">"El pasto del vecino siempre es más verde. Yo trabajo cómodo o no rindo."</div></div>
+
+<div class="ec"><div class="ech"><div class="ei">👂</div><div><div class="ecl">Oye</div><div class="ecq">¿Qué le dice su entorno?</div></div></div>
+<ul class="el">
+<li><strong>Jefes:</strong> "¿Te volvés a la oficina?", "Necesitamos verte más por acá".</li>
+<li><strong>Colegas:</strong> comparan setups, monitores. Foto del rincón en Slack.</li>
+<li><strong>Referentes:</strong> Coscu, Momo, Davoo Xeneize, Spreen, Frankkaster, TechnoReviews.</li>
+<li><strong>Cultura:</strong> "El home office llegó para quedarse, pero hacelo bien."</li>
+</ul></div>
+
+<div class="ec"><div class="ech"><div class="ei">👁️</div><div><div class="ecl">Ve</div><div class="ecq">¿Qué consume en sus pantallas?</div></div></div>
+<ul class="el">
+<li>Reels y videos de <strong>"desk setup tour"</strong> en YouTube, IG y TikTok.</li>
+<li>Ergonomía, monitores en brazos, escritorios sit-stand, cables, LED.</li>
+<li>Publicidad de tecnología en cuotas (bancos 12-20 cuotas en tech).</li>
+<li>Foros de hardware, MercadoLibre, sitios tech.</li>
+<li>Ve que <strong>todos los soportes se parecen</strong>: todo es promedio.</li>
+</ul></div>
+
+<div class="ec"><div class="ech"><div class="ei">💬</div><div><div class="ecl">Dice & hace</div><div class="ecq">¿Cómo compra?</div></div></div>
+<ul class="el">
+<li><strong>Hace research:</strong> ficha técnica, reseñas, compatibilidad VESA.</li>
+<li>Compara precio en ML, TN y contra importar por courier.</li>
+<li>Compra planificada en Hot Sale (mayo) y Black Friday (noviembre).</li>
+<li><strong>Dentro de sus posibilidades va a la punta superior:</strong> paga 50K más por el eléctrico.</li>
+<li>Se apalanca en cuotas (4,2 en promedio).</li>
+</ul>
+<div class="qb">"Me armé el setup", "se me re acomodó la espalda", "lo necesito para laburar".</div></div>
+
+<div class="ec pn"><div class="ech"><div class="ei">⚠️</div><div><div class="ecl">Dolores · Esfuerzos</div><div class="ecq">¿Qué le quita el sueño?</div></div></div>
+<ul class="el">
+<li>Miedo a que el soporte <strong>no aguante el peso/medida</strong> del monitor.</li>
+<li>Que el importado tarde semanas y llegue con falla sin postventa.</li>
+<li>Ticket alto: $300K+ por un escritorio requiere cuota sin interés sí o sí.</li>
+<li>Cables, desorden, dolor físico por mala ergonomía.</li>
+<li>Justificarle al jefe por qué necesita seguir desde casa.</li>
+</ul></div>
+
+<div class="ec gn"><div class="ech"><div class="ei">🎯</div><div><div class="ecl">Ganancias · Resultados</div><div class="ecq">¿Cuándo siente que ganó?</div></div></div>
+<ul class="el">
+<li>Espacio ergonómico y "profesional" que mejora foco y comodidad.</li>
+<li>"Trabajo cómodo, sin dolor, y mi setup quedó <strong>pro</strong>."</li>
+<li>Sentir que la inversión se justifica: durabilidad, garantía, llegó rápido.</li>
+<li>Aceptación en redes/Slack: poder mostrar su setup.</li>
+<li>Tener argumento para defender el home office.</li>
+</ul></div>
+</div>
+
+<div class="eh" style="margin-top:48px"><div class="et">📊 ¿Cuándo y cómo compra?</div><div class="es">Patrones extraídos de 18.820 ventas en ML.</div></div>
+<div class="dg th">
+<div class="dc"><div class="dch"><span class="dce">🕐</span><span class="dcl">Hora del día</span></div><h4>Horario laboral</h4>
+<div class="hc"><div class="hco"><div class="hb" style="height:20%"></div><div class="hl">Madr</div></div><div class="hco"><div class="hb" style="height:20%"></div><div class="hl">6-9</div></div><div class="hco"><div class="hb pk" style="height:100%"></div><div class="hl">9-12</div></div><div class="hco"><div class="hb" style="height:82%"></div><div class="hl">12-15</div></div><div class="hco"><div class="hb" style="height:67%"></div><div class="hl">15-18</div></div><div class="hco"><div class="hb" style="height:62%"></div><div class="hl">18-21</div></div><div class="hco"><div class="hb" style="height:35%"></div><div class="hl">Noche</div></div></div>
+<p style="font-size:13px;color:var(--tm);margin-top:14px">Pico <strong>9-12h (23%)</strong>. Compra desde el escritorio del laburo.</p></div>
+
+<div class="dc"><div class="dch"><span class="dce">📅</span><span class="dcl">Día semana</span></div><h4>Lunes manda</h4>
+<div class="hc"><div class="hco"><div class="hb pk" style="height:100%"></div><div class="hl">Lun</div></div><div class="hco"><div class="hb" style="height:92%"></div><div class="hl">Mar</div></div><div class="hco"><div class="hb" style="height:85%"></div><div class="hl">Mié</div></div><div class="hco"><div class="hb" style="height:82%"></div><div class="hl">Jue</div></div><div class="hco"><div class="hb" style="height:79%"></div><div class="hl">Vie</div></div><div class="hco"><div class="hb" style="height:53%"></div><div class="hl">Sáb</div></div><div class="hco"><div class="hb" style="height:55%"></div><div class="hl">Dom</div></div></div>
+<p style="font-size:13px;color:var(--tm);margin-top:14px"><strong>Lunes 18,3%</strong>. Fin de semana baja a 10%. Planificado.</p></div>
+
+<div class="dc"><div class="dch"><span class="dce">📆</span><span class="dcl">Estacionalidad</span></div><h4>Hot Sale y Black Friday</h4>
+<div class="se2"><div class="seo"><div class="sba md" style="height:25%"></div><div class="sel">E</div></div><div class="seo"><div class="sba md" style="height:30%"></div><div class="sel">F</div></div><div class="seo"><div class="sba hi" style="height:50%"></div><div class="sel">M</div></div><div class="seo"><div class="sba hi" style="height:55%"></div><div class="sel">A</div></div><div class="seo"><div class="sba pk" style="height:90%"></div><div class="sel">M</div></div><div class="seo"><div class="sba hi" style="height:50%"></div><div class="sel">J</div></div><div class="seo"><div class="sba md" style="height:35%"></div><div class="sel">J</div></div><div class="seo"><div class="sba md" style="height:38%"></div><div class="sel">A</div></div><div class="seo"><div class="sba hi" style="height:45%"></div><div class="sel">S</div></div><div class="seo"><div class="sba hi" style="height:65%"></div><div class="sel">O</div></div><div class="seo"><div class="sba pk" style="height:100%"></div><div class="sel">N</div></div><div class="seo"><div class="sba hi" style="height:70%"></div><div class="sel">D</div></div></div>
+<p style="font-size:13px;color:var(--tm);margin-top:14px"><strong>Mayo</strong> (Hot Sale) y <strong>Noviembre</strong> (Black Friday).</p></div>
+</div>
+
+<div class="dg">
+<div class="dc"><div class="dch"><span class="dce">🗺️</span><span class="dcl">Mapa de calor</span></div><h4>De dónde compra Martín</h4>
+<ul class="gl"><li class="gi"><span class="gr">1</span><span class="gn">🏙️ Buenos Aires</span><span class="gp">42,1%</span></li><li class="gi"><span class="gr">2</span><span class="gn">🌆 Capital Federal</span><span class="gp">19,9%</span></li><li class="gi"><span class="gr">3</span><span class="gn">🏔️ Córdoba</span><span class="gp">9,7%</span></li><li class="gi"><span class="gr">4</span><span class="gn">🌾 Santa Fe</span><span class="gp">6,8%</span></li><li class="gi"><span class="gr">5</span><span class="gn">🍷 Mendoza</span><span class="gp">2,7%</span></li></ul>
+<p style="font-size:13px;color:var(--tm);margin-top:12px"><strong>62% AMBA.</strong> Top 5 = 81%. El buyer más urbano.</p></div>
+
+<div class="dc"><div class="dch"><span class="dce">🚚</span><span class="dcl">Tiempo de entrega</span></div><h4>Es el más "paciente"</h4>
+<div class="sh1"><div><span>⚡ Mercado Envíos Flex</span><span>45,1%</span></div><div><span>📦 Colecta ML</span><span>29,9%</span></div><div><span>🏬 Mercado Envíos Full</span><span>23,2%</span></div></div>
+<p style="font-size:13px;color:var(--tm);margin-top:14px"><strong>23% usa Full</strong> (el más alto). Compra planificada. Entrega promedio: 1,7 días.</p></div>
+</div>
+
+<div class="dg">
+<div class="dc"><div class="dch"><span class="dce">🏆</span><span class="dcl">Top SKUs por categoría</span></div>
+<h4>Sus productos estrella</h4>
+<p style="font-size:12px;color:var(--tm);margin-bottom:14px">Categorías ordenadas por facturación. Clickeá para ver el top de cada una.</p>
+<div class="ca op"><div class="cah" onclick="tc(this)"><span class="cae">🖥️</span><div class="cai"><div class="can">Escritorios ergonómicos</div><div class="cam">$648.3M · 8,865 ud · 10 SKUs</div></div><span class="car2">▼</span></div><div class="cab"><ul class="sl"><li class="sli"><span class="skc">SS-1032M</span><span class="sku">8,080 ud</span><span class="skp">$48K</span></li><li class="sli"><span class="skc">22D-BEL MADERA (MODELO ELECTRICO)</span><span class="sku">196 ud</span><span class="skp">$380K</span></li><li class="sli"><span class="skc">22D-B COLOR NEGRO</span><span class="sku">158 ud</span><span class="skp">$308K</span></li><li class="sli"><span class="skc">22D-BEL/ST</span><span class="sku">156 ud</span><span class="skp">$301K</span></li><li class="sli"><span class="skc">22D-B MADERA</span><span class="sku">145 ud</span><span class="skp">$307K</span></li><li class="sli"><span class="skc">22D-BEL BLANCO (MODELO ELECTRICO)</span><span class="sku">68 ud</span><span class="skp">$399K</span></li></ul></div></div>
+<div class="ca"><div class="cah" onclick="tc(this)"><span class="cae">🖥️</span><div class="cai"><div class="can">Monitor</div><div class="cam">$500.9M · 9,525 ud · 9 SKUs</div></div><span class="car2">▼</span></div><div class="cab"><ul class="sl"><li class="sli"><span class="skc">SM-C012</span><span class="sku">3,554 ud</span><span class="skp">$33K</span></li><li class="sli"><span class="skc">SS-C024D</span><span class="sku">3,056 ud</span><span class="skp">$83K</span></li><li class="sli"><span class="skc">SM-C024</span><span class="sku">1,991 ud</span><span class="skp">$44K</span></li><li class="sli"><span class="skc">SM-C09</span><span class="sku">335 ud</span><span class="skp">$29K</span></li><li class="sli"><span class="skc">SM-C010</span><span class="sku">225 ud</span><span class="skp">$30K</span></li><li class="sli"><span class="skc">SM-C011NBH</span><span class="sku">134 ud</span><span class="skp">$69K</span></li></ul></div></div>
+<div class="ca"><div class="cah" onclick="tc(this)"><span class="cae">📦</span><div class="cai"><div class="can">Otros</div><div class="cam">$115.6M · 313 ud · 1 SKUs</div></div><span class="car2">▼</span></div><div class="cab"><ul class="sl"><li class="sli"><span class="skc">22D-BEL NEGRO (MODELO ELECTRICO)</span><span class="sku">313 ud</span><span class="skp">$369K</span></li></ul></div></div>
+<div class="ca"><div class="cah" onclick="tc(this)"><span class="cae">📦</span><div class="cai"><div class="can">Microfonos</div><div class="cam">$17.1M · 255 ud · 3 SKUs</div></div><span class="car2">▼</span></div><div class="cab"><ul class="sl"><li class="sli"><span class="skc">SB-51</span><span class="sku">243 ud</span><span class="skp">$69K</span></li><li class="sli"><span class="skc">FTP-2W</span><span class="sku">7 ud</span><span class="skp">$28K</span></li><li class="sli"><span class="skc">S-M1</span><span class="sku">5 ud</span><span class="skp">$31K</span></li></ul></div></div>
+<div class="ca"><div class="cah" onclick="tc(this)"><span class="cae">📺</span><div class="cai"><div class="can">TV</div><div class="cam">$14.0M · 346 ud · 1 SKUs</div></div><span class="car2">▼</span></div><div class="cab"><ul class="sl"><li class="sli"><span class="skc">S-CM222</span><span class="sku">346 ud</span><span class="skp">$41K</span></li></ul></div></div>
+</div>
+
+<div class="dc"><div class="dch"><span class="dce">🔗</span><span class="dcl">Cross-sell</span></div><h4>Pares que se compran juntos</h4>
+<div class="cp"><span class="skc">SS-1032M</span><span class="car">+</span><span class="skc">SS-C024D</span><span class="cco">63 pares</span></div>
+<div class="cp"><span class="skc">SM-C012</span><span class="car">+</span><span class="skc">SM-C024</span><span class="cco">29 pares</span></div>
+<div class="cp"><span class="skc">SM-C012</span><span class="car">+</span><span class="skc">SS-1032M</span><span class="cco">23 pares</span></div>
+<div class="cp"><span class="skc">22D-BEL</span><span class="car">+</span><span class="skc">SS-1032M</span><span class="cco">14 ⭐</span></div>
+<div class="hb2" style="margin-top:12px;padding:14px 18px"><strong>💡 Kit setup completo:</strong> escritorio sit-stand + soporte hidráulico. <strong>Armar combo</strong>.</div></div>
+</div>
+
+<div class="np"><div class="npl">🚀 Productos nuevos sugeridos</div><h4>¿Qué más le podríamos vender a Martín?</h4><p class="npd">Accesorios para completar el ecosistema Home Office. <strong>One-stop shop.</strong></p>
+<div class="npg">
+<div class="npi"><span class="npe">🦶</span>Reposapiés ergonómico</div>
+<div class="npi"><span class="npe">🛋️</span>Almohadón lumbar</div>
+<div class="npi"><span class="npe">💡</span>Lámpara LED con USB</div>
+<div class="npi"><span class="npe">🔌</span>Hub USB-C con HDMI</div>
+<div class="npi"><span class="npe">💻</span>Soporte para notebook</div>
+<div class="npi"><span class="npe">📐</span>Bandeja organizadora bajo escritorio</div>
+<div class="npi"><span class="npe">📹</span>Aro LED para videollamadas</div>
+<div class="npi"><span class="npe">🛡️</span>Filtro privacidad / luz azul</div>
+<div class="npi"><span class="npe">⚡</span>Multitoma con protector tensión</div>
+</div></div>
+
+<div class="st"><div class="stl">💡 Estrategia NAKU para Martín</div>
+<h3>Cuota sin interés visible. Postventa local. Ergonomía como argumento de salud.</h3>
+<p>Mostrar la cuota sin interés <em>arriba</em> del precio (no en letra chica). Posicionar "stock y postventa en Argentina, llega ya" como antídoto frente al courier importado. Crear contenido con creadores de setup/tech argentinos para Hot Sale y Black Friday. Comunicar capacidad VESA en cada ficha para matar el miedo técnico. <strong>Armar kit Combo Setup</strong> (escritorio + soporte) que ya está pasando orgánicamente.</p></div>
+</div>
+<div class="bd" id="b2">
+<div class="bh"><div class="bca"><div class="bcae">🏠</div><div class="bcan">Mariana</div><div class="bcat">La Organizadora del Hogar · 28–55 años</div><div class="bcq">"Si mi casa está ordenada, mi cabeza también."</div>
+<div class="bcs"><div><div class="bcsl">Género</div><div class="bcsv">66% mujeres</div></div><div><div class="bcsl">Pico</div><div class="bcsv">Mayo · Marzo-Abril</div></div><div><div class="bcsl">Compra</div><div class="bcsv">9-12hs y 18-21hs</div></div><div><div class="bcsl">Envío</div><div class="bcsv">51% Flex</div></div></div></div>
+<div class="bk">
+<div class="bki"><div><div class="bkl">📊 Volumen ML</div><div class="bkv b">25,4%</div></div><div class="bkd"><strong>24.989 unidades</strong> · 2do en volumen · Base operativa de NAKU</div></div>
+<div class="bki"><div><div class="bkl">🏷️ Ticket promedio</div><div class="bkv">$81K</div></div><div class="bkd">Medio · Cuotas 3,4 · Sensible al precio pero le importa la estética</div><div class="cc"><div class="ch"><div class="chl">ML</div><div class="chv">$30K</div></div><div class="ch"><div class="chl">TN</div><div class="chv">$81K</div></div></div></div>
+<div class="bki"><div><div class="bkl">🔄 Devoluciones</div><div class="bkv">5,5%</div></div><div class="bkd">Normal · Top SKU devuelto: MC-002 (coser): 507 ud</div></div>
+<div class="bki"><div><div class="bkl">📈 Recompra</div><div class="bkv">3,1%</div></div><div class="bkd">84% vuelve a la misma categoría · 6% pasa a Juan (compra soporte TV del marido)</div></div>
+</div></div>
+
+<div class="sb"><div class="sbt">🎭 Los 3 motivos de Mariana</div><div class="sbs">No la separamos en sub-perfiles, pero compra por <strong>3 motivos distintos</strong> según el momento:</div>
+<div class="sg">
+<div class="sc"><span class="sct">MOTIVO 1</span><h5>📦 Ordenar</h5><p>Estanterías, carritos, zapateros, organizadores. <strong>Compra cuando "no doy más con el desorden"</strong>. Cambio de temporada o mudanza.</p></div>
+<div class="sc"><span class="sct">MOTIVO 2</span><h5>🧹 Limpiar</h5><p>Mopas EARTH (4S y 2S). Ticket más bajo ($19-20K) pero alta rotación. Compra de reposición, no aspiracional.</p></div>
+</div>
+<div class="sg" style="margin-top:16px"><div class="sc" style="grid-column:span 2"><span class="sct">MOTIVO 3</span><h5>✂️ Crear / Coser</h5><p><strong>5.789 MC-002 vendidas en ML</strong>. Hobby creativo, ahorro doméstico o microemprendimiento. <strong>Insight nuevo: 7 compradoras de MC-002 también compraron SB-200 (selladora)</strong> → emprendedoras textiles que venden ropa por Instagram.</p></div></div>
+</div>
+
+<div class="eh"><div class="et">🧠 ¿Cómo piensa Mariana?</div><div class="es">El "deber ser" de tener la casa ordenada — lo vive como responsabilidad, no como placer.</div></div>
+<div class="eg">
+<div class="ec"><div class="ech"><div class="ei">💭</div><div><div class="ecl">Piensa & siente</div><div class="ecq">"Si no lo hago yo, no lo hace nadie."</div></div></div>
+<ul class="el">
+<li><strong>Lo vive como "deber ser":</strong> tener la casa ordenada es su responsabilidad, no su gusto.</li>
+<li>Aspira a tener contentos a su familia/compañeros de casa.</li>
+<li>Cansancio acumulado: "ya no doy más con el desorden".</li>
+<li>En 2026, con menos plata, valora soluciones que <strong>"transformen" un espacio sin obra</strong>.</li>
+<li>Vive en alquiler o espacios chicos: necesita plegable, con ruedas, multifunción.</li>
+</ul>
+<div class="qb">"Ya no doy más con el desorden. Hoy lo soluciono."</div></div>
+
+<div class="ec"><div class="ech"><div class="ei">👂</div><div><div class="ecl">Oye</div><div class="ecq">¿Qué le dice su entorno?</div></div></div>
+<ul class="el">
+<li><strong>Amigas/familia:</strong> "¿De dónde sacaste esa estantería?", "mostrame cómo lo ordenaste".</li>
+<li><strong>Referentes:</strong> @tuespacioorganizado (Brenda Haines ~2M), @soyamodecasa (Nes ~1,1M).</li>
+<li><strong>Red profesional:</strong> AROPA (organizadores profesionales argentinos).</li>
+<li><strong>Cultura:</strong> Marie Kondo, minimalismo, "menos es más", bienestar.</li>
+<li>Sus pares (otras amas de casa) se autorrecomiendan productos.</li>
+</ul></div>
+
+<div class="ec"><div class="ech"><div class="ei">👁️</div><div><div class="ecl">Ve</div><div class="ecq">¿Qué consume en sus pantallas?</div></div></div>
+<ul class="el">
+<li>Reels <strong>antes/después</strong> de placares, cocinas, lavaderos.</li>
+<li>Carritos auxiliares, organizadores transparentes, zapateros.</li>
+<li>Mucho IG y TikTok (reels de organización), Pinterest para inspiración.</li>
+<li>Publicidad de tiendas de deco y cuentas de organización.</li>
+<li><strong>Valora ver fotos REALES</strong> de clientes usando el producto, no fotos de catálogo.</li>
+</ul></div>
+
+<div class="ec"><div class="ech"><div class="ei">💬</div><div><div class="ecl">Dice & hace</div><div class="ecq">¿Cómo compra?</div></div></div>
+<ul class="el">
+<li><strong>Compra resolutiva:</strong> tras un hartazgo, busca y compra rápido. NO es aspiracional.</li>
+<li>Compara precio, mira reseñas y fotos reales de clientes.</li>
+<li>Usa cuotas moderadamente (3,4).</li>
+<li>Sensible a la estética. <strong>Le gusta el color</strong> (rosa, turquesa).</li>
+<li>Madre líder, resolutiva, empoderada. <strong>El gusto se lo da en otro lado</strong> (shopping, camperita).</li>
+</ul>
+<div class="qb">"Me cambió la vida", "quedó divino y me costó dos mangos", "miren cómo me quedó".</div></div>
+
+<div class="ec pn"><div class="ech"><div class="ei">⚠️</div><div><div class="ecl">Dolores · Esfuerzos</div><div class="ecq">¿Qué le quita el sueño?</div></div></div>
+<ul class="el">
+<li>Que el producto se vea lindo en la foto pero llegue <strong>endeble o distinto</strong>.</li>
+<li>Espacios chicos: miedo a que <strong>"no entre"</strong> o no sirva.</li>
+<li>Que sea complicado de armar (a veces sin pareja que ayude).</li>
+<li>Presupuesto ajustado: prioriza, no puede equivocarse.</li>
+<li>Sentirse "atrasada" viendo casas perfectas en redes.</li>
+</ul></div>
+
+<div class="ec gn"><div class="ech"><div class="ei">🎯</div><div><div class="ecl">Ganancias · Resultados</div><div class="ecq">¿Cuándo siente que ganó?</div></div></div>
+<ul class="el">
+<li>Un espacio transformado, ordenado y <strong>estéticamente satisfactorio</strong>.</li>
+<li>"Gané lugar, quedó lindo y fue fácil."</li>
+<li>Recompensa emocional del <strong>"antes y después"</strong>.</li>
+<li>Resolver sin romper el bolsillo.</li>
+<li>Orgullo de mostrar su casa: "miren cómo me quedó".</li>
+</ul></div>
+</div>
+
+<div class="eh" style="margin-top:48px"><div class="et">📊 ¿Cuándo y cómo compra?</div><div class="es">Patrones de 24.989 ventas en ML.</div></div>
+<div class="dg th">
+<div class="dc"><div class="dch"><span class="dce">🕐</span><span class="dcl">Hora del día</span></div><h4>Mañana y tarde-noche</h4>
+<div class="hc"><div class="hco"><div class="hb" style="height:37%"></div><div class="hl">Madr</div></div><div class="hco"><div class="hb" style="height:46%"></div><div class="hl">6-9</div></div><div class="hco"><div class="hb pk" style="height:100%"></div><div class="hl">9-12</div></div><div class="hco"><div class="hb" style="height:82%"></div><div class="hl">12-15</div></div><div class="hco"><div class="hb" style="height:59%"></div><div class="hl">15-18</div></div><div class="hco"><div class="hb" style="height:63%"></div><div class="hl">18-21</div></div><div class="hco"><div class="hb" style="height:32%"></div><div class="hl">Noche</div></div></div>
+<p style="font-size:13px;color:var(--tm);margin-top:14px">Pico 9-12h y rebote 18-21h. <strong>De noche cuando los chicos duermen</strong>.</p></div>
+
+<div class="dc"><div class="dch"><span class="dce">📅</span><span class="dcl">Día semana</span></div><h4>Activa fin de semana</h4>
+<div class="hc"><div class="hco"><div class="hb pk" style="height:100%"></div><div class="hl">Lun</div></div><div class="hco"><div class="hb" style="height:96%"></div><div class="hl">Mar</div></div><div class="hco"><div class="hb" style="height:93%"></div><div class="hl">Mié</div></div><div class="hco"><div class="hb" style="height:92%"></div><div class="hl">Jue</div></div><div class="hco"><div class="hb" style="height:96%"></div><div class="hl">Vie</div></div><div class="hco"><div class="hb" style="height:77%"></div><div class="hl">Sáb</div></div><div class="hco"><div class="hb" style="height:72%"></div><div class="hl">Dom</div></div></div>
+<p style="font-size:13px;color:var(--tm);margin-top:14px">Toda la semana pareja, <strong>sábado y domingo activos</strong>.</p></div>
+
+<div class="dc"><div class="dch"><span class="dce">📆</span><span class="dcl">Estacionalidad</span></div><h4>Post verano + Hot Sale</h4>
+<div class="se2"><div class="seo"><div class="sba md" style="height:30%"></div><div class="sel">E</div></div><div class="seo"><div class="sba md" style="height:35%"></div><div class="sel">F</div></div><div class="seo"><div class="sba hi" style="height:65%"></div><div class="sel">M</div></div><div class="seo"><div class="sba pk" style="height:85%"></div><div class="sel">A</div></div><div class="seo"><div class="sba pk" style="height:100%"></div><div class="sel">M</div></div><div class="seo"><div class="sba md" style="height:45%"></div><div class="sel">J</div></div><div class="seo"><div class="sba md" style="height:40%"></div><div class="sel">J</div></div><div class="seo"><div class="sba md" style="height:42%"></div><div class="sel">A</div></div><div class="seo"><div class="sba md" style="height:48%"></div><div class="sel">S</div></div><div class="seo"><div class="sba hi" style="height:55%"></div><div class="sel">O</div></div><div class="seo"><div class="sba hi" style="height:60%"></div><div class="sel">N</div></div><div class="seo"><div class="sba md" style="height:50%"></div><div class="sel">D</div></div></div>
+<p style="font-size:13px;color:var(--tm);margin-top:14px"><strong>Mayo (Hot Sale)</strong> pico. Marzo-abril "ordenamos para arrancar".</p></div>
+</div>
+
+<div class="dg">
+<div class="dc"><div class="dch"><span class="dce">🗺️</span><span class="dcl">Mapa de calor</span></div><h4>De dónde compra Mariana</h4>
+<ul class="gl"><li class="gi"><span class="gr">1</span><span class="gn">🏙️ Buenos Aires</span><span class="gp">47,9%</span></li><li class="gi"><span class="gr">2</span><span class="gn">🌆 Capital Federal</span><span class="gp">16,4%</span></li><li class="gi"><span class="gr">3</span><span class="gn">🏔️ Córdoba</span><span class="gp">6,5%</span></li><li class="gi"><span class="gr">4</span><span class="gn">🌾 Santa Fe</span><span class="gp">6,1%</span></li><li class="gi"><span class="gr">5</span><span class="gn">🍷 Mendoza</span><span class="gp">2,5%</span></li></ul>
+<p style="font-size:13px;color:var(--tm);margin-top:12px"><strong>64% AMBA</strong>. Top ciudades: La Plata, La Matanza, Lomas de Zamora, Mar del Plata.</p></div>
+
+<div class="dc"><div class="dch"><span class="dce">🚚</span><span class="dcl">Forma de envío</span></div><h4>Lo quiere rápido</h4>
+<div class="sh1"><div><span>⚡ Mercado Envíos Flex</span><span>51,0%</span></div><div><span>📦 Colecta ML</span><span>35,9%</span></div><div><span>🏬 Mercado Envíos Full</span><span>7,0%</span></div></div>
+<p style="font-size:13px;color:var(--tm);margin-top:14px"><strong>86% rápido</strong>. Tiempo promedio: 1,8 días.</p></div>
+</div>
+
+<div class="dg">
+<div class="dc"><div class="dch"><span class="dce">🏆</span><span class="dcl">Top SKUs por categoría</span></div>
+<h4>Sus productos estrella</h4>
+<p style="font-size:12px;color:var(--tm);margin-bottom:14px">Categorías ordenadas por facturación. Clickeá para ver el top de cada una.</p>
+<div class="ca op"><div class="cah" onclick="tc(this)"><span class="cae">✂️</span><div class="cai"><div class="can">Máquinas de coser</div><div class="cam">$359.8M · 6,577 ud · 3 SKUs</div></div><span class="car2">▼</span></div><div class="cab"><ul class="sl"><li class="sli"><span class="skc">MC-002</span><span class="sku">5,789 ud</span><span class="skp">$57K</span></li><li class="sli"><span class="skc">MC-001</span><span class="sku">653 ud</span><span class="skp">$21K</span></li><li class="sli"><span class="skc">MC-003</span><span class="sku">135 ud</span><span class="skp">$109K</span></li></ul></div></div>
+<div class="ca"><div class="cah" onclick="tc(this)"><span class="cae">🗄️</span><div class="cai"><div class="can">Organizadores multiuso</div><div class="cam">$227.6M · 5,847 ud · 14 SKUs</div></div><span class="car2">▼</span></div><div class="cab"><ul class="sl"><li class="sli"><span class="skc">ORG-004</span><span class="sku">1,547 ud</span><span class="skp">$27K</span></li><li class="sli"><span class="skc">ORG-004 BLANCO</span><span class="sku">1,083 ud</span><span class="skp">$26K</span></li><li class="sli"><span class="skc">ORG-003</span><span class="sku">581 ud</span><span class="skp">$38K</span></li><li class="sli"><span class="skc">ORG-006</span><span class="sku">444 ud</span><span class="skp">$70K</span></li><li class="sli"><span class="skc">ORG-004 ROSA</span><span class="sku">378 ud</span><span class="skp">$27K</span></li><li class="sli"><span class="skc">ORG-003 BLANCO</span><span class="sku">372 ud</span><span class="skp">$33K</span></li></ul></div></div>
+<div class="ca"><div class="cah" onclick="tc(this)"><span class="cae">👔</span><div class="cai"><div class="can">Organización de ropa</div><div class="cam">$147.2M · 2,907 ud · 21 SKUs</div></div><span class="car2">▼</span></div><div class="cab"><ul class="sl"><li class="sli"><span class="skc">ZAP-001</span><span class="sku">449 ud</span><span class="skp">$25K</span></li><li class="sli"><span class="skc">ZAP-002</span><span class="sku">447 ud</span><span class="skp">$25K</span></li><li class="sli"><span class="skc">CRS-002</span><span class="sku">314 ud</span><span class="skp">$22K</span></li><li class="sli"><span class="skc">CRS-001</span><span class="sku">289 ud</span><span class="skp">$19K</span></li><li class="sli"><span class="skc">PER-005</span><span class="sku">248 ud</span><span class="skp">$50K</span></li><li class="sli"><span class="skc">PER-004</span><span class="sku">247 ud</span><span class="skp">$42K</span></li></ul></div></div>
+<div class="ca"><div class="cah" onclick="tc(this)"><span class="cae">⛱️</span><div class="cai"><div class="can">Exterior y aire libre</div><div class="cam">$26.1M · 77 ud · 3 SKUs</div></div><span class="car2">▼</span></div><div class="cab"><ul class="sl"><li class="sli"><span class="skc">CE-1</span><span class="sku">45 ud</span><span class="skp">$256K</span></li><li class="sli"><span class="skc">CE-3</span><span class="sku">21 ud</span><span class="skp">$485K</span></li><li class="sli"><span class="skc">CE-2</span><span class="sku">11 ud</span><span class="skp">$403K</span></li></ul></div></div>
+<div class="ca"><div class="cah" onclick="tc(this)"><span class="cae">📦</span><div class="cai"><div class="can">Otros</div><div class="cam">$20.1M · 547 ud · 7 SKUs</div></div><span class="car2">▼</span></div><div class="cab"><ul class="sl"><li class="sli"><span class="skc">PER-002 X 20 UNITS</span><span class="sku">189 ud</span><span class="skp">$13K</span></li><li class="sli"><span class="skc">PER-002 X 50 UNITS</span><span class="sku">122 ud</span><span class="skp">$32K</span></li><li class="sli"><span class="skc">PER-001 X 20 UNITS</span><span class="sku">114 ud</span><span class="skp">$26K</span></li><li class="sli"><span class="skc">PER-002 X 100 UNITS</span><span class="sku">62 ud</span><span class="skp">$70K</span></li><li class="sli"><span class="skc">PER-001 X 100 UNITS</span><span class="sku">32 ud</span><span class="skp">$138K</span></li><li class="sli"><span class="skc">PER-001 X 50 UNITS</span><span class="sku">27 ud</span><span class="skp">$71K</span></li></ul></div></div>
+<div class="ca"><div class="cah" onclick="tc(this)"><span class="cae">💡</span><div class="cai"><div class="can">Iluminación</div><div class="cam">$8.0M · 386 ud · 1 SKUs</div></div><span class="car2">▼</span></div><div class="cab"><ul class="sl"><li class="sli"><span class="skc">VP-003</span><span class="sku">386 ud</span><span class="skp">$21K</span></li></ul></div></div>
+<div class="ca"><div class="cah" onclick="tc(this)"><span class="cae">🧹</span><div class="cai"><div class="can">Limpieza</div><div class="cam">$3.7M · 192 ud · 2 SKUs</div></div><span class="car2">▼</span></div><div class="cab"><ul class="sl"><li class="sli"><span class="skc">EARTH4S</span><span class="sku">98 ud</span><span class="skp">$19K</span></li><li class="sli"><span class="skc">EARTH2S</span><span class="sku">94 ud</span><span class="skp">$19K</span></li></ul></div></div>
+<div class="ca"><div class="cah" onclick="tc(this)"><span class="cae">🔩</span><div class="cai"><div class="can">Soportes</div><div class="cam">$161K · 7 ud · 1 SKUs</div></div><span class="car2">▼</span></div><div class="cab"><ul class="sl"><li class="sli"><span class="skc">S-LH</span><span class="sku">7 ud</span><span class="skp">$23K</span></li></ul></div></div>
+</div>
+
+<div class="dc"><div class="dch"><span class="dce">🔗</span><span class="dcl">Cross-sell</span></div><h4>Pares ganadores</h4>
+<div class="cp"><span class="skc">MC-002</span><span class="car">+</span><span class="skc">SB-200</span><span class="cco">7 ⭐</span></div>
+<div class="cp"><span class="skc">ORG-006</span><span class="car">+</span><span class="skc">ORG-008</span><span class="cco">8 pares</span></div>
+<div class="cp"><span class="skc">EARTH 2S</span><span class="car">+</span><span class="skc">EARTH 4S</span><span class="cco">3 pares</span></div>
+<div class="hb2" style="margin-top:12px;padding:14px 18px"><strong>💡 La Emprendedora Textil:</strong> mezcla MC-002 (coser) + SB-200 (selladora). Vende ropa por Instagram. <strong>Combo "Emprendé tu marca"</strong>.</div></div>
+</div>
+
+<div class="np"><div class="npl">🚀 Productos nuevos sugeridos</div><h4>¿Qué más le podríamos vender a Mariana?</h4><p class="npd">Productos que aparecen mucho en sus reels de IG/TikTok y que NAKU todavía no tiene.</p>
+<div class="npg">
+<div class="npi"><span class="npe">📦</span>Set cajas organizadoras transparentes</div>
+<div class="npi"><span class="npe">🧥</span>Bolsas al vacío para placard</div>
+<div class="npi"><span class="npe">🧂</span>Spinner organizador de especias</div>
+<div class="npi"><span class="npe">🗄️</span>Organizador modular de cajones</div>
+<div class="npi"><span class="npe">🪝</span>Set ganchos adhesivos (sin agujerear)</div>
+<div class="npi"><span class="npe">👔</span>Tabla de planchar plegable</div>
+<div class="npi"><span class="npe">🌀</span>Aspiradora portátil de mano</div>
+<div class="npi"><span class="npe">🪟</span>Tendedero colgante de pared</div>
+<div class="npi"><span class="npe">🥐</span>Carrito bandeja desayuno (estético)</div>
+</div></div>
+
+<div class="st"><div class="stl">💡 Estrategia NAKU para Mariana</div>
+<h3>Antes y después. Fotos REALES de clientes. Alianzas con organizadoras profesionales.</h3>
+<p>Contenido "antes y después" en Instagram/TikTok (su feed natural). Alianza con AROPA y perfiles tipo @tuespacioorganizado. Foco marzo-abril y mayo. <strong>Fotos reales de clientes</strong> en cada ficha. Mostrar dimensiones y "cabe en X tipo de espacio" para matar el miedo de "no entra en mi casa". Comunicar "fácil de armar" con video. Considerar variantes de color (rosa, turquesa).</p></div>
+</div>
+<div class="bd" id="b3">
+<div class="bh"><div class="bca"><div class="bcae">🔧</div><div class="bcan">Juan</div><div class="bcat">El que tiene que Resolver · 30–55 años</div><div class="bcq">"Lo resolví yo. Tardé 20 minutos. Pagar a alguien era una locura."</div>
+<div class="bcs"><div><div class="bcsl">Género</div><div class="bcsv">53% hombres</div></div><div><div class="bcsl">Pico</div><div class="bcsv">Mayo · Junio (Mundial)</div></div><div><div class="bcsl">Compra</div><div class="bcsv">9-12hs · Lunes</div></div><div><div class="bcsl">Envío</div><div class="bcsv">53% Flex</div></div></div></div>
+<div class="bk">
+<div class="bki"><div><div class="bkl">🥇 Volumen ML</div><div class="bkv b">35,8%</div></div><div class="bkd">El <strong>#1 absoluto</strong> de NAKU. 35.262 unidades en ML. Corazón del negocio.</div></div>
+<div class="bki"><div><div class="bkl">💰 Facturación ML</div><div class="bkv">$1.389 M</div></div><div class="bkd">La más alta de los 5 en ML. Soportes TV son el alma de NAKU.</div><div class="cc"><div class="ch"><div class="chl">ML</div><div class="chv">$44K</div></div><div class="ch"><div class="chl">TN</div><div class="chv">$83K</div></div></div></div>
+<div class="bki"><div><div class="bkl">🔄 Devoluciones</div><div class="bkv g">4,9%</div></div><div class="bkd">Por debajo del promedio · Sus productos son robustos · Confianza alta</div></div>
+<div class="bki"><div><div class="bkl">🎯 Oportunidad</div><div class="bkv">🚀</div></div><div class="bkd"><strong>NO hay influencers DIY argentinos masivos</strong>. Espacio de marca vacante para NAKU.</div></div>
+</div></div>
+
+<div class="sb"><div class="sbt">🎭 Los 2 Juan</div><div class="sbs">El debate fuerte de la reunión: hay <strong>2 sub-perfiles</strong> que conviven en el mismo arquetipo.</div>
+<div class="sg">
+<div class="sc"><span class="sct">SUB 1</span><h5>🔧 El Fanático freaky</h5><p><strong>Le ENCANTA descifrar el manual</strong>. Va a la ferretería. Fetiche con herramientas. Vocación de servicio (le instala cosas a los primos). No le da el bolsillo para Bosch, va a NAKU.</p></div>
+<div class="sc"><span class="sct">SUB 2</span><h5>📋 El que TIENE que resolver</h5><p>No le emociona, pero <strong>es su deber</strong>. Su mujer/jefe le pide. Compra él, a veces lo arma otro (un primo). Igual: <strong>él elige el SKU</strong>. Hablarle a él en la publi.</p></div>
+</div></div>
+
+<div class="eh"><div class="et">🧠 ¿Cómo piensa Juan?</div><div class="es">El orgullo del "yo lo hago" en un país donde la mano de obra está cara.</div></div>
+<div class="eg">
+<div class="ec"><div class="ech"><div class="ei">💭</div><div><div class="ecl">Piensa & siente</div><div class="ecq">"¿Para qué pago si lo hago yo?"</div></div></div>
+<ul class="el">
+<li>Orgullo de <strong>arreglárselas solo</strong>. "Yo lo hago, no llamo a nadie."</li>
+<li>Satisfacción y ahorro al instalar él mismo (TV, cámara, escalera).</li>
+<li>En 2026 valora más que nunca el DIY: <strong>la mano de obra está cara</strong>.</li>
+<li><strong>Anticipa problemas:</strong> compra la caja de herramientas / escalera "por las dudas".</li>
+<li>Quiere resolver rápido y bien, sin depender de terceros.</li>
+</ul>
+<div class="qb">"Vino con todo lo que necesitaba. No tuve que ir a la ferretería. 10 puntos."</div></div>
+
+<div class="ec"><div class="ech"><div class="ei">👂</div><div><div class="ecl">Oye</div><div class="ecq">¿Qué le dice su entorno?</div></div></div>
+<ul class="el">
+<li><strong>Entorno:</strong> "Che, ¿me ayudás a colgar la tele?", "vos sabés de estas cosas".</li>
+<li>Su mujer/jefe: "ocupate, sería bueno tener esto".</li>
+<li><strong>Referentes:</strong> NO hay youtubers DIY argentinos masivos. Tutoriales genéricos.</li>
+<li>Inspiración: Easy/Sodimac "Hágalo Usted Mismo", carpintería de Rada.</li>
+<li><strong>Cultura:</strong> autosuficiencia, "para qué pagar si lo hago yo".</li>
+</ul></div>
+
+<div class="ec"><div class="ech"><div class="ei">👁️</div><div><div class="ecl">Ve</div><div class="ecq">¿Qué consume?</div></div></div>
+<ul class="el">
+<li>Tutoriales de "cómo colgar tu TV", instalación de cámaras WiFi.</li>
+<li>Comparativas de soportes y escaleras.</li>
+<li><strong>YouTube es su plataforma clave</strong> (busca el paso a paso).</li>
+<li>Facebook/Marketplace, publi de ferreterías y home centers.</li>
+<li><strong>Ve problemas alrededor</strong>: picaporte mal puesto, cuadro torcido. Le molesta. Lo arregla.</li>
+</ul></div>
+
+<div class="ec"><div class="ech"><div class="ei">💬</div><div><div class="ecl">Dice & hace</div><div class="ecq">¿Cómo compra?</div></div></div>
+<ul class="el">
+<li><strong>Se jacta:</strong> "mira lo que hice", "lo arreglé solo".</li>
+<li>Busca <strong>kit completo</strong>: que traiga tornillos, fichas, instructivo.</li>
+<li>Compra anticipando: la caja de herramientas "por las dudas".</li>
+<li>Valora reseñas técnicas y videos de instalación de otros usuarios.</li>
+<li>Cuotas moderadas (3,1).</li>
+</ul>
+<div class="qb">"Lo hice yo. Si llamaba a alguien me gastaba 100 lucas al pedo."</div></div>
+
+<div class="ec pn"><div class="ech"><div class="ei">⚠️</div><div><div class="ecl">Dolores · Esfuerzos</div><div class="ecq">¿Qué le quita el sueño?</div></div></div>
+<ul class="el">
+<li>Que el producto venga incompleto (faltan tornillos/tarugos) → <strong>tener que ir a la ferretería</strong>.</li>
+<li>Instrucciones malas o que no calce con su pared/TV.</li>
+<li>Que el soporte no sea seguro → miedo a que se caiga la TV.</li>
+<li>Postventa inexistente del importado.</li>
+<li><strong>Haber elegido mal</strong> el producto (por eso mira tantas reseñas).</li>
+</ul></div>
+
+<div class="ec gn"><div class="ech"><div class="ei">🎯</div><div><div class="ecl">Ganancias · Resultados</div><div class="ecq">¿Cuándo siente que ganó?</div></div></div>
+<ul class="el">
+<li>Resolver el problema <strong>rápido, seguro y sin vueltas</strong>.</li>
+<li>"Lo instalé en 20 minutos y quedó perfecto."</li>
+<li>Kit completo, instructivo claro, seguridad/robustez.</li>
+<li><strong>Endorfinas del DIY</strong>: bienestar de haber resuelto algo con sus manos.</li>
+<li>Validación del entorno: "este sabe, hace todo en su casa".</li>
+</ul></div>
+</div>
+
+<div class="eh" style="margin-top:48px"><div class="et">📊 ¿Cuándo y cómo compra?</div><div class="es">Patrones de 35.262 ventas en ML — el buyer más grande.</div></div>
+<div class="dg th">
+<div class="dc"><div class="dch"><span class="dce">🕐</span><span class="dcl">Hora del día</span></div><h4>Mañana laboral</h4>
+<div class="hc"><div class="hco"><div class="hb" style="height:31%"></div><div class="hl">Madr</div></div><div class="hco"><div class="hb" style="height:53%"></div><div class="hl">6-9</div></div><div class="hco"><div class="hb pk" style="height:100%"></div><div class="hl">9-12</div></div><div class="hco"><div class="hb" style="height:79%"></div><div class="hl">12-15</div></div><div class="hco"><div class="hb" style="height:61%"></div><div class="hl">15-18</div></div><div class="hco"><div class="hb" style="height:62%"></div><div class="hl">18-21</div></div><div class="hco"><div class="hb" style="height:31%"></div><div class="hl">Noche</div></div></div>
+<p style="font-size:13px;color:var(--tm);margin-top:14px">Pico 9-12h (24%). En el laburo, entre llamadas.</p></div>
+
+<div class="dc"><div class="dch"><span class="dce">📅</span><span class="dcl">Día semana</span></div><h4>Lunes resuelve</h4>
+<div class="hc"><div class="hco"><div class="hb pk" style="height:100%"></div><div class="hl">Lun</div></div><div class="hco"><div class="hb" style="height:93%"></div><div class="hl">Mar</div></div><div class="hco"><div class="hb" style="height:90%"></div><div class="hl">Mié</div></div><div class="hco"><div class="hb" style="height:90%"></div><div class="hl">Jue</div></div><div class="hco"><div class="hb" style="height:88%"></div><div class="hl">Vie</div></div><div class="hco"><div class="hb" style="height:66%"></div><div class="hl">Sáb</div></div><div class="hco"><div class="hb" style="height:65%"></div><div class="hl">Dom</div></div></div>
+<p style="font-size:13px;color:var(--tm);margin-top:14px">Lunes 17%. "Pasó el finde, hay que ponerse a resolver."</p></div>
+
+<div class="dc"><div class="dch"><span class="dce">📆</span><span class="dcl">Estacionalidad</span></div><h4>Hot Sale + Mundial</h4>
+<div class="se2"><div class="seo"><div class="sba md" style="height:22%"></div><div class="sel">E</div></div><div class="seo"><div class="sba md" style="height:25%"></div><div class="sel">F</div></div><div class="seo"><div class="sba hi" style="height:40%"></div><div class="sel">M</div></div><div class="seo"><div class="sba hi" style="height:60%"></div><div class="sel">A</div></div><div class="seo"><div class="sba pk" style="height:100%"></div><div class="sel">M</div></div><div class="seo"><div class="sba pk" style="height:90%"></div><div class="sel">J</div></div><div class="seo"><div class="sba md" style="height:30%"></div><div class="sel">J</div></div><div class="seo"><div class="sba md" style="height:32%"></div><div class="sel">A</div></div><div class="seo"><div class="sba md" style="height:35%"></div><div class="sel">S</div></div><div class="seo"><div class="sba hi" style="height:42%"></div><div class="sel">O</div></div><div class="seo"><div class="sba hi" style="height:55%"></div><div class="sel">N</div></div><div class="seo"><div class="sba md" style="height:38%"></div><div class="sel">D</div></div></div>
+<p style="font-size:13px;color:var(--tm);margin-top:14px"><strong>Mayo y Junio</strong> picos. <strong>Mundial 2026</strong>: TVs nuevas que hay que colgar.</p></div>
+</div>
+
+<div class="dg">
+<div class="dc"><div class="dch"><span class="dce">🗺️</span><span class="dcl">Mapa de calor</span></div><h4>De dónde compra Juan</h4>
+<ul class="gl"><li class="gi"><span class="gr">1</span><span class="gn">🏙️ Buenos Aires</span><span class="gp">48,8%</span></li><li class="gi"><span class="gr">2</span><span class="gn">🌆 Capital Federal</span><span class="gp">19,1%</span></li><li class="gi"><span class="gr">3</span><span class="gn">🏔️ Córdoba</span><span class="gp">6,8%</span></li><li class="gi"><span class="gr">4</span><span class="gn">🌾 Santa Fe</span><span class="gp">5,7%</span></li><li class="gi"><span class="gr">5</span><span class="gn">🍷 Mendoza</span><span class="gp">2,3%</span></li></ul>
+<p style="font-size:13px;color:var(--tm);margin-top:12px"><strong>68% AMBA</strong>. Tiempo entrega: 1,7 días. AMBA: mismo día.</p></div>
+
+<div class="dc"><div class="dch"><span class="dce">🚚</span><span class="dcl">Forma de envío</span></div><h4>Lo necesita ya</h4>
+<div class="sh1"><div><span>⚡ Mercado Envíos Flex</span><span>52,9%</span></div><div><span>📦 Colecta ML</span><span>31,3%</span></div><div><span>🏬 Mercado Envíos Full</span><span>12,8%</span></div></div>
+<p style="font-size:13px;color:var(--tm);margin-top:14px"><strong>84% rápido</strong>. Compró la TV, ahora hay que colgarla.</p></div>
+</div>
+
+<div class="dg">
+<div class="dc"><div class="dch"><span class="dce">🏆</span><span class="dcl">Top SKUs por categoría</span></div>
+<h4>Sus productos estrella</h4>
+<p style="font-size:12px;color:var(--tm);margin-bottom:14px">Categorías ordenadas por facturación. Clickeá para ver el top de cada una.</p>
+<div class="ca op"><div class="cah" onclick="tc(this)"><span class="cae">📺</span><div class="cai"><div class="can">TV</div><div class="cam">$1365.8M · 29,365 ud · 38 SKUs</div></div><span class="car2">▼</span></div><div class="cab"><ul class="sl"><li class="sli"><span class="skc">SP-446</span><span class="sku">4,413 ud</span><span class="skp">$56K</span></li><li class="sli"><span class="skc">SH-446</span><span class="sku">4,223 ud</span><span class="skp">$55K</span></li><li class="sli"><span class="skc">SE-446</span><span class="sku">3,881 ud</span><span class="skp">$45K</span></li><li class="sli"><span class="skc">SSP-223L</span><span class="sku">2,120 ud</span><span class="skp">$46K</span></li><li class="sli"><span class="skc">SP-44B</span><span class="sku">1,756 ud</span><span class="skp">$15K</span></li><li class="sli"><span class="skc">SH-443WL</span><span class="sku">1,189 ud</span><span class="skp">$52K</span></li></ul></div></div>
+<div class="ca"><div class="cah" onclick="tc(this)"><span class="cae">🔧</span><div class="cai"><div class="can">Herramientas y equipamiento</div><div class="cam">$342.2M · 4,060 ud · 6 SKUs</div></div><span class="car2">▼</span></div><div class="cab"><ul class="sl"><li class="sli"><span class="skc">—</span><span class="sku">1,528 ud</span><span class="skp">$93K</span></li><li class="sli"><span class="skc">ESC-001</span><span class="sku">1,311 ud</span><span class="skp">$129K</span></li><li class="sli"><span class="skc">ESC-003</span><span class="sku">799 ud</span><span class="skp">$125K</span></li><li class="sli"><span class="skc">ESC-002</span><span class="sku">371 ud</span><span class="skp">$182K</span></li><li class="sli"><span class="skc">CH-01</span><span class="sku">36 ud</span><span class="skp">$50K</span></li><li class="sli"><span class="skc">ESC-005</span><span class="sku">15 ud</span><span class="skp">$120K</span></li></ul></div></div>
+<div class="ca"><div class="cah" onclick="tc(this)"><span class="cae">📹</span><div class="cai"><div class="can">Seguridad y vigilancia</div><div class="cam">$76.5M · 1,027 ud · 15 SKUs</div></div><span class="car2">▼</span></div><div class="cab"><ul class="sl"><li class="sli"><span class="skc">CV-002</span><span class="sku">177 ud</span><span class="skp">$53K</span></li><li class="sli"><span class="skc">CV-002 X 2 UNITS</span><span class="sku">167 ud</span><span class="skp">$94K</span></li><li class="sli"><span class="skc">CV-001</span><span class="sku">158 ud</span><span class="skp">$41K</span></li><li class="sli"><span class="skc">CV-001 X 3 UNITS</span><span class="sku">125 ud</span><span class="skp">$115K</span></li><li class="sli"><span class="skc">CV-001 X 2 UNITS</span><span class="sku">125 ud</span><span class="skp">$79K</span></li><li class="sli"><span class="skc">CV-002 X 3 UNITS</span><span class="sku">85 ud</span><span class="skp">$142K</span></li></ul></div></div>
+<div class="ca"><div class="cah" onclick="tc(this)"><span class="cae">🖥️</span><div class="cai"><div class="can">Monitor</div><div class="cam">$39.2M · 874 ud · 4 SKUs</div></div><span class="car2">▼</span></div><div class="cab"><ul class="sl"><li class="sli"><span class="skc">SM-T01</span><span class="sku">390 ud</span><span class="skp">$33K</span></li><li class="sli"><span class="skc">SP-11W</span><span class="sku">262 ud</span><span class="skp">$33K</span></li><li class="sli"><span class="skc">PP-C024D</span><span class="sku">151 ud</span><span class="skp">$89K</span></li><li class="sli"><span class="skc">PP-1032M</span><span class="sku">71 ud</span><span class="skp">$59K</span></li></ul></div></div>
+</div>
+
+<div class="dc"><div class="dch"><span class="dce">🔗</span><span class="dcl">Cross-sell</span></div><h4>Pares ganadores</h4>
+<div class="cp"><span class="skc">SE-446</span><span class="car">+</span><span class="skc">SH-446</span><span class="cco">12 pares</span></div>
+<div class="cp"><span class="skc">SE-446</span><span class="car">+</span><span class="skc">SP-446</span><span class="cco">11 pares</span></div>
+<div class="cp"><span class="skc">SP-446</span><span class="car">+</span><span class="skc">SH-446</span><span class="cco">9 pares</span></div>
+<div class="hb2" style="margin-top:12px;padding:14px 18px"><strong>💡 La casa con varias TVs:</strong> compra 2 soportes (living + dormitorio). <strong>Pack 2 soportes</strong> = oportunidad.</div></div>
+</div>
+
+<div class="np"><div class="npl">🚀 Productos nuevos sugeridos</div><h4>¿Qué más le podríamos vender a Juan?</h4><p class="npd">El <strong>"one-stop shop"</strong>: que no salga de NAKU para terminar la instalación. Lo que pidió Ariel en la reunión.</p>
+<div class="npg">
+<div class="npi"><span class="npe">🔩</span>Set universal de tornillería</div>
+<div class="npi"><span class="npe">🪛</span>Set de mechas para taladro</div>
+<div class="npi"><span class="npe">🔑</span>Llave Allen multipropósito</div>
+<div class="npi"><span class="npe">⚡</span>Multímetro digital básico</div>
+<div class="npi"><span class="npe">📏</span>Cinta métrica + nivel láser</div>
+<div class="npi"><span class="npe">🔦</span>Linterna LED frontal recargable</div>
+<div class="npi"><span class="npe">🔌</span>Multiplicador con protector tensión</div>
+<div class="npi"><span class="npe">🧰</span>Caja herramientas básica (no Bosch)</div>
+<div class="npi"><span class="npe">🧵</span>Set bridas y organizadores cable</div>
+</div></div>
+
+<div class="st"><div class="stl">💡 Estrategia NAKU para Juan</div>
+<h3>Crear el espacio DIY argentino que no existe. Tutoriales propios. One-stop shop.</h3>
+<p>El espacio DIY argentino está vacío de referentes masivos. <strong>NAKU puede ocuparlo</strong>: videos "cómo colgar tu TV en 20 minutos", "cómo instalar tu cámara WiFi". Destacar "kit completo, viene todo" en cada ficha. Vincular soportes TV con el Mundial 2026. Mostrar videos reales de instalación. <strong>Vender tornillos, mechas, llaves Allen como complemento</strong> para que no salga a la ferretería.</p></div>
+</div>
+<div class="bd" id="b4">
+<div class="bh"><div class="bca"><div class="bcae">🏕️</div><div class="bcan">Lucho</div><div class="bcat">El Aventurero Familiar · 30–50 años</div><div class="bcq">"Armamos el operativo. ¿Quién lleva el gazebo?"</div>
+<div class="bcs"><div><div class="bcsl">Género</div><div class="bcsv">48% M / 37% H</div></div><div><div class="bcsl">Pico</div><div class="bcsv">Enero · Abril · Dic</div></div><div><div class="bcsl">Compra</div><div class="bcsv">9-12hs y 18-21hs</div></div><div><div class="bcsl">Envío</div><div class="bcsv">55% Colecta</div></div></div></div>
+<div class="bk">
+<div class="bki"><div><div class="bkl">📊 Volumen ML</div><div class="bkv b">6,2%</div></div><div class="bkd">6.146 unidades · Segmento chico pero <strong>estacional concentrado</strong> · Mucha venta en pocas semanas</div></div>
+<div class="bki"><div><div class="bkl">🔁 Recompra</div><div class="bkv g">5,5%</div></div><div class="bkd"><strong>La más alta de todos</strong>. Vuelve al año siguiente con nuevas necesidades outdoor.</div></div>
+<div class="bki"><div><div class="bkl">🔄 Devoluciones</div><div class="bkv r">8,6%</div></div><div class="bkd"><strong>¡Alerta! Casi 2x el promedio</strong>. Productos que se rompen al primer uso. Revisar SOM-1, GZB, MP-002.</div></div>
+<div class="bki"><div><div class="bkl">🌎 Insight</div><div class="bkv">⚖️</div></div><div class="bkd"><strong>Mixto en género</strong>: 48% mujeres, 37% hombres. NO es "solo papá outdoor".</div></div>
+</div></div>
+
+<div class="sb"><div class="sbt">🎭 Los 2 Lucho</div><div class="sbs">El que se va a Gualeguaychú no es el mismo que pone gazebo en su patio.</div>
+<div class="sg">
+<div class="sc"><span class="sct">SUB 1</span><h5>🚐 El Nómade Camping</h5><p>Se va al carnaval de Gualeguaychú, a Mar del Plata en enero, al camping del Bolsón. <strong>Liviano, plegable, transportable</strong>. MP-002 y reposeras viajan en el baúl.</p></div>
+<div class="sc"><span class="sct">SUB 2</span><h5>🏡 El de Jardín/Patio (PH)</h5><p>Tiene un PH con patio o departamento con balcón. <strong>NO es Nordelta</strong> (esos van a Landmark). Pone su GZB-002 los fines de semana para el asado. Mismo target, distinto uso.</p></div>
+</div></div>
+
+<div class="eh"><div class="et">🧠 ¿Cómo piensa Lucho?</div><div class="es">"Cinco para el peso": aspira a algo más grande pero no llega. Le hace funcionar lo que tiene.</div></div>
+<div class="eg">
+<div class="ec"><div class="ech"><div class="ei">💭</div><div><div class="ecl">Piensa & siente</div><div class="ecq">"Que la familia la pase bien sin gastar una fortuna."</div></div></div>
+<ul class="el">
+<li>Quiere <strong>hacer vivir momentos a la familia</strong>: asados, escapadas, camping.</li>
+<li>En 2026, con menos plata para turismo caro, <strong>la salida cercana es la forma accesible</strong>.</li>
+<li>"Cinco para el peso": aspira al quincho pero compra gazebo. Aspira a la carpa pero lleva sombrilla.</li>
+<li>Siente <strong>orgullo de ser el que organiza</strong>.</li>
+<li>NO prioriza estético, prioriza funcional y resistente.</li>
+</ul>
+<div class="qb">"No llegamos a Brasil, pero nos armamos un finde bárbaro en el camping."</div></div>
+
+<div class="ec"><div class="ech"><div class="ei">👂</div><div><div class="ecl">Oye</div><div class="ecq">¿Qué le dice su entorno?</div></div></div>
+<ul class="el">
+<li><strong>Familia/amigos:</strong> "¿Dónde vamos el finde?", "llevá la mesa y las reposeras".</li>
+<li><strong>Referentes:</strong> Locos x el Asado / "Laucha" Luchetti (~3,6M).</li>
+<li>Cuentas viaje familiar: Dando Vueltas, Rodando por Argentina, La Marta Viajera.</li>
+<li><strong>Cultura:</strong> el asado como ritual, "reconectar con naturaleza", camping como plan económico.</li>
+<li>Quiere <strong>influenciar a sus pares</strong>: "compralo, está buenísimo".</li>
+</ul></div>
+
+<div class="ec"><div class="ech"><div class="ei">👁️</div><div><div class="ecl">Ve</div><div class="ecq">¿Qué consume?</div></div></div>
+<ul class="el">
+<li>Reels de asados, camping, gazebos, mesas plegables, reposeras gravedad cero.</li>
+<li>Videos de escapadas y campings argentinos.</li>
+<li>Grupos de Facebook (camping, salidas, motorhome).</li>
+<li>Publicidad estacional (verano/fiestas).</li>
+<li>Ve <strong>productos expuestos a la vista</strong>: jardín, balcón, playa. Por eso siente orgullo.</li>
+</ul></div>
+
+<div class="ec"><div class="ech"><div class="ei">💬</div><div><div class="ecl">Dice & hace</div><div class="ecq">¿Cómo compra?</div></div></div>
+<ul class="el">
+<li>Compra <strong>estacional concentrada</strong> (enero, diciembre, abril).</li>
+<li>Compara y prioriza durabilidad/transporte.</li>
+<li>Usa pocas cuotas (3,0). Decisión <strong>compartida en pareja</strong>.</li>
+<li>Sensible al "llega a tiempo" (antes del finde o vacaciones).</li>
+<li>Persona proactiva, multitasking, positiva. Valora el aire fresco.</li>
+</ul>
+<div class="qb">"Mira lo que me compré, es una bomba." — Y se lo recomienda a todo el mundo.</div></div>
+
+<div class="ec pn"><div class="ech"><div class="ei">⚠️</div><div><div class="ecl">Dolores · Esfuerzos</div><div class="ecq">¿Qué le quita el sueño?</div></div></div>
+<ul class="el">
+<li>Productos que se rompen al primer uso o no aguantan sol/viento. <strong>8,6% devuelve</strong>.</li>
+<li>Que sea difícil de transportar o armar (con la familia esperando).</li>
+<li>Llegar justo para la fecha: que el envío no llegue antes del finde.</li>
+<li>Presupuesto: que entre en el plan sin desarmar las vacaciones.</li>
+<li><strong>Clavarse</strong>: comprar barato y arrepentirse.</li>
+</ul></div>
+
+<div class="ec gn"><div class="ech"><div class="ei">🎯</div><div><div class="ecl">Ganancias · Resultados</div><div class="ecq">¿Cuándo siente que ganó?</div></div></div>
+<ul class="el">
+<li><strong>Salidas memorables sin contratiempos</strong>.</li>
+<li>"Funcionó todo, la pasamos bárbaro y lo uso por años."</li>
+<li>Confiabilidad: que el producto "esté a la altura del momento familiar".</li>
+<li>Foto de la familia disfrutando = <strong>ROI emocional</strong>.</li>
+<li>Que dure varias temporadas (2-3 años mínimo).</li>
+</ul></div>
+</div>
+
+<div class="eh" style="margin-top:48px"><div class="et">📊 ¿Cuándo y cómo compra?</div><div class="es">Patrones de 6.146 ventas en ML — el más estacional.</div></div>
+<div class="dg th">
+<div class="dc"><div class="dch"><span class="dce">🕐</span><span class="dcl">Hora del día</span></div><h4>Planifica de noche</h4>
+<div class="hc"><div class="hco"><div class="hb" style="height:29%"></div><div class="hl">Madr</div></div><div class="hco"><div class="hb" style="height:46%"></div><div class="hl">6-9</div></div><div class="hco"><div class="hb pk" style="height:100%"></div><div class="hl">9-12</div></div><div class="hco"><div class="hb" style="height:80%"></div><div class="hl">12-15</div></div><div class="hco"><div class="hb" style="height:66%"></div><div class="hl">15-18</div></div><div class="hco"><div class="hb pk" style="height:75%"></div><div class="hl">18-21</div></div><div class="hco"><div class="hb" style="height:36%"></div><div class="hl">Noche</div></div></div>
+<p style="font-size:13px;color:var(--tm);margin-top:14px"><strong>Pico distintivo 18-21h (17,4%)</strong> · Planifica el finde de noche.</p></div>
+
+<div class="dc"><div class="dch"><span class="dce">📅</span><span class="dcl">Día semana</span></div><h4>Activo fin de semana</h4>
+<div class="hc"><div class="hco"><div class="hb pk" style="height:100%"></div><div class="hl">Lun</div></div><div class="hco"><div class="hb" style="height:96%"></div><div class="hl">Mar</div></div><div class="hco"><div class="hb" style="height:89%"></div><div class="hl">Mié</div></div><div class="hco"><div class="hb" style="height:87%"></div><div class="hl">Jue</div></div><div class="hco"><div class="hb" style="height:83%"></div><div class="hl">Vie</div></div><div class="hco"><div class="hb" style="height:75%"></div><div class="hl">Sáb</div></div><div class="hco"><div class="hb" style="height:73%"></div><div class="hl">Dom</div></div></div>
+<p style="font-size:13px;color:var(--tm);margin-top:14px"><strong>Sábado y domingo 12% c/u</strong>. Mientras planifica el próximo finde.</p></div>
+
+<div class="dc"><div class="dch"><span class="dce">📆</span><span class="dcl">Estacionalidad</span></div><h4>Verano + fiestas</h4>
+<div class="se2"><div class="seo"><div class="sba pk" style="height:100%"></div><div class="sel">E</div></div><div class="seo"><div class="sba hi" style="height:55%"></div><div class="sel">F</div></div><div class="seo"><div class="sba md" style="height:30%"></div><div class="sel">M</div></div><div class="seo"><div class="sba pk" style="height:85%"></div><div class="sel">A</div></div><div class="seo"><div class="sba hi" style="height:50%"></div><div class="sel">M</div></div><div class="seo"><div class="sba md" style="height:20%"></div><div class="sel">J</div></div><div class="seo"><div class="sba md" style="height:18%"></div><div class="sel">J</div></div><div class="seo"><div class="sba md" style="height:25%"></div><div class="sel">A</div></div><div class="seo"><div class="sba md" style="height:32%"></div><div class="sel">S</div></div><div class="seo"><div class="sba hi" style="height:45%"></div><div class="sel">O</div></div><div class="seo"><div class="sba hi" style="height:55%"></div><div class="sel">N</div></div><div class="seo"><div class="sba pk" style="height:80%"></div><div class="sel">D</div></div></div>
+<p style="font-size:13px;color:var(--tm);margin-top:14px"><strong>Enero (verano)</strong>, <strong>Abril (Semana Santa)</strong>, <strong>Diciembre (fiestas)</strong>.</p></div>
+</div>
+
+<div class="dg">
+<div class="dc"><div class="dch"><span class="dce">🗺️</span><span class="dcl">Mapa de calor</span></div><h4>De dónde compra Lucho</h4>
+<ul class="gl"><li class="gi"><span class="gr">1</span><span class="gn">🏙️ Buenos Aires</span><span class="gp">49,7%</span></li><li class="gi"><span class="gr">2</span><span class="gn">🌆 Capital Federal</span><span class="gp">9,1%</span></li><li class="gi"><span class="gr">3</span><span class="gn">🏔️ Córdoba</span><span class="gp">8,9%</span></li><li class="gi"><span class="gr">4</span><span class="gn">🌾 Santa Fe</span><span class="gp">8,9%</span></li><li class="gi"><span class="gr">5</span><span class="gn">🏔️ Neuquén</span><span class="gp">3,6%</span></li></ul>
+<p style="font-size:13px;color:var(--tm);margin-top:12px"><strong>Menos CABA (9%) y más interior</strong>. Patagonia más fuerte que en otros buyers.</p></div>
+
+<div class="dc"><div class="dch"><span class="dce">🚚</span><span class="dcl">Forma de envío</span></div><h4>Va a buscarlo él</h4>
+<div class="sh1"><div><span>📦 Colecta ML</span><span>54,7%</span></div><div><span>⚡ Mercado Envíos Flex</span><span>43,2%</span></div><div><span>🏬 Mercado Envíos Full</span><span>0,6%</span></div></div>
+<p style="font-size:13px;color:var(--tm);margin-top:14px"><strong>Casi nada de Full</strong>. Productos grandes (gazebos, mesas) que él va a buscar.</p></div>
+</div>
+
+<div class="dg">
+<div class="dc"><div class="dch"><span class="dce">🏆</span><span class="dcl">Top SKUs por categoría</span></div>
+<h4>Sus productos estrella</h4>
+<p style="font-size:12px;color:var(--tm);margin-bottom:14px">Categorías ordenadas por facturación. Clickeá para ver el top de cada una.</p>
+<div class="ca op"><div class="cah" onclick="tc(this)"><span class="cae">⛱️</span><div class="cai"><div class="can">Exterior y aire libre</div><div class="cam">$269.0M · 3,787 ud · 14 SKUs</div></div><span class="car2">▼</span></div><div class="cab"><ul class="sl"><li class="sli"><span class="skc">MP-002</span><span class="sku">2,320 ud</span><span class="skp">$48K</span></li><li class="sli"><span class="skc">GZB-002 A</span><span class="sku">325 ud</span><span class="skp">$180K</span></li><li class="sli"><span class="skc">SOM-2 A</span><span class="sku">312 ud</span><span class="skp">$29K</span></li><li class="sli"><span class="skc">REP-001</span><span class="sku">265 ud</span><span class="skp">$81K</span></li><li class="sli"><span class="skc">REP-001 X2</span><span class="sku">125 ud</span><span class="skp">$155K</span></li><li class="sli"><span class="skc">MP-001 NEGRA</span><span class="sku">125 ud</span><span class="skp">$78K</span></li></ul></div></div>
+<div class="ca"><div class="cah" onclick="tc(this)"><span class="cae">📦</span><div class="cai"><div class="can">Otros</div><div class="cam">$108.0M · 1,228 ud · 6 SKUs</div></div><span class="car2">▼</span></div><div class="cab"><ul class="sl"><li class="sli"><span class="skc">MP-001</span><span class="sku">681 ud</span><span class="skp">$74K</span></li><li class="sli"><span class="skc">SOM-2 R</span><span class="sku">233 ud</span><span class="skp">$29K</span></li><li class="sli"><span class="skc">GZB-002 R</span><span class="sku">228 ud</span><span class="skp">$180K</span></li><li class="sli"><span class="skc">GZB-001 R</span><span class="sku">81 ud</span><span class="skp">$121K</span></li><li class="sli"><span class="skc">MP-001-NEGRA</span><span class="sku">3 ud</span><span class="skp">$78K</span></li><li class="sli"><span class="skc">SOM-1R</span><span class="sku">2 ud</span><span class="skp">$28K</span></li></ul></div></div>
+</div>
+
+<div class="dc"><div class="dch"><span class="dce">🔗</span><span class="dcl">Cross-sell</span></div><h4>Pares ganadores</h4>
+<div class="cp"><span class="skc">SOM-2 A</span><span class="car">+</span><span class="skc">SOM-2 R</span><span class="cco">9 pares</span></div>
+<div class="cp"><span class="skc">SOM-1 A</span><span class="car">+</span><span class="skc">SOM-1 R</span><span class="cco">8 pares</span></div>
+<div class="cp"><span class="skc">REP-001</span><span class="car">+</span><span class="skc">REP-001 x2</span><span class="cco">5+ pares</span></div>
+<div class="hb2" style="margin-top:12px;padding:14px 18px"><strong>💡 Familia de varios:</strong> compra 2 sombrillas. <strong>Pack familia outdoor</strong>: gazebo + mesa + 2 reposeras + 2 sombrillas.</div></div>
+</div>
+
+<div class="np"><div class="npl">🚀 Productos nuevos sugeridos</div><h4>¿Qué más le podríamos vender a Lucho?</h4><p class="npd">Todo lo que falta para que arme el operativo familiar completo en NAKU.</p>
+<div class="npg">
+<div class="npi"><span class="npe">🧊</span>Conservadora plegable</div>
+<div class="npi"><span class="npe">☕</span>Pava plegable para camping</div>
+<div class="npi"><span class="npe">💡</span>Lámpara LED solar / linterna</div>
+<div class="npi"><span class="npe">⛺</span>Carpa pop-up de 1 minuto</div>
+<div class="npi"><span class="npe">🔋</span>Cargador solar portátil</div>
+<div class="npi"><span class="npe">💧</span>Bidón dispenser agua plegable</div>
+<div class="npi"><span class="npe">🍖</span>Set utensilios de asado plegables</div>
+<div class="npi"><span class="npe">🎒</span>Mochila playera / canasta picnic</div>
+<div class="npi"><span class="npe">🏖️</span>Paredes adicionales para gazebo</div>
+</div></div>
+
+<div class="st"><div class="stl">💡 Estrategia NAKU para Lucho</div>
+<h3>Campañas estacionales. Llega para el finde. Revisar calidad (devuelve 8,6%).</h3>
+<p>Campañas estacionales: diciembre-enero (verano), abril (Semana Santa), octubre-noviembre (pre-fiestas). Estética asado/camping/playa con creadores tipo "Locos x el Asado". Garantizar entrega antes de fechas clave: <strong>"te llega para el finde"</strong> como promesa. Mostrar reels reales de familias usando los productos. <strong>Atención: revisar calidad de SOM-1, GZB-002 y MP-002</strong> que tienen 8,6% de devolución (casi 2x el promedio). Problema operativo serio.</p></div>
+</div>
+<div class="bd" id="b5">
+<div class="bh"><div class="bca"><div class="bcae">🏪</div><div class="bcan">Mario</div><div class="bcat">El Comerciante de Barrio · 35–55 años</div><div class="bcq">"Si esto me falla, paro de facturar. No es opcional, lo necesito ya."</div>
+<div class="bcs"><div><div class="bcsl">Género</div><div class="bcsv">Equilibrado</div></div><div><div class="bcsl">Pico</div><div class="bcsv">Marzo · Abril · Mayo</div></div><div><div class="bcsl">Compra</div><div class="bcsv">6-9hs y 9-12hs</div></div><div><div class="bcsl">Envío</div><div class="bcsv">49% Colecta</div></div></div></div>
+<div class="bk">
+<div class="bki"><div><div class="bkl">📊 Volumen ML</div><div class="bkv b">6,7%</div></div><div class="bkd">5.991 unidades · Segmento chico pero <strong>estratégico por recurrencia de consumibles</strong></div></div>
+<div class="bki"><div><div class="bkl">💳 Cuotas</div><div class="bkv g">2,5</div></div><div class="bkd"><strong>El que MENOS cuotas usa</strong>. Paga rápido. No quiere endeudarse: cada peso es del negocio.</div></div>
+<div class="bki"><div><div class="bkl">🏷️ Ticket promedio</div><div class="bkv">$51K</div></div><div class="bkd">El más bajo. Compras individuales chicas. <strong>Potencial recompra de insumos.</strong></div></div>
+<div class="bki"><div><div class="bkl">🧾 Factura A</div><div class="bkv">⭐</div></div><div class="bkd">14% de las compras son CUIT (empresa). Necesita factura para descargar IVA (-21%).</div></div>
+</div></div>
+
+<div class="sb"><div class="sbt">🎭 Los 2 Mario</div><div class="sbs">El dueño que equipa su comercio vs el revendedor que compra para revender.</div>
+<div class="sg">
+<div class="sc"><span class="sct">SUB 1</span><h5>🏪 El Dueño del Comercio</h5><p>Tiene kiosco, polirubro, almacén, dietética, indumentaria. <strong>Equipa su negocio</strong>: selladora, lector, contadora. Compra por ML o TN, busca factura y rapidez. Lo conocemos.</p></div>
+<div class="sc"><span class="sct">SUB 2</span><h5>📞 El Revendedor B2B (WhatsApp)</h5><p><strong>Este NO pasa por ML/TN</strong>. Empresa o persona que <strong>compra para revender</strong> productos NAKU. Va por WhatsApp/mail directo. Mínimo ~$150K. Canal aparte, off-platform.</p></div>
+</div></div>
+
+<div class="eh"><div class="et">🧠 ¿Cómo piensa Mario?</div><div class="es">Acelerado, multitasking, sin tiempo para vueltas. El comercio de barrio en 2026 está exigido.</div></div>
+<div class="eg">
+<div class="ec"><div class="ech"><div class="ei">💭</div><div><div class="ecl">Piensa & siente</div><div class="ecq">"Esto me tiene que servir para laburar."</div></div></div>
+<ul class="el">
+<li>Necesita equipar/mejorar su negocio, <strong>gastando lo justo</strong>.</li>
+<li>En 2026 el comercio de barrio está exigido: consumo en baja, competencia importada, costos en alza.</li>
+<li>Piensa en términos de ROI: <strong>cada peso debe volver</strong>.</li>
+<li>NO busca marca aspiracional sino <strong>funcional y durable</strong>.</li>
+<li>Sentido de urgencia <strong>mucho más alto</strong> que los demás buyers.</li>
+</ul>
+<div class="qb">"Si esto me falla, paro de facturar. No es opcional, lo necesito ya."</div></div>
+
+<div class="ec"><div class="ech"><div class="ei">👂</div><div><div class="ecl">Oye</div><div class="ecq">¿Qué le dice su entorno?</div></div></div>
+<ul class="el">
+<li><strong>Colegas:</strong> "¿Con qué selladora trabajás?", "conseguite un lector que te agilice la caja".</li>
+<li><strong>Empleados:</strong> "necesitamos esto para mejorar".</li>
+<li><strong>Referentes:</strong> Ariel Baños (precios), Endeavor Argentina, ASEA, podcast EMPRE.AR.</li>
+<li><strong>Bancos pyme:</strong> Mercado Pago, Banco Nación, programas Pyme.</li>
+<li><strong>Cultura:</strong> "hay que rebuscársela", emprender como salida.</li>
+</ul></div>
+
+<div class="ec"><div class="ech"><div class="ei">👁️</div><div><div class="ecl">Ve</div><div class="ecq">¿Qué consume?</div></div></div>
+<ul class="el">
+<li>Videos prácticos de "equipá tu negocio".</li>
+<li>Comparativas de selladoras, lectores, contadoras de billetes.</li>
+<li>Contenido de gestión pyme.</li>
+<li><strong>WhatsApp es central</strong> (proveedores, clientes), IG/Facebook para el negocio.</li>
+<li>Ve problemas para optimizar: <strong>"no perdamos tiempo contando billetes"</strong>.</li>
+</ul></div>
+
+<div class="ec"><div class="ech"><div class="ei">💬</div><div><div class="ecl">Dice & hace</div><div class="ecq">¿Cómo compra?</div></div></div>
+<ul class="el">
+<li>Compra <strong>decidido. Investiga poco. Resuelve y sigue</strong>.</li>
+<li>Paga rápido: 2,5 cuotas (el que MENOS financia).</li>
+<li>Valora <strong>factura A</strong>, garantía y disponibilidad inmediata.</li>
+<li>Compra en horario/ritmo de trabajo. <strong>Pico 6-9hs (antes de abrir)</strong>.</li>
+<li>Casi no compra domingo (9,4% vs 17% lunes) — comercio cerrado.</li>
+</ul>
+<div class="qb">"¿Me hacés precio?", "¿esto sirve para mi local?", "lo necesito ya."</div></div>
+
+<div class="ec pn"><div class="ech"><div class="ei">⚠️</div><div><div class="ecl">Dolores · Esfuerzos</div><div class="ecq">¿Qué le quita el sueño?</div></div></div>
+<ul class="el">
+<li>Que el equipo falle y le frene la operación del negocio.</li>
+<li><strong>Demoras de entrega</strong>. Que llegue antes de las 18hs.</li>
+<li>Falta de factura A o de repuestos.</li>
+<li>Postventa lenta — si se rompe, no factura.</li>
+<li>Lo barato sale caro (gastar 2 veces por mala compra).</li>
+</ul></div>
+
+<div class="ec gn"><div class="ech"><div class="ei">🎯</div><div><div class="ecl">Ganancias · Resultados</div><div class="ecq">¿Cuándo siente que ganó?</div></div></div>
+<ul class="el">
+<li>Un negocio mejor equipado que funcione sin interrupciones.</li>
+<li>"Lo compré, lo enchufé y <strong>ya estoy facturando con eso</strong>."</li>
+<li>Funcionalidad, precio accesible, factura A, garantía y entrega rápida.</li>
+<li>Confianza para volver a comprar (recompra de insumos: rollos, cintas).</li>
+<li>Equilibrio precio/calidad. Que el ROI se cumpla.</li>
+</ul></div>
+</div>
+
+<div class="eh" style="margin-top:48px"><div class="et">📊 ¿Cuándo y cómo compra?</div><div class="es">Patrones de 5.991 ventas en ML.</div></div>
+<div class="dg th">
+<div class="dc"><div class="dch"><span class="dce">🕐</span><span class="dcl">Hora del día</span></div><h4>Antes de abrir el local</h4>
+<div class="hc"><div class="hco"><div class="hb" style="height:32%"></div><div class="hl">Madr</div></div><div class="hco"><div class="hb pk" style="height:55%"></div><div class="hl">6-9</div></div><div class="hco"><div class="hb pk" style="height:100%"></div><div class="hl">9-12</div></div><div class="hco"><div class="hb" style="height:62%"></div><div class="hl">12-15</div></div><div class="hco"><div class="hb" style="height:51%"></div><div class="hl">15-18</div></div><div class="hco"><div class="hb" style="height:51%"></div><div class="hl">18-21</div></div><div class="hco"><div class="hb" style="height:25%"></div><div class="hl">Noche</div></div></div>
+<p style="font-size:13px;color:var(--tm);margin-top:14px"><strong>Pico distintivo 6-9hs (14,5%)</strong> · Antes de abrir el comercio.</p></div>
+
+<div class="dc"><div class="dch"><span class="dce">📅</span><span class="dcl">Día semana</span></div><h4>Lunes a viernes</h4>
+<div class="hc"><div class="hco"><div class="hb pk" style="height:100%"></div><div class="hl">Lun</div></div><div class="hco"><div class="hb" style="height:91%"></div><div class="hl">Mar</div></div><div class="hco"><div class="hb" style="height:93%"></div><div class="hl">Mié</div></div><div class="hco"><div class="hb" style="height:86%"></div><div class="hl">Jue</div></div><div class="hco"><div class="hb" style="height:84%"></div><div class="hl">Vie</div></div><div class="hco"><div class="hb" style="height:66%"></div><div class="hl">Sáb</div></div><div class="hco"><div class="hb" style="height:54%"></div><div class="hl">Dom</div></div></div>
+<p style="font-size:13px;color:var(--tm);margin-top:14px"><strong>Domingo solo 9,4%</strong>. Comercio cerrado, no compra.</p></div>
+
+<div class="dc"><div class="dch"><span class="dce">📆</span><span class="dcl">Estacionalidad</span></div><h4>Arranque del año</h4>
+<div class="se2"><div class="seo"><div class="sba md" style="height:22%"></div><div class="sel">E</div></div><div class="seo"><div class="sba md" style="height:28%"></div><div class="sel">F</div></div><div class="seo"><div class="sba hi" style="height:60%"></div><div class="sel">M</div></div><div class="seo"><div class="sba pk" style="height:100%"></div><div class="sel">A</div></div><div class="seo"><div class="sba hi" style="height:75%"></div><div class="sel">M</div></div><div class="seo"><div class="sba md" style="height:30%"></div><div class="sel">J</div></div><div class="seo"><div class="sba md" style="height:28%"></div><div class="sel">J</div></div><div class="seo"><div class="sba md" style="height:32%"></div><div class="sel">A</div></div><div class="seo"><div class="sba md" style="height:38%"></div><div class="sel">S</div></div><div class="seo"><div class="sba hi" style="height:42%"></div><div class="sel">O</div></div><div class="seo"><div class="sba md" style="height:35%"></div><div class="sel">N</div></div><div class="seo"><div class="sba md" style="height:32%"></div><div class="sel">D</div></div></div>
+<p style="font-size:13px;color:var(--tm);margin-top:14px"><strong>Marzo-Abril-Mayo</strong>. Equipa el comercio post-verano.</p></div>
+</div>
+
+<div class="dg">
+<div class="dc"><div class="dch"><span class="dce">🗺️</span><span class="dcl">Mapa de calor</span></div><h4>De dónde compra Mario</h4>
+<ul class="gl"><li class="gi"><span class="gr">1</span><span class="gn">🏙️ Buenos Aires</span><span class="gp">48,0%</span></li><li class="gi"><span class="gr">2</span><span class="gn">🌆 Capital Federal</span><span class="gp">9,5%</span></li><li class="gi"><span class="gr">3</span><span class="gn">🏔️ Córdoba</span><span class="gp">8,4%</span></li><li class="gi"><span class="gr">4</span><span class="gn">🌾 Santa Fe</span><span class="gp">7,9%</span></li><li class="gi"><span class="gr">5</span><span class="gn">🍷 Mendoza</span><span class="gp">2,7%</span></li></ul>
+<p style="font-size:13px;color:var(--tm);margin-top:12px"><strong>Menos CABA</strong> (9,5%) y más comercio de barrio en GBA e interior.</p></div>
+
+<div class="dc"><div class="dch"><span class="dce">🚚</span><span class="dcl">Forma de envío</span></div><h4>Va a buscarlo o flex</h4>
+<div class="sh1"><div><span>📦 Colecta ML</span><span>48,8%</span></div><div><span>⚡ Mercado Envíos Flex</span><span>44,5%</span></div><div><span>🏬 Mercado Envíos Full</span><span>3,5%</span></div></div>
+<p style="font-size:13px;color:var(--tm);margin-top:14px"><strong>Necesita antes de las 18hs</strong>. Si llega después, ya cerró.</p></div>
+</div>
+
+<div class="dg">
+<div class="dc"><div class="dch"><span class="dce">🏆</span><span class="dcl">Top SKUs por categoría</span></div>
+<h4>Sus productos estrella</h4>
+<p style="font-size:12px;color:var(--tm);margin-bottom:14px">Categorías ordenadas por facturación. Clickeá para ver el top de cada una.</p>
+<div class="ca op"><div class="cah" onclick="tc(this)"><span class="cae">🏪</span><div class="cai"><div class="can">Comercio</div><div class="cam">$313.2M · 7,517 ud · 20 SKUs</div></div><span class="car2">▼</span></div><div class="cab"><ul class="sl"><li class="sli"><span class="skc">SB-200</span><span class="sku">2,482 ud</span><span class="skp">$20K</span></li><li class="sli"><span class="skc">SB-400</span><span class="sku">1,604 ud</span><span class="skp">$47K</span></li><li class="sli"><span class="skc">CR-001</span><span class="sku">1,158 ud</span><span class="skp">$91K</span></li><li class="sli"><span class="skc">SB-300</span><span class="sku">903 ud</span><span class="skp">$29K</span></li><li class="sli"><span class="skc">LCB1D-002 CON SOPORTE</span><span class="sku">291 ud</span><span class="skp">$39K</span></li><li class="sli"><span class="skc">LCB2D-003 CON SOPORTE</span><span class="sku">255 ud</span><span class="skp">$39K</span></li></ul></div></div>
+<div class="ca"><div class="cah" onclick="tc(this)"><span class="cae">🔧</span><div class="cai"><div class="can">Herramientas y equipamiento</div><div class="cam">$21.1M · 470 ud · 5 SKUs</div></div><span class="car2">▼</span></div><div class="cab"><ul class="sl"><li class="sli"><span class="skc">ESC-009</span><span class="sku">150 ud</span><span class="skp">$52K</span></li><li class="sli"><span class="skc">ESC-008</span><span class="sku">144 ud</span><span class="skp">$34K</span></li><li class="sli"><span class="skc">ESC-007</span><span class="sku">144 ud</span><span class="skp">$29K</span></li><li class="sli"><span class="skc">ESC-006</span><span class="sku">30 ud</span><span class="skp">$138K</span></li><li class="sli"><span class="skc">ESC-004</span><span class="sku">2 ud</span><span class="skp">$102K</span></li></ul></div></div>
+</div>
+
+<div class="dc"><div class="dch"><span class="dce">🔗</span><span class="dcl">Cross-sell</span></div><h4>Cross con otros buyers</h4>
+<div class="cp"><span class="skc">MC-002</span><span class="car">+</span><span class="skc">SB-200</span><span class="cco">7 ⭐</span></div>
+<div class="cp"><span class="skc">SB-200</span><span class="car">→</span><span class="skc">SB-400</span><span class="cco">recompra</span></div>
+<div class="hb2" style="margin-top:12px;padding:14px 18px"><strong>💡 Cruce con Mariana:</strong> 11% de los Mario también compra como Juan (equipa su casa con TV/soportes). <strong>Mario es persona, no solo "el del local"</strong>.</div></div>
+</div>
+
+<div class="np"><div class="npl">🚀 Productos nuevos sugeridos</div><h4>¿Qué más le podríamos vender a Mario?</h4><p class="npd">Productos para equipar comercio, <strong>consumibles para recompra</strong>, y el cruce con la "Emprendedora Textil".</p>
+<div class="npg">
+<div class="npi"><span class="npe">🧾</span>Rollos térmicos (CONSUMIBLE ⭐)</div>
+<div class="npi"><span class="npe">📜</span>Cinta selladora repuesto (CONSUMIBLE)</div>
+<div class="npi"><span class="npe">💰</span>Cajón portamonedas</div>
+<div class="npi"><span class="npe">🏷️</span>Etiquetadora manual + repuestos</div>
+<div class="npi"><span class="npe">🛍️</span>Bolsas térmicas para delivery</div>
+<div class="npi"><span class="npe">📱</span>Soporte para tablet/POS</div>
+<div class="npi"><span class="npe">👕</span>Maniquí / exhibidor textil</div>
+<div class="npi"><span class="npe">📐</span>Cinta métrica de modista</div>
+<div class="npi"><span class="npe">🏪</span>Mostrador modular plegable</div>
+</div></div>
+
+<div class="st"><div class="stl">💡 Estrategia NAKU para Mario</div>
+<h3>WhatsApp Business. Factura A. Entrega antes de las 18hs. Sin vueltas.</h3>
+<p>Comunicación utilitaria por WhatsApp Business (donde ya vive). Foco en <strong>factura A, garantía y entrega inmediata</strong>. Campaña concentrada marzo-mayo. <strong>Email/WhatsApp de recompra de insumos</strong> (rollos, cintas) es ORO: Mario los necesita continuamente. Testimonios reales: "le facturé X y me devolvió la inversión en Y semanas". <strong>Combo "Emprendé tu marca de ropa"</strong>: máquina coser + selladora + etiquetadora + maniquí (cruce con Mariana detectado).</p></div>
+</div>
+
+</div></section>
+<section class="s a"><div class="c">
+<div class="sh"><span class="se">🎯 Recomendaciones</span>
+<h2>5 movimientos que <em>NAKU</em> debería hacer ya.</h2>
+<p class="si">Acciones concretas alineadas al propósito de la marca y al contexto del mercado argentino 2026.</p></div>
+
+<div class="dg">
+<div class="dc"><span class="kp in" style="font-size:12px;padding:5px 12px">01 · Inmediato</span>
+<h4 style="margin-top:12px">Cuota sin interés visible en cada ficha</h4>
+<p style="font-size:14px;color:var(--tm);line-height:1.6">8 de cada 10 valoran las cuotas (CACE). Hoy NAKU da 6 cuotas sin interés en compras > $220K. <strong>Comunicarlo arriba del precio</strong>, no en letra chica. Crítico para Martín y Juan.</p></div>
+
+<div class="dc"><span class="kp wn" style="font-size:12px;padding:5px 12px">02 · Posicionamiento</span>
+<h4 style="margin-top:12px">"Stock y postventa en Argentina, llega ya"</h4>
+<p style="font-size:14px;color:var(--tm);line-height:1.6">Antídoto frente al courier importado (+123% i.a.). Es el argumento más fuerte para los 5 buyers. Mostrar tiempo de envío real (AMBA: <strong>mismo día</strong>) en cada producto.</p></div>
+
+<div class="dc"><span class="kp sc" style="font-size:12px;padding:5px 12px">03 · Contenido</span>
+<h4 style="margin-top:12px">Crear los tutoriales DIY argentinos que no existen</h4>
+<p style="font-size:14px;color:var(--tm);line-height:1.6">Para Juan: tutoriales propios en YouTube ("cómo colgar tu TV"). Para Mariana: alianza con AROPA. Para Martín: creadores de setup/tech. Cada buyer, su lenguaje.</p></div>
+
+<div class="dc"><span class="kp" style="background:#EDE9FE;color:#5B21B6;font-size:12px;padding:5px 12px">04 · One-Stop Shop</span>
+<h4 style="margin-top:12px">Sumar accesorios para no perder ventas</h4>
+<p style="font-size:14px;color:var(--tm);line-height:1.6">Que Juan no salga a la ferretería después de comprar el soporte (vender tornillos, mechas, llaves Allen). Que Mario tenga rollos térmicos para recompra. <strong>"Lo práctico no debería ser complicado".</strong></p></div>
+
+<div class="dc"><span class="kp dg" style="font-size:12px;padding:5px 12px">05 · Operación</span>
+<h4 style="margin-top:12px">Revisar calidad de productos outdoor (Lucho)</h4>
+<p style="font-size:14px;color:var(--tm);line-height:1.6">Lucho devuelve <strong>8,6%</strong> (vs 5,3% promedio). Revisar SOM-1, GZB-002, MP-002. La calidad es su miedo #1 y NAKU no puede confirmárselo.</p></div>
+
+<div class="dc"><span class="kp" style="background:#FEF3C7;color:#92400E;font-size:12px;padding:5px 12px">📅 Calendario</span>
+<h4 style="margin-top:12px">Calendario estacional por buyer</h4>
+<p style="font-size:14px;color:var(--tm);line-height:1.6"><strong>Mayo:</strong> Hot Sale (Martín, Mariana, Juan). <strong>Junio:</strong> Mundial → Juan. <strong>Dic-Ene:</strong> Lucho. <strong>Mar-May:</strong> Mario. <strong>Nov:</strong> Black Friday → Martín.</p></div>
+</div>
+
+<div class="st" style="margin-top:32px"><div class="stl">⚡ El gran take-away</div>
+<h3>El propósito de NAKU calza con el momento argentino 2026.</h3>
+<p>El consumidor pragmático no quiere marcas aspiracionales. Quiere <strong>resolver fácil, rápido y confiable, en un solo lugar</strong>. Eso es exactamente lo que NAKU promete. La oportunidad es <strong>traducir ese propósito al código emocional argentino 2026</strong>: cuota sin interés visible, envío AMBA rápido, reseñas reales y postventa local como diferencial defendible frente al precio del importado.</p></div>
+</div></section>
+
+<footer class="ft"><div class="c">
+<div class="fg">
+<div><div class="fl"><span class="mk"></span>NAKU</div>
+<p>Buyer personas B2C basados en <strong style="color:white;opacity:1">89.617 ventas de Mercado Libre + 2.390 ventas de Tienda Nube</strong> (mayo 2025 – junio 2026), cruzadas con el contexto macro Argentina 2026. Insights validados en reunión del 12 de junio 2026.</p></div>
+
+<div><h3>📚 Fuentes</h3>
+<ul><li>INDEC (inflación, pobreza)</li><li>BCRA (REM, mora bancaria)</li><li>CACE (e-commerce 2025)</li><li>Analytica (courier)</li><li>IIEP-UBA/CONICET (salarios)</li><li>Randstad, Mercer (RRHH)</li><li>Youniversal (consumo)</li></ul></div>
+
+<div><h3>⚠️ Notas</h3>
+<ul><li>Pobreza oficial 28% vs UCA ~36% (disputa metodológica)</li><li>Género inferido por nombre (heurística)</li><li>"Sker" = listing duplicado NAKU en ML (no se muestra como marca separada)</li><li>B2B revendedor real NO está en ML/TN (canal WhatsApp/mail)</li><li>Tickets en ARS a junio 2026</li></ul></div>
+</div>
+
+<div class="fb"><div>© NAKU · Buyer Personas Argentina 2026</div><div>Hecho con datos reales · Junio 2026</div></div>
+</div></footer>
+
+<script>
+function sw(n){
+  document.querySelectorAll('.bta').forEach((t,i)=>t.classList.toggle('ac',i===n-1));
+  document.querySelectorAll('.bd').forEach((d,i)=>d.classList.toggle('ac',i===n-1));
+  const nav=document.querySelector('.bn');
+  if(nav){window.scrollTo({top:nav.getBoundingClientRect().top+window.pageYOffset,behavior:'smooth'});}
+}
+function tc(el){
+  el.parentElement.classList.toggle('op');
+}
+</script>
+</body></html>
