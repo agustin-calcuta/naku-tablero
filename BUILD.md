@@ -96,8 +96,18 @@ En la v2, panel "Complementarios" por persona.
 - `docs/index.html` — switcher: barra + iframe, alterna por URL `?v=leo` / `?v=nueva`, para que Leo compare y elija.
 - `docs/leo.html` (deck original de Leo) · `docs/nueva.html` (la v2). Copias; re-copiar al actualizar.
 
-## Próximo paso (plan del usuario)
-1. **Esperar los exports frescos de Leo** → correr `tools/reconcile.mjs` para confirmar que el esquema no cambió.
-2. **Deployar** `docs/` en GitHub Pages y el `Code.gs` como Web App; conectar `api.js`.
-3. Leo compara versiones en la URL → elegimos la ganadora y la dejamos activa.
-4. Instrumentar la versión elegida con `getRollup()` (datos en vivo) — hoy la v2 usa snapshot embebido; pasa a `fetch`.
+## Desplegado (live)
+- Repo: **github.com/agustin-calcuta/naku-tablero** (branch `main`, Pages desde `/docs`, con `.nojekyll`).
+- Tablero live (para que Leo compare diseños):
+  - https://agustin-calcuta.github.io/naku-tablero/?v=nueva
+  - https://agustin-calcuta.github.io/naku-tablero/?v=leo
+- La v2 usa **snapshot embebido** (datos reales). El backend Apps Script está **escrito pero NO deployado**.
+- Nota de fix: el iframe del switcher necesita altura explícita (`calc(100dvh - 48px)`), no solo flex — Safari no estira flex-iframes. Y Pages puede fallar el deploy transitoriamente ("try again later"): re-pushear.
+
+## Runbook: cuando Leo mande los exports nuevos
+1. Poner los archivos en `../Tablero Buyer Naku/`; `npm i` + `node tools/reconcile.mjs`.
+   → confirma que el esquema de MeLi no cambió y reconcilia facturación vs targets (Juan $1.372M / Martin $984M / Mariana $604M / Lucho $293M / Mario $257M). Si cambió, ajustar el mapeo **por nombre** en `engine.mjs`, nunca por índice.
+2. Regenerar datos: `node tools/snapshot.mjs > web/data/snapshot.json`, actualizar el `DATA` embebido en `web/tablero-v2.html`, `cp web/tablero-v2.html docs/nueva.html`, commit + push → Pages redeploya.
+3. (Recomendado) modo demo público: pasar la v2 a `%`/redondeado (los montos reales van por el backend con token, no en el HTML público).
+4. Backend "de Drive": seguir `appsscript/README.md` → crear Sheet + pegar `Code.gs` + `CONFIG` + deploy Web App → URL `/exec` → setear en `web/api.js`.
+5. Leo elige versión → instrumentar la ganadora con `getRollup()` (fetch en vivo) en lugar del snapshot embebido.
