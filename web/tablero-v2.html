@@ -45,6 +45,20 @@
   .imp-recon .up{color:var(--good)} .imp-recon .dn{color:var(--crit)}
   .imp-dl{margin-top:12px;display:flex;gap:9px;flex-wrap:wrap}
   .imp-priv{margin-top:12px;font-size:11px;color:var(--faint);line-height:1.5;display:flex;gap:6px;align-items:flex-start}
+  /* fuente de datos + filtros */
+  .src-badge{margin:14px 0 2px;font-size:12.5px;color:var(--muted);background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:9px 13px;line-height:1.5}
+  .src-badge.on{display:flex;align-items:center;gap:12px;flex-wrap:wrap;border-color:var(--accent);background:var(--accent-soft);color:var(--ink)}
+  .src-badge b{color:var(--ink)}
+  .src-clear{margin-left:auto;font-family:var(--sans);font-size:11.5px;font-weight:600;color:var(--crit);background:none;border:1px solid var(--line);border-radius:6px;padding:5px 10px;cursor:pointer;white-space:nowrap}
+  .src-clear:hover{border-color:var(--crit)}
+  .flt{display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin:8px 0 2px;font-size:12.5px}
+  .flt-lab{font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+  .flt-sel{font-family:var(--sans);font-size:12.5px;color:var(--ink);background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:5px 8px;cursor:pointer}
+  .flt-arrow{color:var(--muted)}
+  .flt-presets{display:flex;gap:2px;background:var(--panel2);border:1px solid var(--line);border-radius:7px;padding:3px;margin-left:6px}
+  .flt-presets button{font-family:var(--mono);font-size:11px;font-weight:600;color:var(--muted);background:none;border:0;padding:5px 10px;border-radius:5px;cursor:pointer}
+  .flt-presets button[aria-pressed="true"]{background:var(--ink);color:var(--paper)}
+  .flt-presets button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
   :root{
     --paper:#F1F2EC; --panel:#FBFBF7; --panel2:#F6F7F1;
     --ink:#191E19; --muted:#6C726A; --faint:#98A08F; --line:#D5D8CD; --line2:#E4E6DE;
@@ -309,6 +323,21 @@
         </div>
       </div>
 
+      <div id="src-badge" class="src-badge"></div>
+      <div id="flt" class="flt" hidden>
+        <span class="flt-lab">Período</span>
+        <select id="flt-desde" class="flt-sel" aria-label="Mes desde"></select>
+        <span class="flt-arrow" aria-hidden="true">→</span>
+        <select id="flt-hasta" class="flt-sel" aria-label="Mes hasta"></select>
+        <div class="flt-presets" role="group" aria-label="Atajos de período">
+          <button data-preset="all" type="button" aria-pressed="true">Todo</button>
+          <button data-preset="1" type="button" aria-pressed="false">Último mes</button>
+          <button data-preset="3" type="button" aria-pressed="false">3 meses</button>
+          <button data-preset="6" type="button" aria-pressed="false">6 meses</button>
+          <button data-preset="ytd" type="button" aria-pressed="false">Este año</button>
+        </div>
+      </div>
+
       <div class="kpis" id="kpis"></div>
 
       <div class="grid2">
@@ -392,7 +421,7 @@ function renderKPIs(){
   const lead = [...ps].sort((a,b)=>facFor(b)-facFor(a))[0];
   const canalLbl = state.canal==='Ambos'?'ambos canales':state.canal;
   document.getElementById('kpis').innerHTML = `
-    <div class="kpi"><div class="lab">Facturación</div><div class="val tnum">${money(total)}</div><div class="sub">${canalLbl} · 14 meses</div></div>
+    <div class="kpi"><div class="lab">Facturación</div><div class="val tnum">${money(total)}</div><div class="sub">${canalLbl} · ${DATA.meta.ventana}</div></div>
     <div class="kpi"><div class="lab">Comprador #1</div><div class="val tnum" style="color:${PC[lead.key]}">${lead.key}</div><div class="sub">${(100*facFor(lead)/total).toFixed(1)}% de la facturación</div></div>
     <div class="kpi"><div class="lab">Cobertura maestro</div><div class="val tnum">${String(DATA.totales.cobertura).replace('.',',')}<small>%</small></div><div class="sub">${String(DATA.sinAsignar.share).replace('.',',')}% sin asignar ↓</div></div>
     <div class="kpi"><div class="lab">Órdenes</div><div class="val tnum">${nf.format(ord)}</div><div class="sub">ticket prom. ${money(DATA.totales.ticket)}</div></div>`;
@@ -506,9 +535,12 @@ renderLede();renderKPIs();renderRank();renderDetail();renderCov();
   const $=id=>document.getElementById(id);
   const panel=$('imp-panel'),btn=$('btn-import'),closeBtn=$('imp-close'),drop=$('imp-drop'),
         filesInput=$('imp-files'),listEl=$('imp-list'),runBtn=$('imp-run'),resetBtn=$('imp-reset'),
-        statusEl=$('imp-status'),reconEl=$('imp-recon'),maestroInput=$('imp-maestro'),dlBox=$('imp-dl');
+        statusEl=$('imp-status'),reconEl=$('imp-recon'),maestroInput=$('imp-maestro'),dlBox=$('imp-dl'),
+        elBadge=$('src-badge'),elFlt=$('flt'),elDesde=$('flt-desde'),elHasta=$('flt-hasta');
   const BASELINE=JSON.parse(JSON.stringify(DATA)), BASELINE_UN=Object.assign({},UNASSIGNED);
+  const MES3=['','ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
   let picked=[], maestroFile=null, lastBuild=null;
+  let LINES=[], SEEN=new Set(), MANIFEST=[], FILTER={desde:null,hasta:null};
 
   // ---- CSV parser (mismo que tools/snapshot.mjs: comillas + delim configurable)
   function parseCSV(text,delim){
@@ -522,6 +554,22 @@ renderLede();renderKPIs();renderRank();renderDetail();renderCov();
     if(f.length||row.length){row.push(f);rows.push(row);}return rows;
   }
 
+  // ---- persistencia: el histórico se acumula en ESTA computadora (IndexedDB).
+  function idb(){return new Promise((res,rej)=>{const r=indexedDB.open('naku-tablero',1);r.onupgradeneeded=()=>r.result.createObjectStore('kv');r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error);});}
+  async function idbGet(k){const db=await idb();return new Promise((res,rej)=>{const t=db.transaction('kv','readonly').objectStore('kv').get(k);t.onsuccess=()=>res(t.result);t.onerror=()=>rej(t.error);});}
+  async function idbSet(k,v){const db=await idb();return new Promise((res,rej)=>{const t=db.transaction('kv','readwrite').objectStore('kv').put(v,k);t.onsuccess=()=>res();t.onerror=()=>rej(t.error);});}
+  async function idbClear(){const db=await idb();return new Promise((res,rej)=>{const t=db.transaction('kv','readwrite').objectStore('kv').clear();t.onsuccess=()=>res();t.onerror=()=>rej(t.error);});}
+  // solo los campos que el motor necesita para agregar + filtrar (líviano para guardar)
+  function compact(l){return {canal:l.canal,order_id:l.order_id,mes:l.mes,buyer:l.buyer,familia:l.familia,nombre:l.nombre,sku:l.sku,sku_raw:l.sku_raw,unidades:l.unidades,facturacion:l.facturacion,cuotas:l.cuotas};}
+  // clave de dedup = misma que engine.lineKey (canal|orden|sku|unidades|facturacion)
+  function keyOf(l){return l.canal+'|'+l.order_id+'|'+l.sku+'|'+l.unidades+'|'+l.facturacion;}
+  async function persist(){try{await idbSet('lines',LINES);await idbSet('manifest',MANIFEST);}catch(e){/* modo privado: queda en memoria de la sesión */}}
+
+  // ---- meses / etiquetas
+  function monthsOf(ls){return [...new Set(ls.map(l=>l.mes).filter(Boolean))].sort();}
+  function mesLabel(ym){return (!ym||ym.length<7)?(ym||'—'):MES3[+ym.slice(5,7)]+' '+ym.slice(0,4);}
+  function windowLabel(ms){return !ms.length?'—':ms.length===1?mesLabel(ms[0]):mesLabel(ms[0])+' – '+mesLabel(ms[ms.length-1]);}
+
   // ---- transform motor -> shape del tablero (port de tools/snapshot.mjs)
   function buildSnapshotFromLines(lines){
     const agg=aggregate(lines);
@@ -530,7 +578,7 @@ renderLede();renderKPIs();renderRank();renderDetail();renderCov();
     const PERS=PERSONAS.filter(p=>p!=='Sin asignar');
     const today=new Date().toISOString().slice(0,10);
     const snapshot={
-      meta:{ventana:DATA.meta.ventana||'—',updated:today,canales:['MercadoLibre','TiendaNube']},
+      meta:{ventana:windowLabel(monthsOf(lines)),updated:today,canales:['MercadoLibre','TiendaNube']},
       totales:{facturacion:agg.totales.facturacion,cobertura:agg.totales.coberturaPct,
         ordenes:agg.totales.ordenes,lineas:agg.totales.lineas,
         ticket:agg.totales.ordenes?Math.round(agg.totales.facturacion/agg.totales.ordenes):0},
@@ -573,30 +621,63 @@ renderLede();renderKPIs();renderRank();renderDetail();renderCov();
   function setErr(m){statusEl.className='imp-status err';statusEl.textContent=m;}
   function setMsg(m){statusEl.className='imp-status';statusEl.innerHTML=m;}
   function applyRender(){renderLede();renderKPIs();renderRank();renderDetail();renderCov();}
+  function nowLabel(){try{return new Date().toLocaleDateString('es-AR');}catch(e){return DATA.meta.updated;}}
+
+  // ---- núcleo: vista actual = líneas (filtradas) o baseline de ejemplo
+  function currentLines(){
+    if(!LINES.length)return null;
+    if(!FILTER.desde&&!FILTER.hasta)return LINES;
+    return LINES.filter(l=>{const m=l.mes||'';return (!FILTER.desde||m>=FILTER.desde)&&(!FILTER.hasta||m<=FILTER.hasta);});
+  }
+  function recompute(){
+    const ls=currentLines();
+    if(ls===null){DATA=JSON.parse(JSON.stringify(BASELINE));UNASSIGNED=Object.assign({},BASELINE_UN);lastBuild=null;}
+    else{lastBuild=buildSnapshotFromLines(ls);DATA=lastBuild.snapshot;UNASSIGNED=lastBuild.unassigned;}
+    applyRender();updateStatics();refreshUI();
+  }
 
   function updateStatics(){
     const cu=DATA.personas.map(p=>p.cuotas).filter(x=>x>0).sort((a,b)=>a-b);
-    const fmt1=x=>x.toFixed(1).replace('.',',');
+    const f1=x=>x.toFixed(1).replace('.',',');
     $('hard-fac').textContent=money(DATA.totales.facturacion);
     $('hard-ord').textContent=nf.format(DATA.totales.ordenes);
-    if(cu.length)$('hard-cuo').textContent=cu[0]===cu[cu.length-1]?fmt1(cu[0]):fmt1(cu[0])+'–'+fmt1(cu[cu.length-1]);
+    $('hard-cuo').textContent=cu.length?(cu[0]===cu[cu.length-1]?f1(cu[0]):f1(cu[0])+'–'+f1(cu[cu.length-1])):'—';
     $('hard-cob').textContent=String(DATA.totales.cobertura).replace('.',',')+'%';
-    let d;try{d=new Date().toLocaleDateString('es-AR');}catch(e){d=DATA.meta.updated;}
-    $('stamp').innerHTML=`ventana <b>${DATA.meta.ventana}</b><br>MercadoLibre + TiendaNube · actualizado ${d}`;
+    $('stamp').innerHTML=`ventana <b>${DATA.meta.ventana}</b><br>MercadoLibre + TiendaNube · ${LINES.length?('actualizado '+nowLabel()):'datos de ejemplo'}`;
   }
 
-  function renderRecon(dd){
+  // ---- badge de fuente + barra de filtros
+  function refreshUI(){
+    const has=LINES.length>0;
+    if(has){
+      const ms=monthsOf(LINES);
+      elBadge.className='src-badge on';
+      const nArch=new Set(MANIFEST.map(m=>m.file)).size||MANIFEST.length;
+      elBadge.innerHTML=`<span><b>Histórico cargado</b> · ${nf.format(LINES.length)} líneas · ${nArch} archivo(s) · ${windowLabel(ms)}</span><button id="badge-clear" class="src-clear" type="button">Borrar histórico</button>`;
+      const bc=$('badge-clear'); if(bc)bc.onclick=clearHistory;
+      const opt=sel=>ms.map(m=>`<option value="${m}"${m===sel?' selected':''}>${mesLabel(m)}</option>`).join('');
+      elDesde.innerHTML=opt(FILTER.desde||ms[0]);
+      elHasta.innerHTML=opt(FILTER.hasta||ms[ms.length-1]);
+      elFlt.hidden=false;
+    }else{
+      elBadge.className='src-badge';
+      elBadge.innerHTML=`Mostrando <b>datos de ejemplo</b>. Tocá <b>“↑ Actualizar datos”</b> y cargá tus exports para ver tus números reales (se guardan en esta compu y se van sumando mes a mes).`;
+      elFlt.hidden=true;
+    }
+    resetBtn.hidden=!has;dlBox.hidden=!has;
+  }
+
+  function renderRecon(info){
     const rows=DATA.personas.map(p=>{
       const base=(BASELINE.personas.find(x=>x.key===p.key)||{}).facturacion||0;
       const d=base?100*(p.facturacion-base)/base:0;
-      const cls=d>0.05?'up':d<-0.05?'dn':'';
-      const arrow=d>0.05?'▲':d<-0.05?'▼':'·';
-      return `<tr><td>${p.key}</td><td>${money(p.facturacion)}</td><td>${p.share}%</td><td class="${cls}">${arrow} ${Math.abs(d).toFixed(1)}%</td></tr>`;
+      const cls=d>0.05?'up':d<-0.05?'dn':'';const ar=d>0.05?'▲':d<-0.05?'▼':'·';
+      return `<tr><td>${p.key}</td><td>${money(p.facturacion)}</td><td>${p.share}%</td><td class="${cls}">${ar} ${Math.abs(d).toFixed(1)}%</td></tr>`;
     }).join('');
     reconEl.hidden=false;
-    reconEl.innerHTML=`<table><thead><tr><th>Comprador</th><th>Facturación</th><th>Share</th><th>vs base</th></tr></thead><tbody>${rows}</tbody>
+    reconEl.innerHTML=`<table><thead><tr><th>Comprador</th><th>Facturación</th><th>Share</th><th>vs ejemplo</th></tr></thead><tbody>${rows}</tbody>
       <tfoot><tr><td>Sin asignar</td><td>${money(DATA.sinAsignar.facturacion)}</td><td>${DATA.sinAsignar.share}%</td><td></td></tr></tfoot></table>
-      <div class="imp-note" style="margin-top:8px">Cobertura <b>${String(DATA.totales.cobertura).replace('.',',')}%</b> · ${nf.format(DATA.totales.ordenes)} órdenes · ${nf.format(DATA.totales.lineas)} líneas · ${nf.format(dd.dups)} duplicadas ignoradas. “vs base” compara contra los números que traía el tablero.</div>`;
+      <div class="imp-note" style="margin-top:8px">${info?`<b>${nf.format(info.nuevas)}</b> líneas nuevas · <b>${nf.format(info.dups)}</b> ya estaban (no duplicadas) · histórico total <b>${nf.format(LINES.length)}</b>. `:''}Cobertura <b>${String(DATA.totales.cobertura).replace('.',',')}%</b> · ${nf.format(DATA.totales.ordenes)} órdenes · ${nf.format(DATA.totales.lineas)} líneas en la vista. “vs ejemplo” compara contra los números de muestra que trae el tablero.</div>`;
   }
 
   function download(name,text,mime){
@@ -613,29 +694,34 @@ renderLede();renderKPIs();renderRank();renderDetail();renderCov();
       const maestroText=maestroFile?await maestroFile.text():$('maestroCSV').textContent;
       if(!maestroText||maestroText.indexOf('__MAESTRO')===0){throw new Error('Falta el maestro embebido (¿el archivo no pasó por el build?). Cargá el maestro en Opciones avanzadas.');}
       window.__match=makeMatcher(buildMaestro(parseCSV(maestroText,';')));
-      let all=[];
+      let nuevas=0,dups=0;
       for(const p of picked){
         setMsg(`Procesando… <b>${p.file.name}</b>`);
-        try{all=all.concat(p.kind==='ml'?await readMeli(p.file):await readTn(p.file));}
+        let ls;
+        try{ls=p.kind==='ml'?await readMeli(p.file):await readTn(p.file);}
         catch(e){throw new Error(`En “${p.file.name}”: ${e.message||e}`);}
+        let nf_=0,df=0;
+        for(const l of ls){const k=keyOf(l);if(SEEN.has(k)){df++;continue;}SEEN.add(k);LINES.push(compact(l));nf_++;}
+        nuevas+=nf_;dups+=df;
+        MANIFEST.push({file:p.file.name,nuevas:nf_,dups:df,when:Date.now()});
       }
-      const dd=dedupe(all);
-      if(!dd.lines.length)throw new Error('No se leyeron ventas de los archivos. Verificá que sean los exports correctos: los .xlsx de MercadoLibre y el .csv de TiendaNube tal cual los descarga cada plataforma.');
-      lastBuild=buildSnapshotFromLines(dd.lines);
-      DATA=lastBuild.snapshot;UNASSIGNED=lastBuild.unassigned;
-      applyRender();updateStatics();renderRecon(dd);
-      dlBox.hidden=false;resetBtn.hidden=false;
-      setMsg(`✓ Tablero actualizado con ${picked.length} archivo(s).`);
+      if(!LINES.length)throw new Error('No se leyeron ventas de los archivos. Verificá que sean los exports correctos: los .xlsx de MercadoLibre y el .csv de TiendaNube tal cual los descarga cada plataforma.');
+      await persist();
+      FILTER={desde:null,hasta:null};      // tras cargar, mostrar todo el histórico
+      recompute();
+      renderRecon({nuevas,dups});
+      picked=[];renderList();
+      if(nuevas===0)setMsg(`Esos archivos ya estaban cargados: <b>${nf.format(dups)}</b> líneas repetidas, <b>0 nuevas</b>. No se duplicó nada.`);
+      else setMsg(`✓ <b>${nf.format(nuevas)}</b> líneas nuevas · <b>${nf.format(dups)}</b> ya estaban (no duplicadas) · histórico: <b>${nf.format(LINES.length)}</b> líneas.`);
     }catch(e){setErr('No se pudo procesar. '+(e.message||e));}
     finally{runBtn.disabled=false;}
   }
 
-  function resetData(){
-    DATA=JSON.parse(JSON.stringify(BASELINE));UNASSIGNED=Object.assign({},BASELINE_UN);
-    applyRender();
-    $('hard-fac').textContent='$4.158 M';$('hard-ord').textContent='99.028';$('hard-cuo').textContent='3,1–4,1';$('hard-cob').textContent='91,5%';
-    $('stamp').innerHTML='ventana <b>jun 2025 – jun 2026</b><br>MercadoLibre + TiendaNube · corte 16 jun 2026';
-    reconEl.hidden=true;dlBox.hidden=true;resetBtn.hidden=true;setMsg('Volviste a los datos base del tablero.');
+  async function clearHistory(){
+    if(!confirm('¿Borrar todo el histórico cargado en esta computadora? Vas a volver a los datos de ejemplo.'))return;
+    LINES=[];SEEN=new Set();MANIFEST=[];FILTER={desde:null,hasta:null};
+    try{await idbClear();}catch(e){}
+    reconEl.hidden=true;recompute();setMsg('Histórico borrado. Estás viendo los datos de ejemplo.');
   }
 
   // ---- eventos
@@ -651,7 +737,17 @@ renderLede();renderKPIs();renderRank();renderDetail();renderCov();
   ;['dragleave','drop'].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.remove('drag');}));
   drop.addEventListener('drop',e=>{if(e.dataTransfer&&e.dataTransfer.files)addFiles(e.dataTransfer.files);});
   runBtn.addEventListener('click',process);
-  resetBtn.addEventListener('click',resetData);
+  resetBtn.addEventListener('click',clearHistory);
+  elDesde.addEventListener('change',()=>{FILTER.desde=elDesde.value;if(FILTER.hasta&&FILTER.desde>FILTER.hasta)FILTER.hasta=FILTER.desde;recompute();});
+  elHasta.addEventListener('change',()=>{FILTER.hasta=elHasta.value;if(FILTER.desde&&FILTER.hasta<FILTER.desde)FILTER.desde=FILTER.hasta;recompute();});
+  document.querySelectorAll('.flt-presets button').forEach(b=>b.addEventListener('click',()=>{
+    const ms=monthsOf(LINES);if(!ms.length)return;const p=b.dataset.preset;
+    if(p==='all')FILTER={desde:null,hasta:null};
+    else if(p==='ytd')FILTER={desde:ms[ms.length-1].slice(0,4)+'-01',hasta:ms[ms.length-1]};
+    else FILTER={desde:ms[Math.max(0,ms.length-(+p))],hasta:ms[ms.length-1]};
+    document.querySelectorAll('.flt-presets button').forEach(x=>x.setAttribute('aria-pressed',x===b));
+    recompute();
+  }));
   $('dl-snap').addEventListener('click',()=>{if(lastBuild)download('snapshot.json',JSON.stringify(lastBuild.snapshot),'application/json');});
   $('dl-unmapped').addEventListener('click',()=>{
     if(!lastBuild)return;
@@ -659,5 +755,15 @@ renderLede();renderKPIs();renderRank();renderDetail();renderCov();
     const csv='sku;nombre;ventas;facturacion\n'+lastBuild.agg.unmapped.map(u=>[esc(u.sku),esc(u.nombre),u.lines,u.facturacion].join(';')).join('\n');
     download('unmapped_skus.csv','﻿'+csv,'text/csv;charset=utf-8');
   });
+
+  // ---- init: levantar histórico guardado (si hay) y pintar
+  (async function init(){
+    resetBtn.textContent='Borrar histórico';
+    try{
+      const [ls,mf]=await Promise.all([idbGet('lines'),idbGet('manifest')]);
+      if(Array.isArray(ls)&&ls.length){LINES=ls;MANIFEST=Array.isArray(mf)?mf:[];SEEN=new Set(LINES.map(keyOf));}
+    }catch(e){/* IDB no disponible */}
+    recompute();
+  })();
 })();
 </script>

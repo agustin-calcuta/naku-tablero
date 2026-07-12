@@ -70,6 +70,15 @@ la máquina de Leo, y la versión pública del tablero no cambia con lo que él 
 - No necesita hosting extra, ni Drive, ni credenciales. Leo solo abre la URL y dropea.
 - El maestro va **embebido** en `docs/nueva.html` (lo inyecta el build). Ojo: la URL de Pages
   es pública → ver la nota de arriba sobre no exponer cifras en producción (Fase 2).
+- **Histórico:** las líneas normalizadas se guardan en **IndexedDB** (en la compu de quien
+  carga). Cada mes que sube se **acumula**; al reabrir la URL el tablero arranca con todo lo
+  cargado. Es **por navegador/máquina** (no compartido — eso es Fase 2 con backend).
+- **Dedup:** al subir se dedup por `canal|orden|sku|unidades|facturación` (misma clave que el
+  motor). Re-subir el mismo archivo/mes → **0 nuevas, no duplica**; solo entran órdenes nuevas.
+- **Filtros:** rango de meses (desde/hasta) + presets (Último mes / 3 / 6 / Este año / Todo) que
+  re-agregan en vivo, y el toggle de canal (Ambos / ML / TiendaNube). El filtro de fecha aparece
+  cuando hay datos cargados (el ejemplo base no se puede filtrar por mes).
+- **Borrar histórico:** botón en el badge / panel → limpia IndexedDB y vuelve al ejemplo.
 
 ### Rebuild (cuando cambie el motor o el maestro)
 
