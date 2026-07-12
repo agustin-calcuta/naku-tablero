@@ -75,6 +75,12 @@
   .envio-leg span{display:flex;align-items:center;gap:5px}
   .envio-leg i{width:9px;height:9px;border-radius:2px}
   .envio-leg b{color:var(--ink);font-family:var(--mono)}
+  .geo{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
+  .geo li{display:grid;grid-template-columns:1fr 72px 42px;gap:9px;align-items:center;font-size:12px}
+  .geo-n{color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .geo-b{height:6px;background:var(--line2);border-radius:3px;overflow:hidden}
+  .geo-b i{display:block;height:100%;background:var(--pc)}
+  .geo-p{font-family:var(--mono);font-size:11px;color:var(--muted);text-align:right}
   :root{
     --paper:#F1F2EC; --panel:#FBFBF7; --panel2:#F6F7F1;
     --ink:#191E19; --muted:#6C726A; --faint:#98A08F; --line:#D5D8CD; --line2:#E4E6DE;
@@ -270,7 +276,7 @@
   <div id="imp-panel" class="imp-backdrop" hidden role="dialog" aria-modal="true" aria-label="Actualizar el tablero con los exports">
     <div class="imp-card">
       <div class="imp-head"><b>Actualizar el tablero con los exports</b><button id="imp-close" class="imp-x" type="button" aria-label="Cerrar">✕</button></div>
-      <p class="imp-sub">Arrastrá (o elegí) los <b>3 Excel de MercadoLibre</b> + el <b>CSV de TiendaNube</b>. Se recalcula todo acá, en tu navegador — <b>nada se sube a internet</b>.</p>
+      <p class="imp-sub">Cuando Leo tenga exports nuevos, soltá acá el <b>Excel de MercadoLibre (.xlsx)</b> + el <b>CSV de TiendaNube (.csv)</b>. Se <b>suman</b> a los datos actuales (no duplica lo que ya está) — <b>nada se sube a internet</b>.</p>
       <label id="imp-drop" class="imp-drop">
         <input id="imp-files" type="file" accept=".xlsx,.csv" multiple hidden>
         <span class="imp-drop-ico" aria-hidden="true">📄</span>
@@ -419,9 +425,10 @@ function money(n){
   if(n>=1e6) return '$'+(n/1e6).toLocaleString('es-AR',{maximumFractionDigits:1})+' M';
   return '$'+nf.format(Math.round(n));
 }
-function facFor(p){ return state.canal==='MercadoLibre'?p.ml : state.canal==='TiendaNube'?p.tn : p.facturacion; }
-let UNASSIGNED = {Ambos:354067065, MercadoLibre:346275416, TiendaNube:7791649};
-function canalTotal(){ return DATA.personas.reduce((a,p)=>a+facFor(p),0) + UNASSIGNED[state.canal]; }
+// La data ya viene filtrada por canal (recompute sobre líneas), así que facFor = total de la persona.
+function facFor(p){ return p.facturacion; }
+let UNASSIGNED = {Ambos:0, MercadoLibre:0, TiendaNube:0};
+function canalTotal(){ return DATA.totales.facturacion; }
 
 // ---- Contexto: personas lede
 function renderLede(){
@@ -478,7 +485,7 @@ function renderDetail(){
         <div class="m ${state.sort==='facturacion'?'hi':''}"><span class="h">factura</span>${money(pr.facturacion)}</div>
       </div>`).join('');
     const extra=f.nProd>f.productos.length?`<div class="prod"><div class="pn" style="color:var(--muted)">+ ${f.nProd-f.productos.length} productos más en esta familia</div><div></div><div></div><div></div></div>`:'';
-    return `<details class="fam" ${i===0?'open':''} style="--pc:${pc}">
+    return `<details class="fam" style="--pc:${pc}">
       <summary>
         <div class="fn"><span class="chev">›</span>${f.familia} <small>· ${f.nProd} SKU</small></div>
         <div class="ff tnum">${money(f.facturacion)}</div>
@@ -492,6 +499,8 @@ function renderDetail(){
   const ENVCOL={Flex:'var(--accent)',Colecta:'var(--juan)',Full:'var(--lucho)','Correo/Andreani':'var(--mariana)','Retiro/Acuerdo':'var(--mario)','Envío a domicilio':'var(--faint)',Otros:'var(--line2)'};
   const env=(p.envio||[]).filter(e=>e.bucket!=='Sin dato'&&e.pct>=1), envTot=env.reduce((a,e)=>a+e.pct,0)||1;
   const envBlock=env.length?`<div class="envio"><div class="envio-h">🚚 Forma de envío <span>· ${nf.format(p.ordenes)} órdenes</span></div><div class="envio-bar">${env.map(e=>`<i style="width:${(100*e.pct/envTot).toFixed(1)}%;background:${ENVCOL[e.bucket]||'var(--muted)'}" title="${e.bucket}: ${e.pct}%"></i>`).join('')}</div><div class="envio-leg">${env.slice(0,5).map(e=>`<span><i style="background:${ENVCOL[e.bucket]||'var(--muted)'}"></i>${e.bucket} <b>${String(e.pct).replace('.',',')}%</b></span>`).join('')}</div></div>`:'';
+  const prov=(p.provincias||[]).filter(x=>x.provincia);
+  const geoBlock=prov.length?`<div class="envio"><div class="envio-h">📍 De dónde compran</div><ul class="geo">${prov.map(x=>`<li><span class="geo-n">${x.provincia}</span><span class="geo-b"><i style="width:${Math.min(100,x.pct)}%"></i></span><span class="geo-p">${String(x.pct).replace('.',',')}%</span></li>`).join('')}</ul></div>`:'';
   const combos=(p.bundles&&p.bundles.length)?p.bundles.map(b=>({h:b.hero,s:b.sug,n:b.n})):(XSELL[p.key]||[]);
   document.getElementById('detail').style.setProperty('--pc',pc);
   document.getElementById('detail').innerHTML = `
@@ -505,6 +514,7 @@ function renderDetail(){
       <div><div class="l">ML / TN</div><div class="v" style="font-size:12.5px">${money(p.ml)} · ${money(p.tn)}</div></div>
     </div>
     ${envBlock}
+    ${geoBlock}
     <div class="fam-head"><span class="t">Top familias · clic para abrir</span>
       <div class="sortbtns" role="group" aria-label="Ordenar productos" style="--pc:${pc}">
         <button data-sort="facturacion" aria-pressed="${state.sort==='facturacion'}">Facturación</button>
@@ -540,18 +550,20 @@ function renderChart(){
   const el=document.getElementById('chart-mes'); if(!el) return;
   const pm=(DATA.porMes||[]).filter(m=>m.mes);
   if(pm.length<2){el.innerHTML='';el.hidden=true;return;} el.hidden=false;
-  const max=Math.max.apply(null,pm.map(m=>m.facturacion).concat([1]));
+  const val=m=>state.canal==='MercadoLibre'?(m.ml||0):state.canal==='TiendaNube'?(m.tn||0):m.facturacion;
+  const canalLbl=state.canal==='Ambos'?'ambos canales':state.canal;
+  const max=Math.max.apply(null,pm.map(val).concat([1]));
   const W=1000,H=150,pad=6,top=14,base=H-22,bw=(W-2*pad)/pm.length;
-  const peak=pm.reduce((a,m)=>m.facturacion>a.facturacion?m:a,pm[0]);
+  const peak=pm.reduce((a,m)=>val(m)>val(a)?m:a,pm[0]);
   const bars=pm.map((m,i)=>{
-    const h=Math.max(1,(m.facturacion/max)*(base-top)),x=pad+i*bw,y=base-h;
+    const h=Math.max(1,(val(m)/max)*(base-top)),x=pad+i*bw,y=base-h;
     const isPeak=m===peak;
-    return `<g><rect x="${(x+bw*0.14).toFixed(1)}" y="${y.toFixed(1)}" width="${(bw*0.72).toFixed(1)}" height="${h.toFixed(1)}" rx="2" fill="${isPeak?'var(--warn)':'var(--accent)'}"><title>${mesLbl(m.mes)}: ${money(m.facturacion)} · ${nf.format(m.unidades)} u</title></rect>`
+    return `<g><rect x="${(x+bw*0.14).toFixed(1)}" y="${y.toFixed(1)}" width="${(bw*0.72).toFixed(1)}" height="${h.toFixed(1)}" rx="2" fill="${isPeak?'var(--warn)':'var(--accent)'}"><title>${mesLbl(m.mes)}: ${money(val(m))}</title></rect>`
       +`<text x="${(x+bw/2).toFixed(1)}" y="${H-6}" font-size="9" text-anchor="middle" fill="var(--muted)" font-family="var(--mono)">${MES3B[+m.mes.slice(5,7)]}</text></g>`;
   }).join('');
   el.innerHTML=`<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" width="100%" height="140" role="img" aria-label="Facturación por mes">`
     +`<line x1="${pad}" y1="${base}" x2="${W-pad}" y2="${base}" stroke="var(--line)" stroke-width="1"/>${bars}</svg>`
-    +`<div class="chart-cap"><span>Facturación por mes · ambos canales</span><span>pico: <b>${mesLbl(peak.mes)}</b> ${money(peak.facturacion)}</span></div>`;
+    +`<div class="chart-cap"><span>Facturación por mes · ${canalLbl}</span><span>pico: <b>${mesLbl(peak.mes)}</b> ${money(val(peak))}</span></div>`;
 }
 
 // ---- tabs & canal
@@ -564,11 +576,8 @@ function setTab(t){
 }
 document.getElementById('tab-contexto').addEventListener('click',()=>setTab('contexto'));
 document.getElementById('tab-negocio').addEventListener('click',()=>setTab('negocio'));
-document.querySelectorAll('.seg button').forEach(b=>b.addEventListener('click',()=>{
-  state.canal=b.dataset.canal;
-  document.querySelectorAll('.seg button').forEach(x=>x.setAttribute('aria-pressed',x===b));
-  renderKPIs();renderRank();
-}));
+// El toggle de canal lo cablea el importer: setea FILTER.canal y recomputa sobre las
+// líneas filtradas (así KPIs, ranking, gráfico y detalle responden al canal).
 
 renderLede();renderKPIs();renderRank();renderDetail();renderCov();renderChart();
 </script>
@@ -584,7 +593,7 @@ renderLede();renderKPIs();renderRank();renderDetail();renderCov();renderChart();
   const BASELINE=JSON.parse(JSON.stringify(DATA)), BASELINE_UN=Object.assign({},UNASSIGNED);
   const MES3=['','ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
   let picked=[], maestroFile=null, lastBuild=null;
-  let LINES=[], SEEN=new Set(), MANIFEST=[], FILTER={desde:null,hasta:null};
+  let LINES=[], SEEN=new Set(), MANIFEST=[], FILTER={desde:null,hasta:null,canal:'Ambos'};
 
   // ---- CSV parser (mismo que tools/snapshot.mjs: comillas + delim configurable)
   function parseCSV(text,delim){
@@ -604,7 +613,7 @@ renderLede();renderKPIs();renderRank();renderDetail();renderCov();renderChart();
   async function idbSet(k,v){const db=await idb();return new Promise((res,rej)=>{const t=db.transaction('kv','readwrite').objectStore('kv').put(v,k);t.onsuccess=()=>res();t.onerror=()=>rej(t.error);});}
   async function idbClear(){const db=await idb();return new Promise((res,rej)=>{const t=db.transaction('kv','readwrite').objectStore('kv').clear();t.onsuccess=()=>res();t.onerror=()=>rej(t.error);});}
   // solo los campos que el motor necesita para agregar + filtrar (líviano para guardar)
-  function compact(l){return {canal:l.canal,order_id:l.order_id,mes:l.mes,buyer:l.buyer,familia:l.familia,nombre:l.nombre,sku:l.sku,sku_raw:l.sku_raw,unidades:l.unidades,facturacion:l.facturacion,cuotas:l.cuotas,envio:l.envio,billable:l.billable};}
+  function compact(l){return {canal:l.canal,order_id:l.order_id,mes:l.mes,buyer:l.buyer,familia:l.familia,nombre:l.nombre,sku:l.sku,sku_raw:l.sku_raw,unidades:l.unidades,facturacion:l.facturacion,cuotas:l.cuotas,envio:l.envio,billable:l.billable,provincia:l.provincia};}
   // clave de dedup = misma que engine.lineKey (canal|orden|sku|unidades|facturacion)
   function keyOf(l){return l.canal+'|'+l.order_id+'|'+l.sku+'|'+l.unidades+'|'+l.facturacion;}
   async function persist(){try{await idbSet('lines',LINES);await idbSet('manifest',MANIFEST);}catch(e){/* modo privado: queda en memoria de la sesión */}}
@@ -616,6 +625,7 @@ renderLede();renderKPIs();renderRank();renderDetail();renderCov();renderChart();
 
   // ---- transform motor -> shape del tablero (port de tools/snapshot.mjs)
   function envioPct(e){const tot=Object.values(e).reduce((a,x)=>a+x.ordenes,0)||1;return Object.entries(e).map(([bucket,v])=>({bucket,ordenes:v.ordenes,pct:+(100*v.ordenes/tot).toFixed(1)})).sort((a,b)=>b.ordenes-a.ordenes);}
+  function topProv(g){const tot=Object.values(g).reduce((a,x)=>a+x,0)||1;return Object.entries(g).map(([provincia,f])=>({provincia,facturacion:Math.round(f),pct:+(100*f/tot).toFixed(1)})).sort((a,b)=>b.facturacion-a.facturacion).slice(0,5);}
   function buildSnapshotFromLines(lines){
     const agg=aggregate(lines);
     const bundles=bundlesByPersona(lines);
@@ -628,13 +638,14 @@ renderLede();renderKPIs();renderRank();renderDetail();renderCov();renderChart();
       totales:{facturacion:agg.totales.facturacion,cobertura:agg.totales.coberturaPct,
         ordenes:agg.totales.ordenes,lineas:agg.totales.lineas,
         ticket:agg.totales.ordenes?Math.round(agg.totales.facturacion/agg.totales.ordenes):0},
-      porMes:agg.porMes.map(m=>({mes:m.mes,facturacion:Math.round(m.facturacion),unidades:m.unidades})),
+      porMes:agg.porMes.map(m=>({mes:m.mes,facturacion:Math.round(m.facturacion),ml:Math.round(m.ml),tn:Math.round(m.tn),unidades:m.unidades})),
       personas:PERS.map(p=>{const b=agg.byPersona[p],c=canal[p]||{MercadoLibre:0,TiendaNube:0};return{
         key:p,facturacion:b.facturacion,share:b.sharePct,ml:Math.round(c.MercadoLibre),tn:Math.round(c.TiendaNube),
         unidades:b.unidades,ordenes:b.ordenes,ticket:b.ticket,cuotas:b.cuotas,
         familias:agg.topByPersona[p].slice(0,6).map(f=>({familia:f.familia,facturacion:f.facturacion,sharePct:f.sharePct,unidades:f.unidades,precioProm:f.precioProm,nProd:f.productos.length,
           productos:f.productos.slice(0,4).map(x=>({nombre:x.nombre,sku:x.sku,facturacion:x.facturacion,unidades:x.unidades,precioProm:x.precioProm}))})),
         envio:envioPct(agg.envioByPersona[p]),
+        provincias:topProv(agg.provinciaByPersona[p]),
         bundles:(bundles[p]||[]).map(x=>({sug:x.sugNombre,sugSku:x.sugSku,hero:x.heroNombre,cruza:x.cruzaFamilia,n:x.n}))
       };}),
       sinAsignar:{facturacion:agg.byPersona['Sin asignar'].facturacion,share:agg.byPersona['Sin asignar'].sharePct,
@@ -675,8 +686,13 @@ renderLede();renderKPIs();renderRank();renderDetail();renderCov();renderChart();
   // ---- núcleo: vista actual = líneas (filtradas) o baseline de ejemplo
   function currentLines(){
     if(!LINES.length)return null;
-    if(!FILTER.desde&&!FILTER.hasta)return LINES;
-    return LINES.filter(l=>{const m=l.mes||'';return (!FILTER.desde||m>=FILTER.desde)&&(!FILTER.hasta||m<=FILTER.hasta);});
+    const cf=FILTER.canal&&FILTER.canal!=='Ambos';
+    if(!FILTER.desde&&!FILTER.hasta&&!cf)return LINES;
+    return LINES.filter(l=>{const m=l.mes||'';
+      if(FILTER.desde&&m<FILTER.desde)return false;
+      if(FILTER.hasta&&m>FILTER.hasta)return false;
+      if(cf&&l.canal!==FILTER.canal)return false;
+      return true;});
   }
   function recompute(){
     const ls=currentLines();
@@ -700,9 +716,10 @@ renderLede();renderKPIs();renderRank();renderDetail();renderCov();renderChart();
     const has=LINES.length>0;
     if(has){
       const ms=monthsOf(LINES);
-      elBadge.className='src-badge on';
       const nArch=new Set(MANIFEST.map(m=>m.file)).size||MANIFEST.length;
-      elBadge.innerHTML=`<span><b>Histórico cargado</b> · ${nf.format(LINES.length)} líneas · ${nArch} archivo(s) · ${windowLabel(ms)}</span><button id="badge-clear" class="src-clear" type="button">Borrar histórico</button>`;
+      const updated=MANIFEST.length>1;
+      elBadge.className='src-badge on';
+      elBadge.innerHTML=`<span>Datos <b>${windowLabel(ms)}</b> · ${nf.format(LINES.length)} líneas${updated?` · ${nArch} archivos cargados`:''}. Para actualizar, tocá <b>“↑ Actualizar datos”</b>.</span>${updated?'<button id="badge-clear" class="src-clear" type="button">Restaurar base</button>':''}`;
       const bc=$('badge-clear'); if(bc)bc.onclick=clearHistory;
       const opt=sel=>ms.map(m=>`<option value="${m}"${m===sel?' selected':''}>${mesLabel(m)}</option>`).join('');
       elDesde.innerHTML=opt(FILTER.desde||ms[0]);
@@ -710,10 +727,10 @@ renderLede();renderKPIs();renderRank();renderDetail();renderCov();renderChart();
       elFlt.hidden=false;
     }else{
       elBadge.className='src-badge';
-      elBadge.innerHTML=`Mostrando <b>datos de ejemplo</b>. Tocá <b>“↑ Actualizar datos”</b> y cargá tus exports para ver tus números reales (se guardan en esta compu y se van sumando mes a mes).`;
+      elBadge.innerHTML=`Mostrando los <b>números base</b>. (No se pudo cargar el detalle por línea para filtrar por fecha — reintentá recargando.)`;
       elFlt.hidden=true;
     }
-    resetBtn.hidden=!has;dlBox.hidden=!has;
+    resetBtn.hidden=!(MANIFEST.length>1);dlBox.hidden=!has;
   }
 
   function renderRecon(info){
@@ -767,10 +784,12 @@ renderLede();renderKPIs();renderRank();renderDetail();renderCov();renderChart();
   }
 
   async function clearHistory(){
-    if(!confirm('¿Borrar todo el histórico cargado en esta computadora? Vas a volver a los datos de ejemplo.'))return;
-    LINES=[];SEEN=new Set();MANIFEST=[];FILTER={desde:null,hasta:null};
+    if(!confirm('¿Borrar los updates que cargaste y volver a los datos base?'))return;
+    LINES=[];SEEN=new Set();MANIFEST=[];FILTER={desde:null,hasta:null,canal:'Ambos'};
     try{await idbClear();}catch(e){}
-    reconEl.hidden=true;recompute();setMsg('Histórico borrado. Estás viendo los datos de ejemplo.');
+    reconEl.hidden=true;
+    await seedFromServer();
+    recompute();setMsg('Volviste a los datos base.');
   }
 
   // ---- eventos
@@ -797,6 +816,11 @@ renderLede();renderKPIs();renderRank();renderDetail();renderCov();renderChart();
     document.querySelectorAll('.flt-presets button').forEach(x=>x.setAttribute('aria-pressed',x===b));
     recompute();
   }));
+  document.querySelectorAll('.seg button').forEach(b=>b.addEventListener('click',()=>{
+    state.canal=b.dataset.canal; FILTER.canal=b.dataset.canal;
+    document.querySelectorAll('.seg button').forEach(x=>x.setAttribute('aria-pressed',x===b));
+    recompute();
+  }));
   $('dl-snap').addEventListener('click',()=>{if(lastBuild)download('snapshot.json',JSON.stringify(lastBuild.snapshot),'application/json');});
   $('dl-unmapped').addEventListener('click',()=>{
     if(!lastBuild)return;
@@ -805,13 +829,28 @@ renderLede();renderKPIs();renderRank();renderDetail();renderCov();renderChart();
     download('unmapped_skus.csv','﻿'+csv,'text/csv;charset=utf-8');
   });
 
-  // ---- init: levantar histórico guardado (si hay) y pintar
+  // Baja el histórico base (líneas) la 1ª visita y lo siembra en IndexedDB.
+  async function seedFromServer(){
+    try{
+      setMsg('Cargando datos…');
+      const r=await fetch('data/lines.json'); if(!r.ok)throw 0;
+      const d=await r.json();
+      LINES=d.rows.map(row=>{const o={};for(let i=0;i<d.cols.length;i++)o[d.cols[i]]=row[i];return o;});
+      SEEN=new Set(LINES.map(keyOf));
+      MANIFEST=[{file:'Histórico base ('+(d.ventana||'')+')',nuevas:LINES.length,dups:0,when:0}];
+      try{await persist();}catch(e){}
+      setMsg(''); return true;
+    }catch(e){ setMsg(''); return false; }
+  }
+
+  // ---- init: levantar lo guardado; si está vacío, sembrar el histórico base
   (async function init(){
-    resetBtn.textContent='Borrar histórico';
+    resetBtn.textContent='Restaurar datos base';
     try{
       const [ls,mf]=await Promise.all([idbGet('lines'),idbGet('manifest')]);
       if(Array.isArray(ls)&&ls.length){LINES=ls;MANIFEST=Array.isArray(mf)?mf:[];SEEN=new Set(LINES.map(keyOf));}
     }catch(e){/* IDB no disponible */}
+    if(!LINES.length) await seedFromServer();
     recompute();
   })();
 })();

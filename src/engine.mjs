@@ -20,6 +20,35 @@
 export const CANCEL_RE = /cancel|devoluc|reembol/i;
 export const PERSONAS = ['Juan', 'Mariana', 'Lucho', 'Martin', 'Mario', 'Sin asignar'];
 
+// Fallback heurístico: clasifica un producto sin mapear por palabras clave del título,
+// reflejando el criterio de negocio (así nada queda 'Sin asignar'). Devuelve
+// { buyer, familia } o null si no reconoce nada.
+export function heuristicBuyer(nombre) {
+  const t = (nombre == null ? '' : String(nombre)).toLowerCase();
+  if (!t) return null;
+  const has = (...ks) => ks.some((k) => t.includes(k));
+  // comercio / mostrador (Mario)
+  if (has('contadora de billete', 'contador de billete', 'lector de código', 'lector de codigo', 'lector 2d', 'lector 1d', 'código de barras', 'codigo de barras', 'gaveta', 'selladora', 'registradora', 'ticketera')) return { buyer: 'Mario', familia: 'Comercio' };
+  // exterior / aventura (Lucho)
+  if (has('sombrilla', 'gazebo', 'reposera', 'camping', 'playa', 'pesca', 'picnic', 'carpa', 'quincho', 'cama elástica', 'cama elastica')) return { buyer: 'Lucho', familia: 'Exterior y aire libre' };
+  if (has('mesa') && has('exterior', 'plegable', 'picnic', 'playa')) return { buyer: 'Lucho', familia: 'Exterior y aire libre' };
+  // home office (Martin)
+  if (has('escritorio', 'sit-stand', 'sit stand', 'micrófono', 'microfono')) return { buyer: 'Martin', familia: 'Escritorios ergonómicos' };
+  if (has('soporte') && has('monitor')) return { buyer: 'Martin', familia: 'Soportes de monitor' };
+  // organización / limpieza / hogar / deco (Mariana)
+  if (has('mopa', 'balde', 'trapeador', 'lampazo', 'escurridor', 'centrifug')) return { buyer: 'Mariana', familia: 'Limpieza' };
+  if (has('percha')) return { buyer: 'Mariana', familia: 'Organización de ropa' };
+  if (has('proyector', 'galaxia', 'velador', 'astronauta')) return { buyer: 'Mariana', familia: 'Iluminación' };
+  if (has('coser', 'costura', 'organizador', 'zapatero', 'cesto', 'estantería', 'estanteria', 'carrito organizador')) return { buyer: 'Mariana', familia: 'Organizadores multiuso' };
+  // resuelve la casa (Juan) — soportes de TV, seguridad, herramientas
+  if (has('caja fuerte')) return { buyer: 'Juan', familia: 'Seguridad y vigilancia' };
+  if (has('cámara', 'camara', 'vigilancia', 'seguridad')) return { buyer: 'Juan', familia: 'Seguridad y vigilancia' };
+  if (has('escalera', 'herramienta', 'taladro')) return { buyer: 'Juan', familia: 'Herramientas y equipamiento' };
+  if (has('soporte', 'rack', 'pedestal') && has('tv', 'televis', 'pared', 'techo', '"', '”')) return { buyer: 'Juan', familia: 'Móviles con Brazo' };
+  if (has('soporte', 'rack')) return { buyer: 'Juan', familia: 'Móviles con Brazo' };
+  return null;
+}
+
 // Normaliza la forma de envío (ML: 'Forma de entrega'; TN: 'Medio de envío') a
 // cubetas legibles y comparables entre canales. '' si no hay dato.
 export function bucketEnvio(s) {
@@ -201,6 +230,8 @@ export function makeMatcher(maestro) {
     }
     const t = normSku(titulo);
     if (t && nameInfo.has(t)) return pack(nameInfo.get(t), 'titulo');
+    const h = heuristicBuyer(titulo);
+    if (h) return { buyer: h.buyer, method: 'heuristica', nombre: '', familia: h.familia, categoria: '' };
     return { buyer: 'Sin asignar', method: 'unmapped', nombre: '', familia: '', categoria: '' };
   };
 }
@@ -239,8 +270,9 @@ export function ingestMeli(aoa, match, sourceFile = '') {
     const billable = !(CANCEL_RE.test(estado) || CANCEL_RE.test(desc));
     const iso = parseDateML(row[iFecha]);
     const titulo = iTitulo >= 0 ? cleanName(row[iTitulo]) : '';
-    const m = match(row[iSKU], titulo);
     const skuRaw = String(row[iSKU] ?? '').trim();
+    if (!skuRaw && !titulo) continue; // fila sin producto (ajuste/envío a nivel de orden)
+    const m = match(row[iSKU], titulo);
     lines.push({
       canal: 'MercadoLibre',
       order_id: String(venta).trim(),
@@ -395,6 +427,8 @@ export function aggregate(lines) {
   // fam[persona] = Map(familia -> { facturacion, unidades, productos: Map(sku -> {sku,nombre,facturacion,unidades}) })
   const fam = {};
   for (const p of PERSONAS) fam[p] = new Map();
+  const prov = {}; // persona -> { provincia -> facturacion }
+  for (const p of PERSONAS) prov[p] = {};
 
   for (const l of lines) {
     const p = byPersona[l.buyer] ? l.buyer : 'Sin asignar';
@@ -423,6 +457,8 @@ export function aggregate(lines) {
     prow.facturacion += l.facturacion; prow.unidades += l.unidades;
     frow.productos.set(pkey, prow);
     fm.set(l.familia, frow);
+    // geografía (de dónde compra cada persona)
+    if (l.provincia) prov[p][l.provincia] = (prov[p][l.provincia] || 0) + l.facturacion;
     // sin asignar (reporte para completar el maestro)
     if (p === 'Sin asignar' && l.sku) {
       const u = unmapped.get(l.sku) || { sku: l.sku_raw, nombre: l.nombre, lines: 0, facturacion: 0 };
@@ -446,8 +482,10 @@ export function aggregate(lines) {
   const porMesMap = new Map();
   for (const r of byMesCanalPersona.values()) {
     if (!r.mes) continue;
-    const m = porMesMap.get(r.mes) || { mes: r.mes, facturacion: 0, unidades: 0 };
-    m.facturacion += r.facturacion; m.unidades += r.unidades; porMesMap.set(r.mes, m);
+    const m = porMesMap.get(r.mes) || { mes: r.mes, facturacion: 0, ml: 0, tn: 0, unidades: 0 };
+    m.facturacion += r.facturacion; m.unidades += r.unidades;
+    if (r.canal === 'MercadoLibre') m.ml += r.facturacion; else if (r.canal === 'TiendaNube') m.tn += r.facturacion;
+    porMesMap.set(r.mes, m);
   }
   const porMes = [...porMesMap.values()].sort((a, b) => (a.mes < b.mes ? -1 : 1));
   for (const p of PERSONAS) {
@@ -493,6 +531,7 @@ export function aggregate(lines) {
     byPersona,
     topByPersona,
     envioByPersona,
+    provinciaByPersona: prov,
     porMes,
     porMesCanalPersona: Array.from(byMesCanalPersona.values()),
     unmapped: Array.from(unmapped.values())

@@ -33,6 +33,10 @@ const envioPct = (e) => {
   const tot = Object.values(e).reduce((a, x) => a + x.ordenes, 0) || 1;
   return Object.entries(e).map(([bucket, v]) => ({ bucket, ordenes: v.ordenes, pct: +(100 * v.ordenes / tot).toFixed(1) })).sort((a, b) => b.ordenes - a.ordenes);
 };
+const topProv = (g) => {
+  const tot = Object.values(g).reduce((a, x) => a + x, 0) || 1;
+  return Object.entries(g).map(([provincia, f]) => ({ provincia, facturacion: Math.round(f), pct: +(100 * f / tot).toFixed(1) })).sort((a, b) => b.facturacion - a.facturacion).slice(0, 5);
+};
 
 const out = {
   meta: { ventana: 'jun 2025 – jun 2026', updated: '2026-06-16', canales: ['MercadoLibre', 'TiendaNube'] },
@@ -41,7 +45,7 @@ const out = {
     ordenes: agg.totales.ordenes, lineas: agg.totales.lineas,
     ticket: Math.round(agg.totales.facturacion / agg.totales.ordenes),
   },
-  porMes: agg.porMes.map((m) => ({ mes: m.mes, facturacion: Math.round(m.facturacion), unidades: m.unidades })),
+  porMes: agg.porMes.map((m) => ({ mes: m.mes, facturacion: Math.round(m.facturacion), ml: Math.round(m.ml), tn: Math.round(m.tn), unidades: m.unidades })),
   personas: E.PERSONAS.filter((p) => p !== 'Sin asignar').map((p) => {
     const b = agg.byPersona[p]; const c = canal[p] || { MercadoLibre: 0, TiendaNube: 0 };
     return {
@@ -52,6 +56,7 @@ const out = {
         productos: f.productos.slice(0, 4).map((x) => ({ nombre: x.nombre, sku: x.sku, facturacion: x.facturacion, unidades: x.unidades, precioProm: x.precioProm })),
       })),
       envio: envioPct(agg.envioByPersona[p]),
+      provincias: topProv(agg.provinciaByPersona[p]),
       bundles: (bundles[p] || []).map((x) => ({ sug: x.sugNombre, sugSku: x.sugSku, hero: x.heroNombre, cruza: x.cruzaFamilia, n: x.n })),
     };
   }),
