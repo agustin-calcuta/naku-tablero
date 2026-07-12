@@ -1,6 +1,50 @@
 <meta charset="utf-8">
 <title>NAKU · Tablero de compradores</title>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <style>
+  /* ---------- Importer (carga de exports) ---------- */
+  .imp-btn{font-family:var(--sans);font-size:12.5px;font-weight:700;color:#fff;background:var(--accent);border:0;border-radius:7px;padding:8px 13px;cursor:pointer;white-space:nowrap;display:inline-flex;align-items:center;gap:7px}
+  .imp-btn:hover{filter:brightness(1.08)}
+  .imp-btn:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+  .imp-backdrop{position:fixed;inset:0;background:rgba(25,30,25,.34);z-index:60;display:flex;align-items:flex-start;justify-content:center;padding:6vh 16px 16px;overflow:auto}
+  .imp-backdrop[hidden]{display:none}
+  .imp-card{background:var(--panel);border:1px solid var(--line);border-radius:14px;max-width:560px;width:100%;padding:20px 22px 22px;box-shadow:0 18px 50px rgba(25,30,25,.22)}
+  .imp-head{display:flex;align-items:center;gap:12px;margin-bottom:4px}
+  .imp-head b{font-size:16px;letter-spacing:-.01em}
+  .imp-x{margin-left:auto;background:none;border:0;font-size:16px;color:var(--muted);cursor:pointer;line-height:1;padding:4px}
+  .imp-sub{font-size:13px;color:var(--muted);line-height:1.5;margin:2px 0 14px}
+  .imp-sub b{color:var(--ink)}
+  .imp-drop{display:flex;flex-direction:column;align-items:center;gap:3px;text-align:center;border:1.5px dashed var(--line);border-radius:11px;padding:22px 16px;cursor:pointer;background:var(--panel2);transition:border-color .15s,background .15s}
+  .imp-drop:hover,.imp-drop.drag{border-color:var(--accent);background:var(--accent-soft)}
+  .imp-drop-ico{font-size:26px}
+  .imp-drop-t{font-weight:700;font-size:14px}
+  .imp-drop-s{font-size:11.5px;color:var(--muted)}
+  .imp-list{margin-top:12px;display:flex;flex-direction:column;gap:5px}
+  .imp-empty{font-size:12px;color:var(--faint);font-style:italic}
+  .imp-f{display:flex;align-items:center;gap:8px;font-size:12.5px;background:var(--panel2);border:1px solid var(--line2);border-radius:7px;padding:6px 9px}
+  .imp-tag{font-family:var(--mono);font-size:9.5px;font-weight:700;color:#fff;border-radius:4px;padding:1px 6px;letter-spacing:.04em}
+  .imp-tag.ml{background:var(--juan)} .imp-tag.tn{background:var(--mariana)}
+  .imp-rm{margin-left:auto;background:none;border:0;color:var(--muted);cursor:pointer;font-size:12px;padding:2px 4px}
+  .imp-adv{margin-top:12px;font-size:12px}
+  .imp-adv summary{cursor:pointer;color:var(--muted);font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase}
+  .imp-mrow{display:block;margin:10px 0 4px;font-size:12.5px}
+  .imp-mrow input{display:block;margin-top:6px;font-size:12px}
+  .imp-note{font-size:11px;color:var(--faint);line-height:1.5}
+  .imp-actions{display:flex;gap:9px;align-items:center;margin-top:16px}
+  .imp-run{font-family:var(--sans);font-size:13px;font-weight:700;color:#fff;background:var(--ink);border:0;border-radius:8px;padding:10px 16px;cursor:pointer}
+  .imp-run:disabled{opacity:.4;cursor:default}
+  .imp-ghost{font-family:var(--sans);font-size:12px;font-weight:600;color:var(--ink);background:var(--panel2);border:1px solid var(--line);border-radius:7px;padding:8px 12px;cursor:pointer}
+  .imp-status{margin-top:12px;font-size:12.5px;color:var(--muted);min-height:1.2em;line-height:1.5}
+  .imp-status.err{color:var(--crit);font-weight:600}
+  .imp-recon{margin-top:12px;border-top:1px solid var(--line);padding-top:12px}
+  .imp-recon table{width:100%;border-collapse:collapse;font-size:12px}
+  .imp-recon th{font-family:var(--mono);font-size:9.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);text-align:right;font-weight:600;padding:3px 6px}
+  .imp-recon th:first-child{text-align:left}
+  .imp-recon td{font-family:var(--mono);text-align:right;padding:3px 6px;border-top:1px solid var(--line2)}
+  .imp-recon td:first-child{text-align:left;font-family:var(--sans);font-weight:600}
+  .imp-recon .up{color:var(--good)} .imp-recon .dn{color:var(--crit)}
+  .imp-dl{margin-top:12px;display:flex;gap:9px;flex-wrap:wrap}
+  .imp-priv{margin-top:12px;font-size:11px;color:var(--faint);line-height:1.5;display:flex;gap:6px;align-items:flex-start}
   :root{
     --paper:#F1F2EC; --panel:#FBFBF7; --panel2:#F6F7F1;
     --ink:#191E19; --muted:#6C726A; --faint:#98A08F; --line:#D5D8CD; --line2:#E4E6DE;
@@ -187,9 +231,42 @@
         <button id="tab-contexto" role="tab" aria-selected="false" aria-controls="contexto">Contexto</button>
         <button id="tab-negocio" role="tab" aria-selected="true" aria-controls="negocio">El negocio</button>
       </div>
-      <div class="stamp">ventana <b>jun 2025 – jun 2026</b><br>MercadoLibre + TiendaNube · corte 16 jun 2026</div>
+      <button id="btn-import" class="imp-btn" type="button" aria-haspopup="dialog"><span aria-hidden="true">↑</span> Actualizar datos</button>
+      <div class="stamp" id="stamp">ventana <b>jun 2025 – jun 2026</b><br>MercadoLibre + TiendaNube · corte 16 jun 2026</div>
     </div>
   </header>
+
+  <!-- ===== Importer: cargar exports y recalcular en el navegador ===== -->
+  <div id="imp-panel" class="imp-backdrop" hidden role="dialog" aria-modal="true" aria-label="Actualizar el tablero con los exports">
+    <div class="imp-card">
+      <div class="imp-head"><b>Actualizar el tablero con los exports</b><button id="imp-close" class="imp-x" type="button" aria-label="Cerrar">✕</button></div>
+      <p class="imp-sub">Arrastrá (o elegí) los <b>3 Excel de MercadoLibre</b> + el <b>CSV de TiendaNube</b>. Se recalcula todo acá, en tu navegador — <b>nada se sube a internet</b>.</p>
+      <label id="imp-drop" class="imp-drop">
+        <input id="imp-files" type="file" accept=".xlsx,.csv" multiple hidden>
+        <span class="imp-drop-ico" aria-hidden="true">📄</span>
+        <span class="imp-drop-t">Soltá los archivos acá</span>
+        <span class="imp-drop-s">o hacé clic para elegirlos · <b>.xlsx</b> = ML · <b>.csv</b> = TiendaNube</span>
+      </label>
+      <div id="imp-list" class="imp-list"></div>
+      <details class="imp-adv">
+        <summary>Opciones avanzadas</summary>
+        <label class="imp-mrow">Reemplazar el maestro SKU→comprador (opcional):
+          <input id="imp-maestro" type="file" accept=".csv"></label>
+        <span class="imp-note">Si no cargás nada, se usa el maestro incluido en el tablero.</span>
+      </details>
+      <div class="imp-actions">
+        <button id="imp-run" class="imp-run" type="button" disabled>Procesar y actualizar</button>
+        <button id="imp-reset" class="imp-ghost" type="button" hidden>Volver a los datos base</button>
+      </div>
+      <div id="imp-status" class="imp-status" role="status" aria-live="polite"></div>
+      <div id="imp-recon" class="imp-recon" hidden></div>
+      <div id="imp-dl" class="imp-dl" hidden>
+        <button id="dl-snap" class="imp-ghost" type="button">↓ snapshot.json</button>
+        <button id="dl-unmapped" class="imp-ghost" type="button">↓ unmapped_skus.csv</button>
+      </div>
+      <div class="imp-priv"><span aria-hidden="true">🔒</span> <span>Los archivos no salen de tu computadora: el procesamiento es 100% local en el navegador. La versión pública del tablero no cambia con lo que cargues acá.</span></div>
+    </div>
+  </div>
 
   <div class="sheet">
 
@@ -203,10 +280,10 @@
       </div>
 
       <div class="hard">
-        <div class="cell"><div class="n tnum">$4.158 M</div><div class="c">Facturación analizada (14 meses, ambos canales)</div></div>
-        <div class="cell"><div class="n tnum">99.028</div><div class="c">Órdenes procesadas</div></div>
-        <div class="cell"><div class="n tnum">3,1–4,1</div><div class="c">Cuotas promedio según persona</div></div>
-        <div class="cell"><div class="n tnum">91,5%</div><div class="c">De la facturación ya asignada a una persona</div></div>
+        <div class="cell"><div class="n tnum" id="hard-fac">$4.158 M</div><div class="c">Facturación analizada (14 meses, ambos canales)</div></div>
+        <div class="cell"><div class="n tnum" id="hard-ord">99.028</div><div class="c">Órdenes procesadas</div></div>
+        <div class="cell"><div class="n tnum" id="hard-cuo">3,1–4,1</div><div class="c">Cuotas promedio según persona</div></div>
+        <div class="cell"><div class="n tnum" id="hard-cob">91,5%</div><div class="c">De la facturación ya asignada a una persona</div></div>
       </div>
 
       <div class="eyebrow"><span class="lab">Los cinco</span><span class="ruler"></span></div>
@@ -253,8 +330,700 @@
   </div>
 </div>
 
+<!-- Motor de normalización/matching/agregación (inline; copia de src/engine.mjs — lo inyecta el build) -->
+<script id="engine">// engine.mjs — Motor de normalización + matching + agregación para el tablero NAKU.
+// PURO: sin I/O, sin DOM, sin dependencias. Corre igual en el browser (dashboard)
+// y en Node (tests) y en Apps Script (con transpile mínimo si hiciera falta).
+//
+// Adaptadores (fuera de este archivo):
+//   - MeLi .xlsx  -> SheetJS: XLSX.utils.sheet_to_json(ws,{header:1,raw:true}) => aoa
+//   - TN   .csv   -> TextDecoder('windows-1252') + PapaParse(delimiter:';')   => aoa
+// El aoa (array-of-arrays, incluye fila(s) de header) entra a ingestMeli/ingestTn.
+//
+// Reglas críticas implementadas (ver PLAN §4):
+//   - MeLi: header en la fila que contiene '# de venta'; columnas por NOMBRE, no por índice
+//           (el export deriva a 64 vs 67 columnas). Headers duplicados -> primera ocurrencia.
+//   - Maestro: columna 'Buyer Persona' está DUPLICADA -> usar la PRIMERA (la poblada).
+//   - Combos 'A + B' en el maestro -> se splitean del lado maestro.
+//   - Cancel/devolución -> se excluyen de facturación.
+//   - Dedup por clave compuesta (los 3 xlsx son cortes; re-subidas no deben duplicar).
+//   - Cada línea carga NOMBRE de producto y FAMILIA (para mostrar nombre>SKU y agrupar
+//     el "top productos" por familia con drill-down).
+
+const CANCEL_RE = /cancel|devoluc|reembol/i;
+const PERSONAS = ['Juan', 'Mariana', 'Lucho', 'Martin', 'Mario', 'Sin asignar'];
+
+const MESES_ES = {
+  enero: 1, febrero: 2, marzo: 3, abril: 4, mayo: 5, junio: 6,
+  julio: 7, agosto: 8, septiembre: 9, setiembre: 9, octubre: 10,
+  noviembre: 11, diciembre: 12,
+};
+
+// ---------------------------------------------------------------- normalizadores
+
+function normSku(s) {
+  return (s == null ? '' : String(s)).trim().toUpperCase().replace(/\s+/g, ' ');
+}
+
+// Variante "pelada": saca (...), multiplicadores xN y colores, para resolver
+// SKUs de venta que llegan sin el sufijo del maestro (fallback tier-2).
+function stripVariant(s) {
+  return normSku(s)
+    .replace(/\([^)]*\)/g, ' ')
+    .replace(/\bX\d+\b/g, ' ')
+    .replace(/\b(NEGRO|NEGRA|BLANCO|BLANCA|ROJO|ROJA|AZUL|VERDE|GRIS)\b/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+// Limpia un nombre de producto para mostrar (saca comillas raras, colapsa espacios).
+function cleanName(s) {
+  return (s == null ? '' : String(s)).replace(/\s+/g, ' ').replace(/\\+$/, '').trim();
+}
+
+// Último nodo de un path "A > B > C" (toma la 1ª categoría si vienen varias con coma).
+function lastCategory(s) {
+  if (!s) return '';
+  const first = String(s).split(',')[0];
+  return first.split('>').pop().replace(/[\\/]+$/, '').replace(/\s+/g, ' ').trim();
+}
+
+// Familia = columna 'Familia' del maestro si existe; si no, último nodo de Categorías;
+// si no, prefijo alfabético del SKU; último recurso 'Otros'.
+function familiaOf(familiaCol, categoria, sku) {
+  const f = cleanName(familiaCol);
+  if (f) return f;
+  const c = lastCategory(categoria);
+  if (c) return c;
+  const m = normSku(sku).match(/^[A-Z]+/);
+  return m ? m[0] : 'Otros';
+}
+
+// Números: acepta Number ya parseado (SheetJS) o string ES ("1.234,56") o "39773.09".
+function parseNumberES(x) {
+  if (typeof x === 'number') return isFinite(x) ? x : 0;
+  if (x == null) return 0;
+  let s = String(x).trim();
+  if (!s) return 0;
+  if (/,\d/.test(s)) s = s.replace(/\./g, '').replace(',', '.'); // formato ES: . miles, , decimal
+  else s = s.replace(/,/g, '');                                  // solo , de miles
+  const n = parseFloat(s.replace(/[^0-9.\-]/g, ''));
+  return isFinite(n) ? n : 0;
+}
+
+// "16 de junio de 2026 11:53 hs." -> "2026-06-16"
+function parseDateML(s) {
+  if (!s) return '';
+  const m = String(s).toLowerCase().match(/(\d{1,2})\s+de\s+([a-záéíóú]+)\s+de\s+(\d{4})/);
+  if (!m) return '';
+  const mes = MESES_ES[m[2]];
+  if (!mes) return '';
+  return `${m[3]}-${String(mes).padStart(2, '0')}-${String(m[1]).padStart(2, '0')}`;
+}
+
+// "01/07/2026 12:58:00" -> "2026-07-01"  (dd/mm/yyyy, día primero)
+function parseDateTN(s) {
+  if (!s) return '';
+  const m = String(s).trim().match(/(\d{1,2})\/(\d{1,2})\/(\d{4})/);
+  if (!m) return '';
+  return `${m[3]}-${m[2].padStart(2, '0')}-${m[1].padStart(2, '0')}`;
+}
+
+const mesOf = (iso) => (iso && iso.length >= 7 ? iso.slice(0, 7) : ''); // YYYY-MM
+
+// ---------------------------------------------------------------- headers duplicados
+
+// Devuelve helpers para resolver columnas por nombre tolerando duplicados.
+function headerIndex(headerRow) {
+  const pos = new Map(); // name -> [idx,...]
+  headerRow.forEach((h, j) => {
+    const k = (h == null ? '' : String(h)).trim();
+    if (!pos.has(k)) pos.set(k, []);
+    pos.get(k).push(j);
+  });
+  const first = (name) => (pos.has(name) ? pos.get(name)[0] : -1);
+  // 'Estado' aparece 2 veces: la 2ª (después de 'Ciudad') es la provincia del comprador.
+  const provinciaIdx = () => {
+    const ciudad = first('Ciudad');
+    const estados = pos.get('Estado') || [];
+    const after = estados.filter((i) => i > ciudad);
+    return after.length ? after[0] : -1;
+  };
+  return { pos, first, provinciaIdx };
+}
+
+// ---------------------------------------------------------------- maestro SKU->buyer
+
+// rows = aoa del CSV/Sheet maestro (incluye header). Usa la PRIMERA 'Buyer Persona'.
+// Columna 'Familia' es opcional (si no está, se deriva de 'Categorías'/prefijo).
+function buildMaestro(rows) {
+  const header = rows[0].map((h) => (h == null ? '' : String(h)).trim());
+  const idxFirst = (name) => header.indexOf(name);
+  const BP = idxFirst('Buyer Persona'); // primera ocurrencia (la poblada)
+  const SK = idxFirst('SKU');
+  const NM = idxFirst('Nombre');
+  const CA = idxFirst('Categorías');
+  const FA = idxFirst('Familia'); // opcional
+  const skuInfo = new Map();  // sku_norm -> { buyer, nombre, categoria, familia }
+  const nameInfo = new Map(); // nombre_norm -> { buyer, nombre, categoria, familia } (fallback por título)
+  let combos = 0;
+  for (let r = 1; r < rows.length; r++) {
+    const row = rows[r];
+    if (!row || row.length <= SK) continue;
+    const buyer = (row[BP] == null ? '' : String(row[BP])).trim();
+    if (!buyer) continue;
+    const nombre = NM >= 0 ? cleanName(row[NM]) : '';
+    const categoria = CA >= 0 ? cleanName(row[CA]) : '';
+    const familia = familiaOf(FA >= 0 ? row[FA] : '', categoria, row[SK]);
+    const info = { buyer, nombre, categoria, familia };
+    if (nombre) {
+      const nm = normSku(nombre);
+      if (nm && !nameInfo.has(nm)) nameInfo.set(nm, info);
+    }
+    const field = row[SK] == null ? '' : String(row[SK]);
+    const isCombo = field.includes('+');
+    if (isCombo) combos++;
+    // Una fila standalone (SKU suelto) mejora nombre/familia de una entrada que venía de un
+    // combo, pero MANTIENE el buyer ya asignado (no mueve facturación; solo mejora el display).
+    const upsert = (key, infoTok) => {
+      const cur = skuInfo.get(key);
+      if (!cur) { skuInfo.set(key, infoTok); return; }
+      if (cur._combo && !isCombo) {
+        cur.nombre = infoTok.nombre; cur.categoria = infoTok.categoria; cur.familia = infoTok.familia; cur._combo = false;
+      }
+    };
+    for (const part of field.split('+')) {
+      const t = normSku(part);
+      if (!t) continue;
+      const familiaTok = familiaOf(FA >= 0 ? row[FA] : '', categoria, t);
+      upsert(t, { buyer, nombre, categoria, familia: familiaTok, _combo: isCombo });
+      const st = stripVariant(t);
+      if (st) upsert(st, { buyer, nombre, categoria, familia: familiaOf(FA >= 0 ? row[FA] : '', categoria, st), _combo: isCombo });
+    }
+  }
+  return { skuInfo, nameInfo, combos };
+}
+
+// Devuelve un matcher (skuRaw, titulo) -> { buyer, method, nombre, familia, categoria }.
+function makeMatcher(maestro) {
+  const { skuInfo, nameInfo } = maestro;
+  const pack = (info, method) => ({
+    buyer: info.buyer, method, nombre: info.nombre, familia: info.familia, categoria: info.categoria,
+  });
+  return function match(skuRaw, titulo) {
+    const s = normSku(skuRaw);
+    if (s) {
+      if (skuInfo.has(s)) return pack(skuInfo.get(s), 'sku');
+      for (const tok of s.split(' ')) if (skuInfo.has(tok)) return pack(skuInfo.get(tok), 'sku_token');
+      const st = stripVariant(s);
+      if (st && skuInfo.has(st)) return pack(skuInfo.get(st), 'sku_stripped');
+    }
+    const t = normSku(titulo);
+    if (t && nameInfo.has(t)) return pack(nameInfo.get(t), 'titulo');
+    return { buyer: 'Sin asignar', method: 'unmapped', nombre: '', familia: '', categoria: '' };
+  };
+}
+
+// ---------------------------------------------------------------- ingest MeLi
+
+// aoa = hoja 'Ventas AR' completa (array-of-arrays). Detecta header por '# de venta'.
+function ingestMeli(aoa, match, sourceFile = '') {
+  let h = -1;
+  for (let i = 0; i < Math.min(aoa.length, 12); i++) {
+    if ((aoa[i] || []).some((c) => c != null && String(c).includes('# de venta'))) { h = i; break; }
+  }
+  if (h < 0) throw new Error('MeLi: no se encontró la fila de header ("# de venta")');
+  const H = headerIndex(aoa[h]);
+  const iVenta = H.first('# de venta');
+  const iSKU = H.first('SKU');
+  const iTotal = H.first('Total (ARS)');
+  const iUni = H.first('Unidades');           // primera ocurrencia = cantidad de la línea
+  const iEstado = H.first('Estado');          // primera = estado de la orden
+  const iDesc = H.first('Descripción del estado');
+  const iFecha = H.first('Fecha de venta');
+  const iTitulo = H.first('Título de la publicación');
+  const iProv = H.provinciaIdx();
+  for (const need of [['# de venta', iVenta], ['SKU', iSKU], ['Total (ARS)', iTotal]]) {
+    if (need[1] < 0) throw new Error(`MeLi: falta columna requerida "${need[0]}" (¿schema drift?)`);
+  }
+  const lines = [];
+  for (let r = h + 1; r < aoa.length; r++) {
+    const row = aoa[r];
+    if (!row) continue;
+    const venta = row[iVenta];
+    if (venta == null || String(venta).trim() === '') continue;
+    const estado = String(row[iEstado] ?? '');
+    const desc = String(iDesc >= 0 ? row[iDesc] ?? '' : '');
+    const billable = !(CANCEL_RE.test(estado) || CANCEL_RE.test(desc));
+    const iso = parseDateML(row[iFecha]);
+    const titulo = iTitulo >= 0 ? cleanName(row[iTitulo]) : '';
+    const m = match(row[iSKU], titulo);
+    const skuRaw = String(row[iSKU] ?? '').trim();
+    lines.push({
+      canal: 'MercadoLibre',
+      order_id: String(venta).trim(),
+      fecha: iso,
+      mes: mesOf(iso),
+      sku_raw: skuRaw,
+      sku: normSku(row[iSKU]),
+      buyer: m.buyer,
+      match_method: m.method,
+      nombre: m.nombre || titulo || skuRaw,               // nombre>SKU; fallback título/SKU
+      familia: m.familia || familiaOf('', '', skuRaw),     // familia por prefijo si no mapea
+      unidades: parseNumberES(row[iUni]) || 0,
+      facturacion: billable ? parseNumberES(row[iTotal]) : 0,
+      cuotas: 0,
+      provincia: iProv >= 0 ? String(row[iProv] ?? '').trim() : '',
+      estado_orden: billable ? 'valida' : 'cancel_devol',
+      billable,
+      source_file: sourceFile,
+    });
+  }
+  return lines;
+}
+
+// ---------------------------------------------------------------- ingest TiendaNube
+
+// aoa = CSV TN ya decodificado cp1252 y parseado (incluye header).
+function ingestTn(aoa, match, sourceFile = '') {
+  const H = headerIndex(aoa[0]);
+  const iOrden = H.first('Número de orden');
+  const iFecha = H.first('Fecha');
+  const iEstado = H.first('Estado de la orden');
+  const iSKU = H.first('SKU');
+  const iNombre = H.first('Nombre del producto');
+  const iPrecio = H.first('Precio del producto');
+  const iCant = H.first('Cantidad del producto');
+  const iCuotas = H.first('Cantidad de cuotas');
+  const iProv = H.first('Provincia o estado');
+  const lines = [];
+  for (let r = 1; r < aoa.length; r++) {
+    const row = aoa[r];
+    if (!row) continue;
+    const orden = row[iOrden];
+    if (orden == null || String(orden).trim() === '') continue;
+    const estado = String(row[iEstado] ?? '').trim();
+    const billable = !/cancel/i.test(estado); // Cancelada -> fuera; Archivada/Abierta -> dentro
+    const iso = parseDateTN(row[iFecha]);
+    const titulo = iNombre >= 0 ? cleanName(row[iNombre]) : '';
+    const m = match(row[iSKU], titulo);
+    const skuRaw = String(row[iSKU] ?? '').trim();
+    const precio = parseNumberES(row[iPrecio]);
+    const cant = parseNumberES(row[iCant]) || 0;
+    lines.push({
+      canal: 'TiendaNube',
+      order_id: String(orden).trim(),
+      fecha: iso,
+      mes: mesOf(iso),
+      sku_raw: skuRaw,
+      sku: normSku(row[iSKU]),
+      buyer: m.buyer,
+      match_method: m.method,
+      nombre: m.nombre || titulo || skuRaw,
+      familia: m.familia || familiaOf('', '', skuRaw),
+      unidades: cant,
+      facturacion: billable ? precio * cant : 0,
+      cuotas: iCuotas >= 0 ? parseNumberES(row[iCuotas]) : 0,
+      provincia: iProv >= 0 ? String(row[iProv] ?? '').trim() : '',
+      estado_orden: billable ? (estado || 'desconocido') : 'cancelada',
+      billable,
+      source_file: sourceFile,
+    });
+  }
+  return lines;
+}
+
+// ---------------------------------------------------------------- dedup
+
+const lineKey = (l) =>
+  `${l.canal}|${l.order_id}|${l.sku}|${l.unidades}|${l.facturacion}`;
+
+// Devuelve { lines, dups } deduplicando por clave compuesta.
+function dedupe(lines, seen = new Set()) {
+  const out = [];
+  let dups = 0;
+  for (const l of lines) {
+    const k = lineKey(l);
+    if (seen.has(k)) { dups++; continue; }
+    seen.add(k);
+    out.push(l);
+  }
+  return { lines: out, dups };
+}
+
+// ---------------------------------------------------------------- market basket
+
+// Pares de SKU co-comprados en la misma orden. Señal baja en NAKU (~0.4% multi-ítem)
+// pero suficiente para sugerir "combos naturales". Devuelve [{a,b,n}] ordenado por n.
+function basketPairs(lines) {
+  const orders = new Map();
+  for (const l of lines) {
+    if (!l.billable || !l.sku) continue;
+    const k = l.canal + '|' + l.order_id;
+    let o = orders.get(k); if (!o) { o = new Map(); orders.set(k, o); }
+    if (!o.has(l.sku)) o.set(l.sku, l);
+  }
+  const pairs = new Map();
+  for (const o of orders.values()) {
+    const arr = [...o.values()];
+    if (arr.length < 2) continue;
+    for (let i = 0; i < arr.length; i++) for (let j = i + 1; j < arr.length; j++) {
+      const key = [arr[i].sku, arr[j].sku].sort().join('␟');
+      let p = pairs.get(key); if (!p) { p = { a: arr[i], b: arr[j], n: 0 }; pairs.set(key, p); }
+      p.n++;
+    }
+  }
+  return [...pairs.values()].sort((x, y) => y.n - x.n);
+}
+
+// Bundles por persona: pares co-comprados donde participa la persona, priorizando el
+// cruce de familias (sugerir algo distinto a lo que ya compró). Top `n` por persona.
+function bundlesByPersona(lines, top = 3) {
+  const pairs = basketPairs(lines);
+  const out = {};
+  for (const p of PERSONAS) {
+    if (p === 'Sin asignar') continue;
+    const rel = pairs
+      .filter((pr) => pr.a.buyer === p || pr.b.buyer === p)
+      .map((pr) => {
+        const hero = pr.a.buyer === p ? pr.a : pr.b;   // lo que compra la persona
+        const sug = pr.a.buyer === p ? pr.b : pr.a;     // lo que se lleva junto
+        return { heroSku: hero.sku, heroNombre: hero.nombre, sugSku: sug.sku, sugNombre: sug.nombre, sugFamilia: sug.familia, sugBuyer: sug.buyer, cruzaFamilia: hero.familia !== sug.familia, n: pr.n };
+      })
+      .sort((a, b) => (b.cruzaFamilia - a.cruzaFamilia) || (b.n - a.n))
+      .slice(0, top);
+    out[p] = rel;
+  }
+  return out;
+}
+
+// ---------------------------------------------------------------- agregación
+
+// Produce el rollup chico que consume el dashboard (nunca las líneas crudas).
+function aggregate(lines) {
+  const byPersona = {};
+  for (const p of PERSONAS) byPersona[p] = { facturacion: 0, unidades: 0, ordenes: 0, ticket: 0, cuotas: 0 };
+
+  const orders = new Map();            // "canal|order_id" -> {total, cuotas, best, persona}
+  const byMesCanalPersona = new Map(); // "mes|canal|persona" -> {facturacion, unidades}
+  const unmapped = new Map();          // sku -> {sku, nombre, lines, facturacion}
+  // fam[persona] = Map(familia -> { facturacion, unidades, productos: Map(sku -> {sku,nombre,facturacion,unidades}) })
+  const fam = {};
+  for (const p of PERSONAS) fam[p] = new Map();
+
+  for (const l of lines) {
+    const p = byPersona[l.buyer] ? l.buyer : 'Sin asignar';
+    // por mes/canal/persona (filtro del dashboard)
+    const mk = `${l.mes}|${l.canal}|${p}`;
+    const mc = byMesCanalPersona.get(mk) || { mes: l.mes, canal: l.canal, buyer: p, facturacion: 0, unidades: 0 };
+    mc.facturacion += l.facturacion; mc.unidades += l.unidades;
+    byMesCanalPersona.set(mk, mc);
+    // órdenes (ticket y # órdenes) — persona dominante = la de mayor facturación de línea
+    const ok = `${l.canal}|${l.order_id}`;
+    const o = orders.get(ok) || { total: 0, cuotas: l.cuotas || 0, best: -1, persona: 'Sin asignar' };
+    o.total += l.facturacion;
+    if (l.cuotas) o.cuotas = Math.max(o.cuotas, l.cuotas);
+    if (l.facturacion > o.best) { o.best = l.facturacion; o.persona = p; }
+    orders.set(ok, o);
+    // facturación/unidades por persona
+    byPersona[p].facturacion += l.facturacion;
+    byPersona[p].unidades += l.unidades;
+    // top por familia -> producto (drill-down)
+    const fm = fam[p];
+    const frow = fm.get(l.familia) || { familia: l.familia, facturacion: 0, unidades: 0, productos: new Map() };
+    frow.facturacion += l.facturacion; frow.unidades += l.unidades;
+    const pkey = l.sku || l.nombre;
+    const prow = frow.productos.get(pkey) || { sku: l.sku_raw, nombre: l.nombre, facturacion: 0, unidades: 0 };
+    prow.facturacion += l.facturacion; prow.unidades += l.unidades;
+    frow.productos.set(pkey, prow);
+    fm.set(l.familia, frow);
+    // sin asignar (reporte para completar el maestro)
+    if (p === 'Sin asignar' && l.sku) {
+      const u = unmapped.get(l.sku) || { sku: l.sku_raw, nombre: l.nombre, lines: 0, facturacion: 0 };
+      u.lines++; u.facturacion += l.facturacion; unmapped.set(l.sku, u);
+    }
+  }
+
+  const ordCount = {}, ordSum = {}, cuoSum = {}, cuoCnt = {};
+  for (const o of orders.values()) {
+    const p = o.persona;
+    ordCount[p] = (ordCount[p] || 0) + 1;
+    ordSum[p] = (ordSum[p] || 0) + o.total;
+    if (o.cuotas > 0) { cuoSum[p] = (cuoSum[p] || 0) + o.cuotas; cuoCnt[p] = (cuoCnt[p] || 0) + 1; }
+  }
+  for (const p of PERSONAS) {
+    byPersona[p].ordenes = ordCount[p] || 0;
+    byPersona[p].ticket = ordCount[p] ? Math.round(ordSum[p] / ordCount[p]) : 0;
+    byPersona[p].cuotas = cuoCnt[p] ? +(cuoSum[p] / cuoCnt[p]).toFixed(1) : 0;
+  }
+
+  const totalFact = PERSONAS.reduce((a, p) => a + byPersona[p].facturacion, 0);
+  const asignada = totalFact - byPersona['Sin asignar'].facturacion;
+  for (const p of PERSONAS) {
+    byPersona[p].sharePct = totalFact ? +(100 * byPersona[p].facturacion / totalFact).toFixed(1) : 0;
+    byPersona[p].shareAsignadoPct = asignada && p !== 'Sin asignar'
+      ? +(100 * byPersona[p].facturacion / asignada).toFixed(1) : 0;
+  }
+
+  // top por persona: familias ordenadas por $, cada una con sus productos (para expandir)
+  // top por persona: familias y productos con facturación (impacto), unidades (volumen)
+  // y precio promedio (densidad de valor) -> el trío que separa "escarbadientes" de "escritorio".
+  const topByPersona = {};
+  for (const p of PERSONAS) {
+    const totalP = byPersona[p].facturacion || 1;
+    topByPersona[p] = Array.from(fam[p].values())
+      .map((f) => ({
+        familia: f.familia,
+        facturacion: Math.round(f.facturacion),
+        unidades: f.unidades,
+        precioProm: f.unidades ? Math.round(f.facturacion / f.unidades) : 0,
+        sharePct: +(100 * f.facturacion / totalP).toFixed(1), // % de la facturación de la persona
+        productos: Array.from(f.productos.values())
+          .map((x) => ({
+            ...x,
+            facturacion: Math.round(x.facturacion),
+            precioProm: x.unidades ? Math.round(x.facturacion / x.unidades) : 0,
+            sharePct: +(100 * x.facturacion / totalP).toFixed(1),
+          }))
+          .sort((a, b) => b.facturacion - a.facturacion),
+      }))
+      .sort((a, b) => b.facturacion - a.facturacion);
+  }
+
+  return {
+    byPersona,
+    topByPersona,
+    porMesCanalPersona: Array.from(byMesCanalPersona.values()),
+    unmapped: Array.from(unmapped.values())
+      .map((u) => ({ ...u, facturacion: Math.round(u.facturacion) }))
+      .sort((a, b) => b.facturacion - a.facturacion),
+    totales: {
+      facturacion: Math.round(totalFact),
+      facturacionAsignada: Math.round(asignada),
+      coberturaPct: totalFact ? +(100 * asignada / totalFact).toFixed(1) : 0,
+      lineas: lines.length,
+      ordenes: orders.size,
+    },
+  };
+}
+</script>
+<!-- Maestro SKU→comprador embebido (lo inyecta el build desde el CSV; editable por la agencia) -->
+<script type="text/plain" id="maestroCSV">Identificador de URL;Nombre;Categorías;Buyer Persona;Buyer Persona;SKU;Descripción para SEO
+combo-papa-handyman-escalera-plegable-esc-005-caja-de-herramientas-ch-01-17nz9;Combo Papá Handyman -- Escalera Plegable + Caja de herramientas;Hogar > Herramientas y equipamiento, Hogar > Día del Padre , Comercio;Juan;;ESC-005 + CH-01;Escalera plegable + caja de herramientas completa. Todo para arreglar tu casa. Hasta 6 cuotas sin interés.
+combo-papa-tecnologico-escritorio-electrico-regulable-negro-soporte-monitor-ss-1032m-1x89m;Combo Papá Tecnológico -- Escritorio Eléctrico Regulable + Soporte Monitor;Hogar > Escritorios ergonómicos, Hogar > Día del Padre ;Martin;;22D-BEL BLANCO (MODELO ELECTRICO) + SS-1032M;Escritorio Sit-Stand + soporte hidráulico para monitor. Ergonomía completa para home office. Hasta 6 cuotas sin interés.
+combo-papa-tecnologico-escritorio-electrico-regulable-negro-soporte-monitor-ss-1032m-1x89m;;;Martin;;22D-BEL NEGRO (MODELO ELECTRICO) + SS-1032M;
+combo-papa-asador-mesa-plegable-mp-001-reposera-rep-001-yzcro;Combo Papá Asador -- Mesa Plegable + Reposera;Hogar > Exterior y aire libre, Hogar > Día del Padre ;Lucho;;REP-001 + MP-001 NEGRA;Mesa plegable + reposera gravedad cero para camping, pesca y playa. Aluminio resistente, portátil y cómoda. Hasta 6 cuotas sin interés.
+combo-papa-asador-mesa-plegable-mp-001-reposera-rep-001-yzcro;;;Lucho;;REP-001 + MP-001;
+tendedero-extensible-plegable-naku-amurado-soporta-18kg-65wyb;Tendedero Extensible Plegable de Pared - Soporta 35kg;Hogar > Organización de ropa, Hogar > Limpieza, Hogar > Organización, Novedades;Mariana;;TEN-004;ptimiza tu lavadero con el tendedero extensible NAKU TEN-004. Soporta hasta 35kg, incluye estación de perchas e instalación dual (con o sin tornillos).
+tendedero-extensible-plegable-naku-con-ventosa-soporta-18kg-sin-perforar-e1wq7;Tendedero Extensible Plegable NAKU con Ventosa (Soporta 18kg) - Sin Perforar;Hogar > Organización de ropa, Hogar > Limpieza, Hogar > Organización, Novedades;Mariana;;TEN-003;Descubre el tendedero plegable NAKU TEN-003. Instalación con ventosa en superficies lisas, sin perforar. Soporta 18kg y tiene 15 espacios para perchas.
+tendedero-giratorio-plegable-doble-tipo-pulpo-tncru;Tendedero Giratorio Plegable doble Tipo Pulpo;Hogar > Organización de ropa, Hogar > Exterior y aire libre, Hogar > Limpieza, Hogar > Máquinas de coser, Hogar > Organización;Mariana;;TEN-002;
+tendedero-giratorio-plegable-tipo-pulpo-e99lp;Tendedero Giratorio Plegable Tipo Pulpo;Hogar > Organización de ropa, Hogar > Exterior y aire libre, Hogar > Limpieza, Hogar > Máquinas de coser, Hogar > Organización;Mariana;;TEN-001;Tendedero giratorio plegable tipo pulpo: seca más ropa en menos espacio. Base triangular estable, ganchos antideslizantes y caños reforzados 0,5 mm.
+escalera-plegable-4-peldanos-antideslizante-1ks2l;Escalera Plegable 4 Peldaños Antideslizante;Hogar > Herramientas y equipamiento, Comercio, Novedades;Mario;Mariana;ESC-009;Escalera plegable NAKU de 4 peldaños con seguro de posición, peldaños y patas antideslizantes. Compacta, estable y soporta hasta 150 kg.
+escalera-plegable-3-peldanos-antideslizante-cf0gn;Escalera Plegable 3 Peldaños Antideslizante;Hogar > Herramientas y equipamiento, Comercio, Novedades;Mario;Mariana;ESC-008;Escalera plegable NAKU de 3 peldaños con seguro de posición, peldaños y patas antideslizantes. Compacta, estable y soporta hasta 150 kg.
+escalera-plegable-2-peldanos-antideslizante-1hwo4;Escalera Plegable 2 Peldaños Antideslizante;Hogar > Herramientas y equipamiento, Comercio, Novedades;Mario;Mariana;ESC-007;Escalera plegable NAKU de 2 peldaños con seguro de posición y patas antideslizantes. Peldaños amplios. Soporta hasta 150 kg. Compacta.
+escalera-plegable-y-compacta-de-aluminio-2x3-peldanos-1x51o;Escalera Plegable y Compacta de Aluminio 2x3 Peldaños;Hogar > Herramientas y equipamiento, Comercio, Novedades;Mario;Mariana;ESC-004;Escalera plegable 2x3 de aluminio NAKU ESC-004: ligera y resistente, soporta 150 kg, apoyos antideslizantes y manija. Se pliega en barra.
+escalera-plegable-y-compacta-de-aluminio-2x4-peldanos-u4nlo;Escalera Plegable y Compacta de Aluminio 2x4 Peldaños;Hogar > Herramientas y equipamiento, Comercio, Novedades;Mario;Mariana;ESC-005;Escalera plegable 2x4 de aluminio NAKU ESC-005: ligera y resistente, soporta 150 kg, apoyos antideslizantes y manija. Se pliega en barra.
+escalera-plegable-y-compacta-de-aluminio-2x5-peldanos-1c0rj;Escalera Plegable y Compacta de Aluminio 2x5 Peldaños;Hogar > Herramientas y equipamiento, Comercio, Novedades;Mario;Mariana;ESC-006;Escalera plegable de aluminio 2x5 peldaños, soporta hasta 150 kg. Compacta para guardar, con manija y apoyos antideslizantes. Ideal hogar y exterior.
+soporte-de-techo-electrico-smart-para-tv-hasta-75-oys8l;"Soporte de Techo Eléctrico Smart para TV hasta 75""";Soportes > TV > Techo;Juan;;ST-466;"Soporte de techo eléctrico smart ST-466. Compatible VESA 200x200 a 600x400, TV hasta 75"", carga máx 55 kg. Ideal para ahorrar espacio."
+soporte-de-tv-hidraulico-full-motion-sp-696-con-nivel-de-burbuja-wuko6;Soporte Premium Reforzado SP-696 De Pared Para Tv 32´´a 120´´extension 78cm 100kg;Soportes > TV > Móviles con Brazo;Juan;;SP-696;"Soporte de TV full motion SP-696: hasta 120"", soporta 100 kg, compatible VESA hasta 900x600. Giro ±60°, inclinación +7°/-4° y nivelación ±3°."
+brazo-hidraulico-de-monitor-a-pared-sp-11w-hasta-32-heive;"Brazo Hidráulico de Monitor a Pared SP-11W (hasta 32"")";Soportes > Monitor, Novedades;Juan;;SP-11W;Brazo de monitor a pared con contrabalanceo. Soporta hasta 32'' (VESA 75/100) y 2-10 kg. Ajustable e incluye gestión de cables. SP-11W.
+base-con-ruedas-ajustable-para-heladera-y-lavarropas-5070-cm-200-kg-s-lh-oendq;Base con ruedas ajustable para heladera y lavarropas 50-70 cm (200 kg) - S-LH;Soportes, Hogar > Organizadores multiuso, Hogar > Herramientas y equipamiento, Hogar > Organización, Novedades;Mariana;Juan;S-LH;Base con ruedas regulable 50-70 cm para heladeras y lavarropas. Soporta hasta 200 kg, 4 ruedas, armado simple y ajuste a medida para tu espacio.
+soporte-esquinero-articulado-she-446-pared-para-tv-de-22-a-75-wymxh;"Soporte esquinero articulado SHE-446 Pared Para TV de 22"" a 75""";Soportes > TV > Móviles con Brazo;Juan;;SHE-446;Soporte de pared esquinero. 22-75´´, hasta 45 kg. Inclinación +6°/-12°, giro 120°, 6-47 cm de pared. VESA 200×200 a 600×400. Incluye kit y pasacables.
+soporte-doble-hidraulico-pp-c024d-para-monitores-1332-r8gl6;"Soporte doble hidráulico PP-C024D para monitores 13-32""";Soportes > Monitor;Juan;;PP-C024D;Brazo a gas para 2 monitores. 13-32´´, 2-10 kg c/u. VESA 75x75/100x100. Extensión 45,1 cm, inclinación ±45°, giro 180°. Abrazadera 1-5 cm. Incluye kit y pasacables.
+soporte-hidraulico-pp-1032m-de-mesa-para-tv-monitor-13-a-32-0xx9u;Soporte Hidraulico PP-1032M De Mesa Para Tv/monitor 13 A 32;Soportes > Monitor;Juan;;PP-1032M;Brazo a gas, ajuste suave. VESA 75x75/100x100, 2-10 kg extensión 45,1 cm, inclinación ±45°. Montaje con abrazadera o tornillo pasante. Incluye kit y pasacables.
+combo-x-2-reposera-con-reposapies-gazebo-con-pared-mesa-chica;Combo x 2 Reposera con Reposapiés + Gazebo con Pared + Mesa Chica;Hogar > Exterior y aire libre, Hogar > Día del Padre , Novedades;Lucho;Mariana;REP-003 x2 + MP-002 + GZB-002 A;Disfrutá el combo ideal: 2 reposeras ergonómicas, gazebo con protección solar y mesa práctica. Perfecto para tu jardín o playa. ¡Compralo ya!
+combo-x-2-reposera-con-reposapies-gazebo-con-pared-mesa-chica;;;Lucho;Mariana;REP-003 x2 + MP-002 + GZB-002 R;
+combo-x-2-reposera-aluminio-plegable-gazebo-con-pared-mesa-chica;Combo x 2 Reposera Aluminio Plegable + Gazebo con Pared + Mesa Chica;Hogar > Exterior y aire libre, Hogar > Día del Padre , Novedades;Lucho;Mariana;REP-002 x2 + MP-002 + GZB-002 A;Disfrutá al aire libre con 2 reposeras aluminio, mesa compacta y gazebo reforzado. Confort y diseño premium. ¡Compralo ahora y preparate para tu escapada!
+combo-x-2-reposera-aluminio-plegable-gazebo-con-pared-mesa-chica;;;Lucho;Mariana;REP-002 x2 + MP-002 + GZB-002 R;
+combo-x-2-reposera-gravedad-cero-gazebo-con-pared-mesa-chica;Combo x 2 Reposera Gravedad Cero + Gazebo con Pared + Mesa Chica;Hogar > Exterior y aire libre, Hogar > Día del Padre , Novedades;Lucho;Mariana;REP-01 x 2 + MP-02 + GZB-02 AZUL;Disfrutá del aire libre con 2 reposeras reclinables, gazebo resistente y mesa plegable. Comodidad y sombra en un combo práctico. ¡Compralo ya!
+combo-x-2-reposera-gravedad-cero-gazebo-con-pared-mesa-chica;;;Lucho;Mariana;REP-01 x 2 + MP-02 + GZB-02 ROJO;
+combo-x-2-reposera-con-reposapies-gazebo-plegable-mesa-chica;Combo x 2 Reposera con Reposapiés + Gazebo Plegable + Mesa Chica;Hogar > Exterior y aire libre, Hogar > Día del Padre , Novedades;Lucho;Mariana;REP-003 x2 + MP-002 + GZB-001 A;Combo con 2 reposeras ajustables, mesa portátil y gazebo UV. Ideal para descanso y sombra en exteriores. ¡Llevá confort y funcionalidad hoy!
+combo-x-2-reposera-con-reposapies-gazebo-plegable-mesa-chica;;;Lucho;Mariana;REP-003 x2 + MP-002 + GZB-001 R;
+combo-x-2-reposera-aluminio-plegable-gazebo-plegable-mesa-chica;Combo x 2 Reposera Aluminio Plegable + Gazebo Plegable + Mesa Chica;Hogar > Exterior y aire libre, Hogar > Día del Padre , Novedades;Lucho;Mariana;REP-002 x2 + MP-002 + GZB-001 A;Combo con 2 reposeras aluminio reclinables, mesa plegable y gazebo con protección solar. Ideal para disfrutar cómodo al aire libre. ¡Compralo ya!
+combo-x-2-reposera-aluminio-plegable-gazebo-plegable-mesa-chica;;;Lucho;Mariana;REP-002 x2 + MP-002 + GZB-001 R;
+combo-x-2-reposera-gravedad-cero-gazebo-plegable-mesa-chica;Combo x 2 Reposera Gravedad Cero + Gazebo Plegable + Mesa Chica;Hogar > Exterior y aire libre, Hogar > Día del Padre , Novedades;Lucho;Mariana;REP-001 x2 + MP-002 + GZB-001 A;Combo ideal para relax al aire libre: 2 reposeras plegables, gazebo con protección solar y mesa portátil. ¡Arma tu espacio en minutos!
+combo-x-2-reposera-gravedad-cero-gazebo-plegable-mesa-chica;;;Lucho;Mariana;REP-001 x2 + MP-002 + GZB-001 R;
+combo-x-2-reposera-con-reposapies-sombrilla-grande;Combo x 2 Reposera con Reposapiés + Sombrilla Grande;Hogar > Exterior y aire libre, Hogar > Día del Padre , Novedades;Lucho;Mariana;REP-003 x2 + SOM-2 A;Disfrutá el combo de 2 reposeras con apoyabrazos y sombrilla grande Naku, ideal para playa y jardín. Cómodo, resistente y fácil de armar. ¡Compralo ya!
+combo-x-2-reposera-con-reposapies-sombrilla-grande;;;Lucho;Mariana;REP-003 x2 + SOM-2 R;
+combo-x-2-reposera-aluminio-plegable-sombrilla-grande;Combo x 2 Reposera Aluminio Plegable + Sombrilla Grande;Hogar > Exterior y aire libre, Hogar > Día del Padre , Novedades;Lucho;Mariana;REP-002 x2 + SOM-2 A;Disfrutá con 2 reposeras de aluminio reforzado y 1 sombrilla amplia con filtro solar. Ideal para relax y resistencia al aire libre. ¡Compralo ya!
+combo-x-2-reposera-aluminio-plegable-sombrilla-grande;;;Lucho;Mariana;REP-002 x2 + SOM-2 R;
+combo-x-2-reposera-gravedad-cero-sombrilla-grande;Combo x 2 Reposera Gravedad Cero + Sombrilla Grande;Hogar > Exterior y aire libre, Hogar > Día del Padre , Novedades;Lucho;Mariana;REP-001 x2 + SOM-2 A;Disfrutá el verano con 2 reposeras plegables y una sombrilla grande regulable. Ideal para playa, parque o jardín. ¡Compralo y relajate al aire libre!
+combo-x-2-reposera-gravedad-cero-sombrilla-grande;;;Lucho;Mariana;REP-001 x2 + SOM-2 R;
+combo-x-2-reposera-con-reposapies-mesa-plegable-chica;Combo x 2 Reposera con Reposapiés + Mesa Plegable chica;Hogar > Exterior y aire libre, Hogar > Día del Padre , Novedades;Lucho;Mariana;REP-003 x2 + MP-002;Disfrutá el combo con 2 reposeras anatómicas y mesa plegable. Confort y funcionalidad garantizados. ¡Compralo ahora y renová tu espacio exterior!
+combo-x-2-reposera-aluminio-plegable-mesa-plegable-chica;Combo x 2 Reposera Aluminio Plegable + Mesa Plegable Chica;Hogar > Exterior y aire libre, Hogar > Día del Padre , Novedades;Lucho;Mariana;REP-002 x2 + MP-002;Combo 2 reposeras aluminio reforzadas y mesa plegable liviana. Ideal para exteriores, fácil de guardar y resistente. Aprovechá esta oferta única hoy.
+combo-x-2-reposera-gravedad-cero-mesa-plegable-chica;Combo x 2 Reposera Gravedad Cero + Mesa Plegable Chica;Hogar > Exterior y aire libre, Hogar > Día del Padre , Novedades;Lucho;Mariana;REP-001 x2 + MP-002;Disfrutá el combo con 2 reposeras gravedad cero y mesa plegable resistente, ideal para camping y jardín. ¡Compralo y relajate donde quieras!
+combo-x-2-reposera-reclinable-con-reposapies-plegable-negra-naku-rep-003;Combo x 2 Reposera Reclinable con Reposapiés Plegable Negra Naku REP-003;Hogar > Exterior y aire libre, Hogar > Día del Padre , Novedades;Lucho;Mariana;REP-003 x2;Disfrutá el confort de las reposeras Naku REP-003, reclinables y plegables con reposapiés. Perfectas para relax en playa o camping. ¡Comprá ya!
+combo-x-2-reposera-aluminio-plegable-5-posiciones-negra-naku-rep-002;Combo x 2 Reposera Aluminio Plegable 5 Posiciones Negra Naku REP-002;Hogar > Exterior y aire libre, Hogar > Día del Padre , Novedades;Lucho;Mariana;REP-002 x 2 UNITS;Combo x2 reposeras Naku REP-002 con estructura reforzada y diseño ergonómico. Plegables y livianas, ideales para playa y camping. ¡Compra ya y disfruta!
+combo-x-2-reposera-gravedad-cero-plegable-naku-rep-001;Combo x 2 Reposera Gravedad Cero Plegable Naku REP-001;Hogar > Exterior y aire libre, Hogar > Día del Padre , Novedades;Lucho;Mariana;REP-001 x 2 UNITS;
+estanteria-plegable-5-niveles-con-ruedas-naku-org008;Estantería Plegable 5 niveles con Ruedas;Hogar > Organizadores multiuso, Hogar > Organización, Novedades;Mariana;;ORG-008;Estantería metálica plegable de 5 niveles con ruedas. Abre en segundos, sin herramientas. Ideal para cocina, taller y comercio. Estructura resistente y fácil de guardar.
+estanteria-plegable-5-niveles-con-ruedas-naku-org008;;;Mariana;;ORG-008-BLANCO;
+estanteria-plegable-4-niveles-con-ruedas-naku-org007;Estantería Plegable 4 niveles con Ruedas Naku ORG-007;Hogar > Organizadores multiuso, Hogar > Organización, Novedades;Mariana;;ORG-007;Estantería plegable Naku ORG-007 con 4 niveles, ruedas con freno y estructura de acero. Más capacidad sin ocupar espacio. Se arma en segundos.
+estanteria-plegable-4-niveles-con-ruedas-naku-org007;;;Mariana;;ORG-007-BLANCO;
+estanteria-plegable-3-niveles-con-ruedas-naku-org006;Estantería Plegable 3 niveles con Ruedas Naku ORG-006;Hogar > Organizadores multiuso, Hogar > Organización, Novedades;Mariana;;ORG-006;Organizador plegable Naku ORG-006 con ruedas y 3 niveles. Acero resistente, diseño compacto, sin instalación. Ideal para cocina, oficina o lavadero.
+estanteria-plegable-3-niveles-con-ruedas-naku-org006;;;Mariana;;ORG-006-BLANCO;
+placard-portatil-armario-modular-negro-130170cm-naku-pla001;Placard Portátil Armario Modular Negro 130×170 cm Naku PLA-001;Hogar > Organización de ropa, Hogar > Organización, Novedades;Mariana;;PLA-001;Organizá con estilo y practicidad. Placard portátil PLA-001 de acero modulado y tela impermeable. Armalo sin herramientas. Ideal para ropa y accesorios.
+organizador-de-botas-y-zapatos-naku-9-niveles-27-pares-botinero-puerta-con-cierre-gris;Organizador De Botas Y Zapatos Naku 9 Niveles 27 Pares Botinero Puerta Con Cierre Gris;Hogar > Organización de ropa, Hogar > Organización, Novedades;Mariana;;ZAP-001;Zapatero Naku de 8 niveles con cierre enrollable, tela impermeable y estructura firme. Capacidad para 24 pares. Ideal para mantener el orden en tu hogar.
+organizador-de-botas-y-zapatos-naku-9-niveles-27-pares-botinero-puerta-con-cierre-negro;Organizador De Botas Y Zapatos Naku 9 Niveles 27 Pares Botinero Puerta Con Cierre Negro;Hogar > Organización de ropa, Hogar > Organización, Novedades;Mariana;;ZAP-002;Zapatero Naku de 8 niveles con cierre enrollable, tela impermeable y estructura firme. Capacidad para 24 pares. Ideal para mantener el orden en tu hogar.
+organizador-zapatero-giratorio-naku-zap-003-melamina-blanco;Organizador Zapatero Giratorio Naku ZAP-003 Melamina Blanco;Hogar > Organización de ropa, Hogar > Organización, Novedades;Mariana;;ZAP-003;Zapatero giratorio de melamina con 6 niveles y hasta 24 espacios. Diseño moderno, compacto y funcional. Ideal para zapatos, carteras y maquillaje.
+organizador-zapatera-perchero-metal-negro-naku-per-006;Organizador Zapatera Perchero Metal Negro Naku PER-006;Hogar > Organización de ropa, Hogar > Organización, Novedades;Mariana;;PER-006;Organizador perchero y zapatera Naku con estructura metálica y diseño funcional. Soporta hasta 12 pares de calzado y permite colgar prendas. Ideal para hogares con poco espacio.
+caja-fuerte-electronica-llave-pared-naku-cf-001;Caja Fuerte Electrónica/Llave Pared Naku CF-001;Hogar > Herramientas y equipamiento, Hogar > Seguridad y vigilancia, Comercio, Novedades;Mario;;CF-001B;
+caja-fuerte-electronica-llave-pared-naku-cf-001;;;Mario;;CF-001N;
+caja-fuerte-electronica-llave-pared-naku-cf-002;Caja Fuerte Electrónica/Llave Pared Naku CF-002;Hogar > Herramientas y equipamiento, Hogar > Seguridad y vigilancia, Comercio, Novedades;Mario;;CF-002B;Caja fuerte Naku CF-002 con combinación digital y llave de emergencia. 12 L de capacidad, pernos de acero, anclajes incluidos. Ideal para hogar u oficina.
+caja-fuerte-electronica-llave-pared-naku-cf-002;;;Mario;;CF-002N;
+reposera-reclinable-con-reposapies-plegable-negra-naku-rep-003;Reposera Reclinable con Reposapiés Plegable Negra Naku REP-003;Hogar > Exterior y aire libre, Novedades;Lucho;Mariana;REP-003;Reposera plegable con 5 posiciones y reposapiés abatible. Aluminio liviano y tela resistente. Ideal para relajarte en playa, camping o jardín.
+reposera-aluminio-plegable-5-posiciones-negra-naku-rep-002;Reposera Aluminio Plegable 5 Posiciones Negra Naku REP-002;Hogar > Exterior y aire libre, Novedades;Lucho;Mariana;REP-002;Reposera Naku de aluminio con 5 posiciones y tela resistente a la intemperie. Liviana, plegable y fácil de transportar. Ideal para playa, camping o jardín.
+reposera-gravedad-cero-plegable-naku-rep-001;Reposera Gravedad Cero Plegable REP-001;Hogar > Exterior y aire libre, Novedades;Lucho;Mariana;REP-001;Reposera gravedad cero REP-001 reclinable 0-160°. Apoyacabezas desmontable. Tela textilene resistente UV. Plegable para playa, camping, parque. Envío gratis.
+pistola-de-riego-regador-8-funciones-adaptador-doble-gatillo-naku-pr-001;Pistola De Riego Regador 8 Funciones Adaptador Doble Gatillo Naku PR-001;Hogar > Exterior y aire libre, Hogar > Limpieza, Hogar > Herramientas y equipamiento, Novedades;Lucho;Mariana;PR-001;Pistola de riego Naku PR-001 con 8 modos de rociado, doble gatillo, presión regulable y acople rápido. Ideal para jardín, limpieza o autos. Diseño ergonómico y resistente.
+zapatillero-estanteria-metalica-3-niveles-naku-zap-004;Zapatillero Estantería Metálica 3 Niveles Naku ZAP-004;Hogar > Organización de ropa, Hogar > Organización, Novedades;Mariana;;ZAP-004;Zapatillero metálico Naku ZAP-004 con 3 niveles. Ideal para organizar tus zapatos con estilo y resistencia. Compacto, duradero y fácil de armar.
+perchero-metalico-con-zapatero-y-doble-barra-naku-per-005;Perchero Metálico con Zapatero y Doble Barra Naku PER-005;Hogar > Organización de ropa, Hogar > Organización, Novedades;Mariana;;PER-005;Organizá tu ropa con el perchero metálico Naku PER-005. Doble barra para colgar y base zapatero. Práctico, resistente y fácil de armar.
+cesto-ropa-sucia-doble-plegable-naku-crs-002;Cesto Ropa Sucia Doble Plegable Naku CRS-002;Hogar > Organización de ropa, Hogar > Organización, Novedades;Mariana;;CRS-002;Cesto de ropa Naku CRS-002 con doble compartimento, marco de aluminio y diseño plegable. Ideal para clasificar ropa clara y oscura. Liviano, práctico y duradero.
+cesto-plegable-tela-impermeable-ropa-sucia-naku-crs-001;Cesto Ropa Sucia Plegable Naku CRS-001;Hogar > Organización de ropa, Hogar > Organización, Novedades;Mariana;;CRS-001;Cesto Naku CRS-001 plegable con tela impermeable y estructura de aluminio. Ideal para ropa sucia. Liviano, duradero y fácil de guardar.
+organizador-plastico-multiuso-3-estantes-kf4ez;Organizador Plástico Multiuso 3 Estantes;Hogar > Organizadores multiuso, Hogar > Organización, Novedades;Mariana;;ORG-001;Carro organizador Naku ORG-001 con 3 estantes plásticos. Ideal para cocina, baño o escritorio. Compacto, liviano y funcional.
+organizador-estanteria-metalica-multiuso-4-niveles-9cegk;Organizador Estantería Metálica Multiuso 4 Niveles;Hogar > Organizadores multiuso, Hogar > Organización, Novedades;Mariana;;ORG-002;Estantería metálica Naku OR-002 con 4 estantes regulables. Ideal para cocina, baño o escritorio. Compacta, moderna y resistente.
+carrito-organizador-auxiliar-plegable-con-ruedas-dpphk;Carrito Organizador Auxiliar Plegable con Ruedas;Hogar > Organizadores multiuso, Hogar > Organización, Novedades;Mariana;;ORG-003;Organizá tu casa u oficina con el carro plegable Naku ORG-003. Ultra liviano, resistente y fácil de mover. ¡Conseguilo online!
+carrito-organizador-auxiliar-plegable-con-ruedas-dpphk;;;Mariana;;ORG-003-BLANCO;
+carrito-organizador-auxiliar-plegable-con-ruedas-dpphk;;;Mariana;;ORG-003-ROSA;
+set-de-perchas-de-madera-laqueada-con-broche-naku-per-003;Set de Perchas de Madera Laqueada con Broche Naku PER-003;Hogar > Organización de ropa, Hogar > Organización, Novedades;Mariana;;PER-003x10;"Pack de perchas Naku de madera laqueada con broches metálicos. Elegancia, resistencia y diseño funcional para organizar tu ropa con estilo.
+"
+set-de-perchas-de-madera-laqueada-con-broche-naku-per-003;;;Mariana;;PER-003x100;
+set-de-perchas-de-madera-laqueada-con-broche-naku-per-003;;;Mariana;;PER-003x20;
+set-de-perchas-de-madera-laqueada-con-broche-naku-per-003;;;Mariana;;PER-003x50;
+perchas-de-terciopelo-naku-per-002;Perchas de Terciopelo NAKU PER-002;Hogar > Organización de ropa, Hogar > Organización, Novedades;Mariana;;PER-002 x 10 UNITS;Set de perchas NAKU de terciopelo antideslizante. Diseño fino que ahorra espacio. Con muescas para vestidos. Ideal para ropa delicada y pesada.
+perchas-de-terciopelo-naku-per-002;;;Mariana;;PER-002 x 100 UNITS;
+perchas-de-terciopelo-naku-per-002;;;Mariana;;PER-002 x 20 UNITS;
+perchas-de-terciopelo-naku-per-002;;;Mariana;;PER-002 x 50 UNITS;
+perchero-comercial-reforzado-naku-per-004;Perchero Comercial Reforzado NAKU PER-004;Hogar > Organización de ropa, Hogar > Organización, Novedades;Mariana;;PER-004;Perchero NAKU de hierro reforzado, desmontable y fácil de armar. Ideal para comercios o uso doméstico. Soporta hasta 25 kg. Diseño moderno e industrial.
+carrito-organizador-auxiliar-con-ruedas-z1jru;Carrito Organizador Auxiliar con Ruedas;Hogar > Organizadores multiuso, Hogar > Organización, Novedades;Mariana;;ORG-004;Carrito organizador NAKU con 3 estantes fijos, ruedas con freno y estructura metálica. Ideal para cocina, baño o juguetes. Se entrega desarmado.
+carrito-organizador-auxiliar-con-ruedas-z1jru;;;Mariana;;ORG-004-BLANCO;
+carrito-organizador-auxiliar-con-ruedas-z1jru;;;Mariana;;ORG-004-ROSA;
+perchas-naku-per-001-de-madera-lustrada-pack;Perchas Naku PER-001 de Madera Lustrada Pack;Hogar > Organización de ropa, Hogar > Organización, Novedades;Mariana;;PER-001 x 10 UNITS;"Pack de perchas Naku de madera lustrada con gancho giratorio y muescas para breteles. Resistentes y perfectas para todo tipo de prendas.
+
+"
+perchas-naku-per-001-de-madera-lustrada-pack;;;Mariana;;PER-001 x 100 UNITS;
+perchas-naku-per-001-de-madera-lustrada-pack;;;Mariana;;PER-001 x 20 UNITS;
+perchas-naku-per-001-de-madera-lustrada-pack;;;Mariana;;PER-001 x 50 UNITS;
+gazebo-naku-gzb-02-plegable-3x3m-con-paredes-y-proteccion-uv;Gazebo Naku GZB-02 Plegable 3x3M con Paredes y Protección UV;Hogar > Exterior y aire libre, Novedades;Lucho;Mariana;GZB-002A;
+gazebo-naku-gzb-02-plegable-3x3m-con-paredes-y-proteccion-uv;;;Lucho;Mariana;GZB-002R;
+gazebo-naku-gzb-01-plegable-autoarmable-3x3m-con-proteccion-uv;Gazebo Naku GZB-01 Plegable Autoarmable 3x3M con Protección UV;Hogar > Exterior y aire libre, Novedades;Lucho;Mariana;GZB-001A;Gazebo Naku GZB-01 de 3x3M autoarmable y reforzado, con tela impermeable Oxford 1080D. Incluye bolso, estacas y protección UV.
+gazebo-naku-gzb-01-plegable-autoarmable-3x3m-con-proteccion-uv;;;Lucho;Mariana;GZB-001R;
+sombrilla-mediana-naku-som-01-playera-reclinable-con-proteccion-uv;Sombrilla Mediana Naku SOM-01 Playera Reclinable con Protección UV;Hogar > Exterior y aire libre, Novedades;Lucho;Mariana;SOM-1A;
+sombrilla-mediana-naku-som-01-playera-reclinable-con-proteccion-uv;;;Lucho;Mariana;SOM-1R;
+sombrilla-grande-naku-som-02-playera-reclinable-con-proteccion-uv;Sombrilla Grande Naku SOM-02 Playera Reclinable con Protección UV;Hogar > Exterior y aire libre, Novedades;Lucho;Mariana;SOM-2A;Sombrilla Grande Naku SOM-02 con protección UV 50+, reclinable y con bolso de transporte. Ideal para playa, jardín o picnic. Disponible en rojo y azul.
+sombrilla-grande-naku-som-02-playera-reclinable-con-proteccion-uv;;;Lucho;Mariana;SOM-2R;
+cama-elastica-naku-ce-03-con-red-de-seguridad-3-66m-de-diametro;Cama Elástica Naku CE-03 con Red de Seguridad 3.66m de Diámetro;Hogar > Exterior y aire libre, Comercio, Novedades;Mariana;Lucho;CE-3;Cama elástica Naku CE-03 de 3.66 m con red incluida. Ideal para exteriores, soporta 150 kg, resistente al clima y con protección UV.
+cama-elastica-naku-ce-02-con-red-de-seguridad-3-05m-de-diametro;Cama Elástica Naku CE-02 con Red de Seguridad 3.05m de Diámetro;Hogar > Exterior y aire libre, Comercio, Novedades;Mariana;Lucho;CE-2;Cama elástica Naku CE-02 de 3.05 m con red incluida. Ideal para exteriores, soporta 150 kg, estructura galvanizada y protección UV.
+cama-elastica-naku-ce-01-con-red-de-seguridad-1-8m-de-diametro;Cama Elástica Naku CE-01 con Red de Seguridad 1.8m de Diámetro;Hogar > Exterior y aire libre, Novedades;Mariana;Lucho;CE-1;Cama elástica Naku CE-01 con red de seguridad, estructura de acero y lona resistente UV. Soporta 120 kg. Ideal para niños y adultos. Medida 1.8 m.
+contadora-y-clasificadora-de-billetes-naku-cdb-004-con-deteccion-uv-mg-ir;Contadora y Clasificadora de Billetes Naku CDB-004 con Detección UV/MG/IR;Comercio;Mario;;CDB-004;Contadora clasificadora Naku CDB-004 con detección UV/MG/IR. Alta precisión, 1200 billetes/min, portátil y segura para comercios y oficinas.
+contadora-de-billetes-profesional-naku-cdb-003-con-deteccion-uv-mg-y-display-externo;Contadora de Billetes Profesional Naku CDB-003 con Detección UV/MG y Display Externo;Comercio;Mario;;CDB-003;Contadora Naku CDB-003 profesional con detección UV/MG. Cuenta hasta 1000 billetes por minuto, incluye display externo y es ideal para bancos o comercios.
+contadora-de-billetes-portatil-naku-cdb-002-con-doble-alimentacion-ijuzo;Contadora de Billetes Portátil Naku CDB-002 con Doble Alimentación;Comercio;Mario;;CDB-002;Máquina contadora de billetes portátil Naku CDB-002. Clasifica billetes, cuenta hasta 600 por minuto y funciona con batería o corriente.
+contadora-de-billetes-naku-cdb-001-con-detector-uv-y-mg;Contadora de Billetes Naku CDB-001 con Detector UV y MG;Comercio;Mario;;CDB-001;Máquina contadora de billetes Naku CDB001 con detección UV y magnética, velocidad de 1000 billetes por minuto y display móvil.
+rack-mtv-001-de-mesa-para-tv-de-32-a-75-con-base-de-vidrio-5qw2y;"Rack MTV-001 de Mesa Para TV de 32"" a 75"" con Base de Vidrio";Soportes > TV > Rack y Stand TV;Juan;Lucho;MTV-001;"Soporte de mesa para TV Naku MTV-001 con base de vidrio, inclinación y rotación. Compatible con pantallas de 32"" a 75"". Firme, seguro y fácil de instalar."
+kit-x-4-camara-de-seguridad-wifi-ip-naku-cv-001-full-hd-4mp-motorizada-con-vision-nocturna;Kit x 4 Cámara de Seguridad WiFi IP Naku CV-001 Full HD 4MP Motorizada con Visión Nocturna;Hogar > Seguridad y vigilancia;Juan;Lucho;CV-001 x 4 UNITS;
+kit-x-3-camara-de-seguridad-wifi-ip-naku-cv-001-full-hd-4mp-motorizada-con-vision-nocturna;Kit x 3 Cámara de Seguridad WiFi IP Naku CV-001 Full HD 4MP Motorizada con Visión Nocturna;Hogar > Seguridad y vigilancia;Juan;Lucho;CV-001 x 3 UNITS;
+kit-x-2-camara-de-seguridad-wifi-ip-naku-cv-001-full-hd-4mp-motorizada-con-vision-nocturna;Kit x 2 Cámara de Seguridad WiFi IP Naku CV-001 Full HD 4MP Motorizada con Visión Nocturna;Hogar > Seguridad y vigilancia;Juan;Lucho;CV-001 x 2 UNITS;
+kit-x-4-camara-de-seguridad-doble-lente-wifi-ip-naku-cv-002-full-hd-motorizada-3mp;Kit x 4 Cámara de Seguridad Doble Lente WiFi IP Naku CV-002 Full HD Motorizada 3MP;Hogar > Seguridad y vigilancia;Juan;Lucho;CV-002 x 4 UNITS;
+kit-x-3-camara-de-seguridad-doble-lente-wifi-ip-naku-cv-002-full-hd-motorizada-3mp;Kit x 3 Cámara de Seguridad Doble Lente WiFi IP Naku CV-002 Full HD Motorizada 3MP;Hogar > Seguridad y vigilancia;Juan;Lucho;CV-002 x 3 UNITS;
+kit-x-2-camara-de-seguridad-doble-lente-wifi-ip-naku-cv-002-full-hd-motorizada-3mp;Kit x 2 Cámara de Seguridad Doble Lente WiFi IP Naku CV-002 Full HD Motorizada 3MP;Hogar > Seguridad y vigilancia;Juan;Lucho;CV-002 x 2 UNITS;
+kit-x-4-camaras-baby-call-doble-lente-wifi-ip-naku-cv-003-full-hd-motorizada-2mp;Kit x 4 Cámaras Baby Call Doble Lente WiFi IP Naku CV-003 Full HD Motorizada 2MP;Hogar > Seguridad y vigilancia;Juan;Lucho;CV-003 x 4 UNITS;
+kit-x-3-camaras-baby-call-doble-lente-wifi-ip-naku-cv-003-full-hd-motorizada-2mp;Kit x 3 Cámaras Baby Call Doble Lente WiFi IP Naku CV-003 Full HD Motorizada 2MP;Hogar > Seguridad y vigilancia;Juan;Lucho;CV-003 x 3 UNITS;
+kit-x-2-camaras-baby-call-doble-lente-wifi-ip-naku-cv-003-full-hd-motorizada-2mp;Kit x 2 Cámaras Baby Call Doble Lente WiFi IP Naku CV-003 Full HD Motorizada 2MP;Hogar > Seguridad y vigilancia;Juan;Lucho;CV-003 x 2 UNITS;
+kit-x-4-camaras-baby-call-wifi-ip-naku-cv-004-full-hd-motorizada-con-vision-nocturna;Kit x 4 Cámaras Baby Call WiFi IP Naku CV-004 Full HD Motorizada con Visión Nocturna;Hogar > Seguridad y vigilancia;Juan;Lucho;CV-004 x 4 UNITS;
+kit-x-3-camaras-baby-call-wifi-ip-naku-cv-004-full-hd-motorizada-con-vision-nocturna;Kit x 3 Cámaras Baby Call WiFi IP Naku CV-004 Full HD Motorizada con Visión Nocturna;Hogar > Seguridad y vigilancia;Juan;Lucho;CV-004 x 3 UNITS;
+kit-x-2-camaras-baby-call-wifi-ip-naku-cv-004-full-hd-motorizada-con-vision-nocturna;Kit x 2 Cámaras Baby Call WiFi IP Naku CV-004 Full HD Motorizada con Visión Nocturna;Hogar > Seguridad y vigilancia;Juan;Lucho;CV-004 x 2 UNITS;
+kit-x-4-camaras-baby-call-wifi-ip-naku-cv-005-full-hd-motorizada-con-vision-nocturna;Kit x 4 Cámaras Baby Call WiFi IP Naku CV-005 Full HD Motorizada con Visión Nocturna;Hogar > Seguridad y vigilancia;Juan;Lucho;CV-005 x 4 UNITS;
+kit-x-3-camaras-baby-call-wifi-ip-naku-cv-005-full-hd-motorizada-con-vision-nocturna;Kit x 3 Cámaras Baby Call WiFi IP Naku CV-005 Full HD Motorizada con Visión Nocturna;Hogar > Seguridad y vigilancia;Juan;Lucho;CV-005 x 3 UNITS;
+kit-x-2-camaras-baby-call-wifi-ip-naku-cv-005-full-hd-motorizada-con-vision-nocturna;Kit x 2 Cámaras Baby Call WiFi IP Naku CV-005 Full HD Motorizada con Visión Nocturna;Hogar > Seguridad y vigilancia;Juan;Lucho;CV-005 x 2 UNITS;
+mopa-plana-naku-earth-4s-con-balde-escurridor-y-2-panos-color-crema;Mopa Plana EARTH-4 Balde Escurridor Color Crema;Hogar > Limpieza, Comercio;Mariana;Mario;EARTH4S;Mopa plana EARTH-4 con balde escurridor integrado y cabezal 360°. Microfibra reutilizable. Mango ajustable hasta 130cm. Limpieza sin esfuerzo. 2 paños incluidos.
+mopa-lampazo-naku-earth-2s-con-balde-centrifugador-rojo;Mopa Lampazo Naku EARTH-2S con Balde Centrifugador Rojo;Hogar > Limpieza, Comercio;Mariana;Mario;EARTH2S;Mopa Naku EARTH-2S con balde centrífugo, dispenser de jabón y paños de microfibra. Ideal para todo tipo de pisos. ¡Limpieza sin esfuerzo!
+escritorio-regulable-manual-135x60-cm-sit-stand-con-manivela-madera-sq512;Escritorio Regulable Manual 135x60 cm - Sit-Stand con Manivela Madera;Hogar > Escritorios ergonómicos;Martin;Mariana;22D-B MADERA;
+escritorio-regulable-manual-135x60-cm-sit-stand-con-manivela-negro-yo49u;Escritorio Regulable Manual 135x60 cm - Sit-Stand con Manivela Negro;Hogar > Escritorios ergonómicos;Martin;Mariana;22D-B COLOR NEGRO;
+escritorio-electrico-regulable-135x60-cm-sit-stand-automatico-madera-x6s0n;Escritorio Eléctrico Sit-Stand 135x60 Madera;Hogar > Escritorios ergonómicos;Martin;Mariana;22D-BEL MADERA (MODELO ELECTRICO);Escritorio eléctrico regulable 135x60cm. Altura ajustable 73-120cm con motor. 2 memorias preestablecidas. Soporta 70kg. Escritorio sit-stand para home office.
+escritorio-electrico-regulable-135x60-cm-sit-stand-automatico-negro-trdei;Escritorio Eléctrico Sit-Stand 135x60 Negro;Hogar > Escritorios ergonómicos;Martin;Mariana;22D-BEL NEGRO (MODELO ELECTRICO);Escritorio eléctrico regulable 135x60cm. Altura ajustable 73-120cm con motor. 2 memorias preestablecidas. Soporta 70kg. Escritorio sit-stand para home office.
+rack-pedestal-naku-tvr-004-con-ruedas-y-estantes-para-tv-de-32-a-75;"Rack Pedestal Naku TVR-004 con Ruedas y Estantes Para TV de 32"" a 75""";Soportes > TV > Rack y Stand TV;Juan;Mariana;TVR-004;"Mové tu TV con estilo y seguridad con el rack pedestal Naku TVR-004. Ruedas, estantes y estructura robusta para pantallas de 32"" a 75""."
+soporte-naku-rack-para-tv-de-32-a-55-con-ruedas-y-estante;"Soporte Rack Naku TVR-001 Para TV de 32"" a 55"" con Ruedas y Estante";Soportes > TV > Rack y Stand TV;Juan;Mariana;TVR-001;Mové tu TV fácilmente con el soporte rack Naku SK-03. Con ruedas, estante y rotación de 360°. Ideal para oficinas, aulas y espacios versátiles.
+soporte-hidraulico-naku-ss-c024d-de-mesa-para-tv-monitor-de-13-a-32;"Soporte Doble Monitor Hidráulico SS-C024D 13-32""";Soportes > Monitor;Martin;Juan;SS-C024D;"Soporte doble monitor hidráulico SS-C024D. 2 brazos independientes 13-32"". Rotación 180°, inclinación +90/-45°. VESA 50/75/100. Home office y gaming."
+soporte-hidraulico-naku-ss-1032m-de-mesa-para-tv-monitor-de-13-a-32;"Soporte Hidráulico Monitor 13-32"" VESA 75x100";Soportes > Monitor;Martin;Juan;SS-1032M;"Soporte hidráulico para TV/monitor 13-32"" con brazo ajustable 50cm y movimiento 360°. Soporta hasta 9kg. Instalación sin herramientas. VESA 75x100."
+soporte-articulado-naku-sm-c048-de-mesa-para-cuatro-monitores-de-13-a-32;"Soporte Articulado Naku SM-C048 de Mesa Para Cuatro Monitores de 13"" a 32""";Soportes > Monitor;Martin;Juan;SM-C048;"Soporte Naku SM-C048 de mesa para 4 monitores de 13"" a 32"". Inclinación, rotación y brazo articulado para máximo control visual."
+soporte-articulado-naku-sm-c034-de-mesa-para-tres-monitores-de-13-a-32;"Soporte Articulado Naku SM-C034 de Mesa Para Tres Monitores de 13"" a 32""";Soportes > Monitor;Martin;Juan;SM-C034;"Soporte de mesa Naku SM-C034 para 3 monitores de 13"" a 32"". Máxima articulación, inclinación y giro para un setup profesional."
+soporte-articulado-naku-sm-c024-de-mesa-para-monitores-de-13-a-32;"Soporte Articulado Naku SM-C024 de Mesa Para Monitores de 13"" a 32""";Soportes > Monitor;Martin;Juan;SM-C024;"Soporte de mesa articulado Naku SM-C024 para 2 monitores de 13"" a 32"". Inclinación, rotación y altura ajustable para mayor confort."
+soporte-articulado-naku-sm-c011nbh-de-mesa-para-notebook-y-tv-de-13-a-32;"Soporte Articulado Naku SM-C011NBH de Mesa Para Notebook y Monitor de 13"" a 32""";Soportes > Monitor;Martin;Juan;SM-C011NBH;"Optimizá tu escritorio con el soporte Naku SM-C011NBH para notebook y monitor de 13"" a 32"". Robusto, articulado y fácil de instalar."
+soporte-brazo-articulado-naku-sm-c012-de-mesa-para-monitor-de-13-a-32;"Soporte Brazo Articulado Naku SM-C012 de Mesa Para Monitor de 13"" a 32""";Soportes > Monitor;Martin;Juan;SM-C012;Mové tu monitor como quieras con el soporte Naku SM-C012. Brazo articulado, inclinación y rotación para máxima comodidad en escritorios.
+soporte-de-escritorio-naku-sm-c010-para-monitor-de-13-a-32;"Soporte de Escritorio Naku SM-C010 Para Monitor de 13"" a 32""";Soportes > Monitor;Martin;Juan;SM-C010;"Organiza tu escritorio con el soporte articulado Naku SM-C010 para monitor de 13"" a 32"". Estilo compacto, base firme y máxima ergonomía."
+soporte-de-escritorio-naku-sm-c09-para-monitor-de-13-a-32;"Soporte de Escritorio Naku SM-C09 Para Monitor de 13"" a 32""";Soportes > Monitor;Martin;Juan;SM-C09;"Optimizá tu escritorio con el soporte Naku SM-C09 para monitor de 13"" a 32"". Inclinación, giro y diseño compacto para máxima ergonomía."
+soporte-de-escritorio-naku-sm-t02-para-monitor-de-13-a-32;"Soporte de Escritorio Naku SM-T02 Para Monitor de 13"" a 32""";Soportes > Monitor;Martin;Juan;SM-T02;"Armá tu estación de trabajo dual con el soporte Naku SM-T02 para dos monitores de 13"" a 32"". Inclinación, giro y base estable de escritorio."
+soporte-de-escritorio-naku-sm-t01-para-monitor-de-13-a-32;"Soporte de Escritorio Naku SM-T01 Para Monitor de 13"" a 32""";Soportes > Monitor;Juan;Mariana;SM-T01;"Ganá comodidad con el soporte Naku SM-T01 para monitor de 13"" a 32"". Base de escritorio, inclinación 45°, giro 360° y montaje VESA."
+soporte-de-techo-naku-plb-ce344-para-tv-de-32-a-75;"Soporte de Techo Naku PLB-CE344 Para TV de 32"" a 75""";Soportes > TV > Techo;Juan;Mariana;PLB-CE344;"Elevá tu TV de 32"" a 75"" con el soporte de techo Naku PLB-CE344. Altura regulable, inclinación y giro para una visual perfecta en cualquier ambiente."
+soporte-de-techo-naku-s-504a-para-tv-de-15-a-48;"Soporte de Techo Naku S-504A Para TV de 15"" a 48""";Soportes > TV > Techo;Juan;Mariana;S-504A;"Instalá tu TV de 15"" a 48"" en el techo con el soporte Naku S-504. Inclinación de 45°, rotación 360° y altura regulable. Ideal para comercios y hogares."
+soporte-de-techo-naku-s-cm244-rebatible-para-tv-de-17-a-60;"Soporte de Techo Naku S-CM244 Rebatible Para TV de 17"" a 60""";Soportes > TV > Techo;Juan;Mariana;S-CM244;"Soporte rebatible de techo Naku S-CM244 para TV de 17"" a 60"". Movilidad, seguridad y ahorro de espacio. Incluye kit de instalación completo."
+soporte-de-techo-naku-s-cm222-rebatible-para-tv-de-17-a-48;"Soporte de Techo Naku S-CM222 Rebatible Para TV de 17"" a 48""";Soportes > TV > Techo;Martin;Mariana;S-CM222;"Soporte rebatible Naku S-CM222 de techo para TV de 17"" a 48"". Ahorra espacio, gira 45° y se pliega fácilmente. Incluye instalación y accesorios."
+soporte-de-pared-naku-sb-51-para-parlantes-pack-x2;Soporte de Pared Naku SB-51 Para Parlantes Pack x2;Soportes > Microfonos\, Parlantes y Proyectores;Martin;Mariana;SB-51;Soporte Naku SB-51 de pared para parlantes. Pack por 2 unidades, metálico, resistente y ajustable. Ideal para estudios y equipos de audio.
+soporte-articulado-para-microfono-naku-s-m1-negro;Soporte Articulado Naku S-M1 de Mesa Para Micrófono;Soportes > Microfonos\, Parlantes y Proyectores;Martin;Mariana;S-M1;Grabá con comodidad con el soporte articulado Naku S-M1. Compatible con micrófonos comunes, rotación 270°, estructura metálica y fácil instalación.
+soporte-naku-ftp-2w-para-proyector-de-techo-o-pared-color-negro;Soporte Naku FTP-2W Para Proyector de Techo o Pared Negro;Soportes > Microfonos\, Parlantes y Proyectores;Martin;Mariana;FTP-2W;Instalá tu proyector con estilo y seguridad con el soporte Naku FTP-2W de techo o pared. Soporta hasta 20 kg, ajuste flexible y diseño negro moderno.
+soporte-articulado-naku-sh36-466-de-pared-para-tv-de-32-a-85;"Soporte Articulado Naku SH36-466 de Pared Para TV de 32"" a 85""";Soportes > TV > Móviles con Brazo;Juan;Mariana;SH36-466;"Soporte reforzado y articulado Naku SH36-466 para TV de 32"" a 85"". Máxima extensión, inclinación y resistencia. Ideal para televisores grandes."
+soporte-articulado-naku-sh-466-de-pared-para-tv-de-32-a-85;"Soporte Articulado Naku SH-466 de Pared Para TV de 32"" a 85""";Soportes > TV > Móviles con Brazo;Juan;Mariana;SH-466;"Mové tu TV como quieras con el soporte articulado Naku SH-466 para 32"" a 85"". Firme, extensible, rotativo y listo para instalación segura."
+soporte-articulado-naku-se-466-de-pared-para-tv-de-32-a-85;"Soporte Articulado Naku SE-466 de Pared Para TV de 32"" a 85";Soportes > TV > Móviles con Brazo;Juan;Mariana;SE-466;"Soporte articulado reforzado para TV de 32"" a 85"". El modelo SE-466 de Naku ofrece firmeza, inclinación, rotación y brazo extensible. Ideal para pantallas grandes."
+soporte-articulado-naku-sp-446-de-pared-para-tv-de-32-a-75;"Soporte Articulado Naku SP-446 de Pared Para TV de 32"" a 75""";Soportes > TV > Móviles con Brazo;Juan;Mariana;SP-446;"Mové y ajustá tu pantalla con el soporte articulado Naku SP-446 para TV de 32"" a 75"". Robusto, estético y fácil de instalar."
+soporte-articulado-naku-sh-446-de-pared-para-tv-de-32-a-75;"Soporte Articulado Naku SH-446 de Pared Para TV de 32"" a 75""";Soportes > TV > Móviles con Brazo;Juan;Mariana;SH-446;"Soporte Naku SH-446 para TV de 32"" a 75"", con brazos articulados, inclinación, rotación y gran resistencia. Instalación rápida y segura."
+soporte-articulado-naku-se-446-de-pared-para-tv-de-20-a-75;"Soporte Articulado Naku SE-446 de Pared Para TV de 20"" a 75""";Soportes > TV > Móviles con Brazo;Juan;Mariana;SE-446;"Instalá tu pantalla con el soporte Naku SE-446 para TV de 20"" a 75"". Soporte articulado, inclinable y con brazo extensible. Seguro y fácil de montar."
+soporte-articulado-naku-sh49-483xld-de-pared-para-tv-de-37-a-90;"Soporte Articulado Naku SH49-483XLD de Pared Para TV de 37"" a 90""";Soportes > TV > Móviles con Brazo;Juan;Mariana;SH49-483XLD;"Soporte articulado Naku SH49-483XLD de pared para TV de 37"" a 90"" con brazo extensible hasta 1 metro. Ideal para pantallas grandes. Seguro y fácil de instalar."
+soporte-articulado-naku-sh49-463d-de-pared-para-tv-de-37-a-85;"Soporte Articulado Naku SH49-463D de Pared Para TV de 37"" a 85""";Soportes > TV > Móviles con Brazo;Juan;Mariana;SH49-463D;"Soporte articulado Naku SH49-463D de pared para TV de 37"" a 85"". Extensión de 61.5 cm, inclinación y rotación. Ideal para pantallas grandes."
+soporte-articulado-naku-sp-463wl-de-pared-para-tv-de-32-a-86;"Soporte Articulado Naku SP-463WL de Pared Para TV de 32"" a 86""";Soportes > TV > Móviles con Brazo;Juan;Mariana;SP-463WL;"Soporte Naku SP-463WL articulado de pared para TV de 32"" a 86"". Extensión de 65 cm, inclinación y rotación, ideal para pantallas grandes."
+soporte-articulado-naku-sh-443xwl-de-pared-para-tv-de-32-a-80;"Soporte Articulado Naku SH-443XWL de Pared Para TV de 32"" a 80""";Soportes > TV > Móviles con Brazo;Juan;Mariana;SH-443XWL;"Soporte Naku SH-443XWL articulado de brazo largo para TV de 32"" a 80"". Extensión de hasta 70 cm, inclinación y rotación. Fácil instalación."
+soporte-articulado-naku-sh-443wl-de-pared-para-tv-de-32-a-75;"Soporte Articulado Naku SH-443WL de Pared Para TV de 32"" a 75""";Soportes > TV > Móviles con Brazo;Juan;Mariana;SH-443WL;"Soporte articulado Naku SH-443WL con brazo largo y rotación total para TV de 32"" a 75"". Instalación rápida, máxima extensión y movilidad."
+soporte-articulado-naku-sh-443-de-pared-para-tv-de-32-a-75;"Soporte Articulado Naku SH-443 de Pared Para TV de 32"" a 75""";Soportes > TV > Móviles con Brazo;Juan;Mariana;SH-443;"Girá, incliná y extendé tu TV de 32"" a 75"" con el soporte articulado Naku SH-443. Instalación fácil y libertad total de movimiento."
+soporte-articulado-naku-se-443-de-pared-para-tv-de-20-a-60;"Soporte Articulado Naku SE-443 de Pared Para TV de 20"" a 60""";Soportes > TV > Móviles con Brazo;Juan;Mariana;SE-443;"Ajustá tu pantalla con el soporte articulado Naku SE-443 para TV de 20"" a 60"". Diseño fuerte, ángulo regulable y fácil instalación."
+soporte-articulado-naku-ss-443-de-pared-para-tv-de-15-a-60;"Soporte Articulado Naku SS-443 de Pared Para TV de 15"" a 60""";Soportes > TV > Móviles con Brazo;Juan;Mariana;SS-443;"Girá, incliná y extendé tu pantalla con el soporte articulado Naku SS-443 para TV de 15"" a 60"". Instalación fácil y máxima movilidad."
+soporte-articulado-naku-e15sb-de-pared-para-tv-de-15-a-60;"Soporte Articulado Naku E15SB de Pared Para TV de 15"" a 60""";Soportes > TV > Móviles con Brazo;Juan;Mariana;E15SB;"Optimiza tus espacios con el soporte articulado Naku E15SB para TV de 15"" a 60"". Inclinable, con brazo móvil y fácil instalación."
+soporte-naku-se-223-de-pared-para-tv-de-15-a-48;"Soporte Articulado Naku SE-223 de Pared Para TV de 15"" a 48""";Soportes > TV > Móviles con Brazo;Juan;Mariana;SE-223;Soporte articulado Naku SE-223 de Pared para TV de 15 a 48 pulgadas. Con 3 brazos, inclinable, giratorio y extensible hasta 37.5 cm. Incluye kit y organizador.
+soporte-naku-se-223wl-de-pared-para-tv-de-15-a-48;"Soporte Articulado Naku SE-223WL de Pared Para TV de 15"" a 48""";Soportes > TV > Móviles con Brazo;Juan;Mariana;SE-223WL;Soporte articulado con 3 brazos Naku SE-223WL para TV de 15 a 48 pulgadas. Giratorio, inclinable y con extensión de hasta 61 cm. Incluye kit.
+soporte-articulado-naku-se-221-de-pared-para-tv-de-15-a-48;"Soporte Articulado Naku SE-221 de Pared Para TV de 15"" a 48""";Soportes > TV > Móviles con Brazo;Juan;Mariana;SE-221;"Soporte articulado Naku SE-221 para TV de 15"" a 48"". Con brazo extensible, inclinación, rotación, organizador de cables y kit de instalación incluido."
+soporte-articulado-naku-ssp-223l-de-pared-para-tv-de-15-a-55;"Soporte Articulado Naku SSP-223L de Pared Para TV de 15"" a 55""";Soportes > TV > Móviles con Brazo;Juan;Mariana;SSP-223L;"Soporte articulado Naku SSP-223L para TV de 15"" a 55"". Con brazo extensible de hasta 61 cm, inclinación, rotación y kit de instalación incluido."
+soporte-articulado-naku-se-222-de-pared-para-tv-de-15-a-48;"Soporte Articulado Naku SE-222 de Pared Para TV de 15"" a 48""";Soportes > TV > Móviles con Brazo;Juan;Mariana;SE-222;Soporte articulado Naku SE-222 de pared para TV de 15 a 48 pulgadas. Inclinable, giratorio y de perfil ajustable. Incluye kit de instalación.
+soporte-fijo-naku-s-f-de-pared-para-tv-de-15-a-100;"Soporte Fijo Naku S-F de Pared Para TV de 15"" a 100""";Soportes > TV > Fijos;Juan;Mariana;S-F;Soporte fijo universal de pared Naku S-F para TV y monitores de 15 a 100 pulgadas. Compatible con VESA 800x600. Resistente y fácil de instalar.
+soporte-videowall-naku-s-vw1-pared-tv-32-a-85;"Soporte Videowall Naku S-VW1 de Pared Para TV de 32"" a 85""";Soportes > TV > Fijos con inclinación;Juan;Mariana;S-VW1;Soporte multipanel Naku S-VW1 para videowall de 32 a 85 pulgadas. Montaje preciso con sistema pop-out, estructura de acero y ajuste profesional.
+soporte-basculante-naku-sp-46-pared-tv-32-a-75;"Soporte Basculante Naku SP-46B de Pared Para TV de 32"" a 75""";Soportes > TV > Fijos con inclinación;Juan;Mariana;SP-46B;Soporte de pared Naku SP-46 para TV de 32 a 75 pulgadas. Basculante, de acero, resistente y fácil de instalar. Compatible con múltiples VESA.
+soporte-basculante-naku-sp-44b-pared-tv-32-a-60;"Soporte Basculante SP-44B de Pared Para TV de 32"" a 60""";Soportes > TV > Fijos con inclinación;Juan;Mariana;SP-44B;Soporte de pared inclinable Naku SP-44B para TV de 32 a 60 pulgadas. Resistente, compacto y fácil de instalar. Ideal para mejorar tu experiencia visual.
+soporte-basculante-naku-sp-22b-pared-tv-15-a-48;"Soporte Basculante Naku SP-22B de Pared Para TV de 15"" a 48""";Soportes > TV > Fijos con inclinación;Juan;Mariana;SP-22B;Soporte inclinable Naku SP-22B de pared para TV de 15 a 48 pulgadas. Compacto, resistente y fácil de instalar. Ideal para optimizar espacios.
+soporte-fijo-naku-s-46f-pared-tv-32-a-85;"Soporte Fijo Naku S-46F de Pared Para TV de 32"" a 85""";Soportes > TV > Fijos;Juan;Mariana;S-46F;Soporte fijo Naku S-46F para TV de 32 a 85 pulgadas. De pared, resistente y seguro. Instalación fácil con kit incluido. VESA compatible.
+soporte-fijo-naku-s-44f-pared-tv-32-a-75;"Soporte Fijo Naku S-44F de Pared Para TV de 32"" a 75""";Soportes > TV > Fijos;Juan;Mariana;S-44F;"Soporte de pared Naku S-44F para TV de 32"" a 75"". Instalación fija, diseño compacto y resistente. Compatible con múltiples VESA."
+soporte-fijo-naku-s-22f-de-pared-para-tv-de-32-a-50;"Soporte Fijo Naku S-22F de Pared Para TV de 32"" a 50""";Soportes > TV > Fijos;Juan;Mariana;S-22F;Soporte fijo NAKU S-22F para TV o monitor de 14 a 50 pulgadas. Fijación segura y diseño compacto. Compatible con VESA. Fácil instalación.
+lector-codigo-barras-naku-lcb2d-005-usb-fijo-2d;Lector De Código De Barras 2D Fijo NAKU LCB2D-005 USB Imager Para Negocio;Comercio;Mario;Juan;LCB2D-005;Lector fijo NAKU LCB2D-005. Escanea códigos 1D, 2D y QR con rapidez y precisión. Ideal para puntos de venta en negocios y supermercados.
+lector-codigo-barras-naku-lcb2d-004-usb-inalambrico-2d;Lector De Código De Barras y Pantallas 2D NAKU LCB2D-004 USB Inalámbrico;Comercio;Mario;Juan;LCB2D-004;Lector inalámbrico NAKU 2D modelo LCB2D-004. Escanea códigos 1D y 2D desde etiquetas o pantallas. Precisión, velocidad y comodidad en un solo equipo.
+lector-codigo-barras-naku-lcb2d-003-usb-2d-imager;Lector De Código De Barras y Pantallas 2D NAKU LCB2D-003 USB;Comercio;Mario;Juan;LCB2D-003;Lector de código de barras NAKU 2D USB modelo LCB2D-003. Escanea códigos 1D y 2D en etiquetas o pantallas. Ideal para comercios, rápido y preciso.
+lector-codigo-barras-naku-lcb1d-002-inalambrico-usb-laser-1d;Lector De Código De Barras 1D NAKU LCB1D-002 Inalámbrico USB Láser Lineal;Comercio;Mario;Juan;LCB1D-002;Lector de código de barras NAKU LCB1D-002. Conexión inalámbrica por USB, escaneo láser 1D de alta velocidad. Ideal para comercios y acciones.
+lector-codigo-barras-sker-lcb1d-001-usb-laser-lineal-1d;Lector De Código De Barras Naku 1D LCB1D-001 USB Imager Láser Lineal;Comercio;Mario;Juan;LCB1D-001;Lector de códigos NAKU 1D modelo LCB1D-001. Conexión USB, escaneo láser rápido lineal y preciso. Ideal para comercios y acciones.
+mesa-plegable-valija-sker-mp-001-picnic-exterior-playa-180x70-blanca;Mesa Plegable Picnic 180x70 cm;Hogar > Exterior y aire libre;Lucho;Mariana;MP-001;Mesa plegable tipo valija 180x70cm para camping, picnic y playa. Transportable, resistente al agua UV. Soporta hasta 8 personas. Incluye asa de traslado.
+mesa-plegable-valija-sker-mp-001-picnic-exterior-playa-180x70-blanca;;;Lucho;Mariana;MP-001-NEGRA;
+mesa-plegable-sker-mp-002-camping-playa-pesca-portatil-con-bolso;Mesa Plegable MP-002 para Camping, Playa o Pesca con Bolso - 52x53 cm;Hogar > Exterior y aire libre;Lucho;Mariana;MP-002;Mesa plegable Sker MP-002 ideal para camping, playa y pesca. Compacta, liviana y resistente. Incluye bolso. Medidas: 53x52x50 cm.
+escalera-naku-esc-003-aluminio-telescopica-9-escalones-3-5m;Escalera Naku ESC-003 de Aluminio Telescópica 9 Escalones Extensible 3,5 m;Hogar > Herramientas y equipamiento, Comercio;Juan;Mariana;ESC-003;Escalera telescópica Naku ESC-003 de aluminio. Extensible hasta 3,5 m con 9 escalones. Compacta, segura y fácil de transportar. Soporta 150 kg.
+escalera-sker-esc-002-aluminio-multiproposito-16-escalones;Escalera Naku ESC-002 de Aluminio Multipropósito 16 Escalones - 8 Posiciones;Hogar > Herramientas y equipamiento, Comercio;Juan;Mariana;ESC-002;Escalera Sker ESC-002 de aluminio con 16 escalones. Articulada, plegable y con 8 posiciones. Soporta hasta 150 kg. Altura máxima 4,56 m.
+escalera-sker-esc-001-aluminio-multiproposito-12-escalones;Escalera Naku ESC-001 de Aluminio Multipropósito 12 Escalones - 8 Posiciones;Hogar > Herramientas y equipamiento, Comercio;Juan;Mariana;ESC-001;Escalera Sker ESC-001 de aluminio con 12 escalones. 8 posiciones, plegable, articulada y segura. Altura máxima de 3,46 m. Soporta hasta 150 kg.
+gaveta-dinero-naku-cr-001-caja-registradora-electronica-5-compartimientos;Gaveta Dinero Electrónica CR-001 5 Compartimientos;Comercio;Mario;Juan;CR-001;Gaveta dinero electrónica CR-001. 5 compartimientos billetes y monedas. Ranura secreta. Cerradura 3 posiciones. Compatible facturación RJ11. Hierro.
+selladora-cortadora-sker-sb-200-40cm-con-regulador-y-repuesto;Selladora Cortadora Naku SB-400 40cm Profesional con Regulador y Repuesto;Comercio;Mario;Mariana;SB-400;Selladora profesional Sker SB-200 de 40cm. 800W, regulador de temperatura, corte automático y repuesto. Para polietileno, PVC y más.
+selladora-cortadora-sker-sb-200-20cm-con-regulador-y-repuesto;Selladora Cortadora SB-200 20cm Regulador Repuesto;Comercio;Mario;Mariana;SB-200;Selladora SB-200 20cm profesional. Potencia 300W. Regulador electrónico de temperatura. Corte automático. Repuesto incluido. Bolsas plásticas y burbujas.
+selladora-cortadora-naku-sb-300-30cm-con-regulador-y-repuesto;Selladora Cortadora SB-300 30cm Regulador y Repuesto;Comercio;Mario;Mariana;SB-300;Selladora SB-400 40cm, 400W profesional. Regulador electrónico. Corte automático. Repuesto incluido. Industria, panaderías, distribuidoras.
+ionizador-solar-pileta-naku-ion-001-150000-litros;Ionizador Solar Naku ION-001 para Piletas Hasta 150.000 L - Antisarro y Sustentable;Hogar > Exterior y aire libre, Hogar > Limpieza;Lucho;Mariana;ION-001;Ionizador solar para pila Naku ION-001. Reduce el uso de cloro, elimina algas y bacterias. Apto hasta 150.000L. Incluye accesorios y tiras medidoras.
+set-x124-herramientas-manuales-en-caja-naku-ch-001;Set X124 Herramientas Manuales en Caja Naku CH-001;Hogar > Herramientas y equipamiento, Comercio;Juan;Lucho;CH-01;Kit de herramientas Naku CH-001 con 124 piezas. Caja portátil con destornilladores, alicates, martillo, linterna, llaves y más.
+astronauta-proyector-naku-vp-002-sentado-galaxia-led-blanco;Astronauta Proyector Sentado Naku VP-002 Luz Galaxia LED con Control - Blanco;Hogar > Iluminación;Mariana;;VP-002-BLANCO;Proyector galaxia LED Naku VP-002 blanco con forma de astronauta sentado. Incluye control remoto, temporizador y proyección 360°.
+astronauta-proyector-naku-vp-002-sentado-galaxia-led-negro;Astronauta Proyector Sentado Naku VP-002 Luz Galaxia LED con Control - Negro;Hogar > Iluminación;Mariana;;VP-002-NEGRO;Proyector LED galaxia Naku VP-002 con forma de astronauta sentado. Control remoto, efectos de nebulosa y temporizador. Ideal para decorar y relajar.
+astronauta-proyector-naku-vp-003-luz-galaxia-led-blanco;Astronauta Proyector Naku VP-003 Luz Galaxia LED con Control - Color Blanco;Hogar > Iluminación;Mariana;;VP-003;Proyector LED Naku VP-003 con forma de astronauta. Luz galaxia y estrellas, control remoto, diseño decorativo y relajante. Ideal para interiores.
+proyector-velador-naku-vp-001-negro-luz-galaxia-led-parlante;Proyector Velador Naku VP-001 Luz Galaxia LED con Parlante y Control Negro;Hogar > Iluminación;Mariana;;VP-001-NEGRO;Lámpara proyector Naku VP-001 negra con luces LED, Bluetooth, temporizador y control remoto. Ideal para dormir, ambientar y relajarse.
+proyector-velador-naku-vp-001-luz-galaxia-led-parlante;Proyector Velador Naku VP-001 Luz Galaxia LED con Parlante y Control Blanco;Hogar > Iluminación;Mariana;;VP-001-BLANCO;Lámpara proyector de estrellas Naku VP-001 con luz LED, Bluetooth, USB y control remoto. Ideal para dormir o ambientar espacios.
+camara-ip-naku-cv-005-babycall-wifi-fullhd;Cámara Baby Call WiFi IP Naku CV-005 Full HD Motorizada con Visión Nocturna;Hogar > Seguridad y vigilancia;Juan;Mariana;CV-005;Cámara WiFi IP Naku CV-005 Full HD 2MP. Ideal como baby call. Audio bidireccional, visión nocturna y control remoto desde celular.
+camara-ip-naku-cv-004-babycall-wifi-fullhd;Cámara Baby Call WiFi IP Naku CV-004 Full HD Motorizada con Visión Nocturna;Hogar > Seguridad y vigilancia;Juan;Mariana;CV-004;Cámara WiFi IP Naku CV-004 con resolución Full HD. Ideal como baby call. Visión nocturna, audio bidireccional y control desde celular o Alexa.
+camara-ip-naku-cv-003-doble-lente-babycall-fullhd;Cámara Baby Call Doble Lente WiFi IP Naku CV-003 Full HD Motorizada 2MP;Hogar > Seguridad y vigilancia;Juan;Mariana;CV-003;Cámara de seguridad interior Naku CV-003 con doble
+camara-ip-naku-cv-002-doble-lente-wifi-fullhd;Cámara de Seguridad Doble Lente WiFi IP Naku CV-002 Full HD Motorizada 3MP;Hogar > Seguridad y vigilancia;Juan;Mariana;CV-002;Cámara de seguridad WiFi IP Naku CV-002 con doble lente 3MP. Visión nocturna, motorizada, audio bidireccional y control desde app o Alexa.
+camara-ip-naku-cv-001-wifi-4mp-fullhd-motorizada;Cámara de Seguridad WiFi IP Naku CV-001 Full HD 4MP Motorizada con Visión Nocturna;Hogar > Seguridad y vigilancia;Juan;Mariana;CV-001;Cámara de seguridad IP WiFi Naku CV-001 4MP Full HD. Visión nocturna, audio bidireccional, detección de movimiento y control desde el celular.
+estructura-escritorio-naku-22d-b-st-altura-regulable;Estructura Regulable Manual 135x60 cm - Sit-Stand con Manivela (SIN TABLA);Hogar > Escritorios ergonómicos;Martin;Mariana;22D-B/ST;Estructura regulable Naku 22D-B/ST con manivela. Ajuste de altura entre 72 y 120 cm. No incluye tablero. Ideal para oficinas o estudios.
+naku-22d-estructura;Estructura Eléctrica Regulable 135x60 cm - Sit-Stand Automatico (SIN TABLA);Hogar > Escritorios ergonómicos;Martin;Mariana;22D-BEL/ST;Base eléctrica regulable Naku 22D-BEL/ST con motor. Altura ajustable de 73 a 120 cm. No incluye tablero. Ideal para armar tu propio escritorio.
+maquina-coser-naku-mc003;Máquina de Coser Naku MC-003 Profesional 12 Puntadas con Pedal y Luz LED;Hogar > Máquinas de coser;Mariana;;MC-003;Máquina de coser profesional Naku MC-003 con 12 puntadas, pedal, función reversa y luz LED. Ideal para uso doméstico.
+mini-coser-naku-mc001;Mini Máquina de Coser Naku MC-001 Portátil 1 Puntada con Pedal y Luz LED;Hogar > Máquinas de coser;Mariana;;MC-001;Máquina de coser mini portátil Naku MC-001. Ideal para uso doméstico, con pedal, luz LED y alimentación por corriente o pilas.
+maquina-de-coser-mc-002-mini-12-puntadas-con-pedal-y-luz-led-z2jap;Máquina de Coser MC-002 Mini 12 Puntadas con Pedal y Luz LED;Hogar > Máquinas de coser;Mariana;;MC-002;áquina de coser compacta y portátil con 12 puntadas, pedal, luz LED y auto bobinado. Ideal para principiantes y uso doméstico.
+escritorio-electrico-regulable-135x60-cm-sit-stand-automatico-blanco-q1r2y;Escritorio Eléctrico Sit-Stand 135x60 Blanco;Hogar > Escritorios ergonómicos;Martin;Mariana;22D-BEL BLANCO (MODELO ELECTRICO);Escritorio eléctrico regulable 135x60cm. Altura ajustable 73-120cm con motor. 2 memorias preestablecidas. Soporta 70kg. Escritorio sit-stand para home office.
+escritorio-regulable-manual-135x60-cm-sit-stand-con-manivela-blanco-oqowc;Escritorio Regulable Manual 135x60 cm - Sit-Stand con Manivela Blanco;Hogar > Escritorios ergonómicos;Martin;Mariana;22D-B BLANCO;Escritorio ergonómico regulable en altura con manivela. Mejora la postura y comodidad en oficina o gaming. Envíos a todo el país.</script>
+
 <script>
-const DATA = {"meta":{"ventana":"jun 2025 – jun 2026","updated":"2026-06-16"},"totales":{"facturacion":4157581386,"cobertura":91.5,"ordenes":99028,"ticket":41984},"personas":[{"key":"Juan","facturacion":1426774575,"share":34.3,"ml":1367601509,"tn":59173066,"unidades":36658,"ordenes":33037,"ticket":43189,"cuotas":3.1,"familias":[{"familia":"Móviles con Brazo","facturacion":834141609,"sharePct":58.5,"unidades":23453,"precioProm":35567,"nProd":22,"productos":[{"nombre":"Soporte Articulado Naku SP-446 de Pared Para TV de 32\" a 75\"","sku":"SP-446","facturacion":187195142,"unidades":4727,"precioProm":39601},{"nombre":"Soporte Articulado Naku SH-446 de Pared Para TV de 32\" a 75\"","sku":"SH-446","facturacion":177049284,"unidades":4514,"precioProm":39222},{"nombre":"Soporte Articulado Naku SE-446 de Pared Para TV de 20\" a 75\"","sku":"SE-446","facturacion":128270199,"unidades":4145,"precioProm":30946},{"nombre":"Soporte Articulado Naku SSP-223L de Pared Para TV de 15\" a 55\"","sku":"SSP-223L","facturacion":70658048,"unidades":2330,"precioProm":30325}]},{"familia":"Herramientas y equipamiento","facturacion":263856704,"sharePct":18.5,"unidades":2835,"precioProm":93071,"nProd":6,"productos":[{"nombre":"Escalera Naku ESC-001 de Aluminio Multipropósito 12 Escalones","sku":"ESC-001","facturacion":130410790,"unidades":1472,"precioProm":88594},{"nombre":"Escalera Naku ESC-003 de Aluminio Telescópica 9 Escalones 3,5 m","sku":"ESC-003","facturacion":77233659,"unidades":869,"precioProm":88876},{"nombre":"Escalera Naku ESC-002 de Aluminio Multipropósito 16 Escalones","sku":"ESC-002","facturacion":52566391,"unidades":429,"precioProm":122532},{"nombre":"Escalera Plegable y Compacta de Aluminio 2x4 Peldaños","sku":"ESC-005","facturacion":2284082,"unidades":22,"precioProm":103822}]},{"familia":"Rack y Stand TV","facturacion":116721938,"sharePct":8.2,"unidades":1727,"precioProm":67587,"nProd":3,"productos":[{"nombre":"Rack MTV-001 de Mesa Para TV de 32\" a 75\" con Base de Vidrio","sku":"MTV-001","facturacion":52440147,"unidades":1150,"precioProm":45600},{"nombre":"Rack Pedestal Naku TVR-004 con Ruedas y Estantes","sku":"TVR-004","facturacion":52281840,"unidades":448,"precioProm":116701},{"nombre":"Soporte Rack Naku TVR-001 con Ruedas y Estante","sku":"TVR-001","facturacion":11999951,"unidades":129,"precioProm":93023}]},{"familia":"Seguridad y vigilancia","facturacion":62031534,"sharePct":4.3,"unidades":1138,"precioProm":54509,"nProd":21,"productos":[{"nombre":"Kit x2 Cámara Seguridad Doble Lente WiFi Naku CV-002 Full HD 3MP","sku":"CV-002 X2","facturacion":12716987,"unidades":178,"precioProm":71444},{"nombre":"Kit x3 Cámara Seguridad WiFi Naku CV-001 Full HD 4MP","sku":"CV-001 X3","facturacion":11525168,"unidades":135,"precioProm":85372},{"nombre":"Kit x3 Cámara Seguridad Doble Lente WiFi Naku CV-002 3MP","sku":"CV-002 X3","facturacion":9561749,"unidades":93,"precioProm":102815},{"nombre":"Kit x2 Cámara Seguridad WiFi Naku CV-001 Full HD 4MP","sku":"CV-001 X2","facturacion":7645188,"unidades":135,"precioProm":56631}]},{"familia":"Techo","facturacion":57172472,"sharePct":4,"unidades":1272,"precioProm":44947,"nProd":4,"productos":[{"nombre":"Soporte de Techo Naku PLB-CE344 Para TV de 32\" a 75\"","sku":"PLB-CE344","facturacion":32826492,"unidades":809,"precioProm":40577},{"nombre":"Soporte de Techo Eléctrico Smart para TV hasta 75\"","sku":"ST-466","facturacion":13349249,"unidades":49,"precioProm":272434},{"nombre":"Soporte de Techo Naku S-504A Para TV de 15\" a 48\"","sku":"S-504A","facturacion":7372225,"unidades":305,"precioProm":24171},{"nombre":"Soporte de Techo Naku S-CM244 Rebatible 17\" a 60\"","sku":"S-CM244","facturacion":3624506,"unidades":109,"precioProm":33252}]}]},{"key":"Mariana","facturacion":655590231,"share":15.8,"ml":604534206,"tn":51056025,"unidades":19065,"ordenes":17558,"ticket":37300,"cuotas":3.4,"familias":[{"familia":"Máquinas de coser","facturacion":272193150,"sharePct":41.5,"unidades":7518,"precioProm":36206,"nProd":3,"productos":[{"nombre":"Máquina de Coser MC-002 Mini 12 Puntadas con Pedal y Luz LED","sku":"MC-002","facturacion":247739386,"unidades":6507,"precioProm":38073},{"nombre":"Mini Máquina de Coser Naku MC-001 Portátil 1 Puntada","sku":"MC-001","facturacion":12950791,"unidades":804,"precioProm":16108},{"nombre":"Máquina de Coser Naku MC-003 Profesional 12 Puntadas","sku":"MC-003","facturacion":11502973,"unidades":207,"precioProm":55570}]},{"familia":"Organizadores multiuso","facturacion":208489745,"sharePct":31.8,"unidades":6827,"precioProm":30539,"nProd":14,"productos":[{"nombre":"Carrito Organizador Auxiliar con Ruedas","sku":"ORG-004","facturacion":34964620,"unidades":1666,"precioProm":20987},{"nombre":"Estantería Plegable 5 niveles con Ruedas","sku":"ORG-008","facturacion":29161799,"unidades":446,"precioProm":65385},{"nombre":"Estantería Plegable 3 niveles con Ruedas Naku ORG-006","sku":"ORG-006","facturacion":28888252,"unidades":561,"precioProm":51494},{"nombre":"Carrito Organizador Auxiliar con Ruedas (Blanco)","sku":"ORG-004 BLANCO","facturacion":23492531,"unidades":1154,"precioProm":20357}]},{"familia":"Organización de ropa","facturacion":117673522,"sharePct":17.9,"unidades":3207,"precioProm":36693,"nProd":16,"productos":[{"nombre":"Organizador Zapatero Giratorio Naku ZAP-003 Melamina Blanco","sku":"ZAP-003","facturacion":53113830,"unidades":255,"precioProm":208290},{"nombre":"Perchero Metálico con Zapatero y Doble Barra Naku PER-005","sku":"PER-005","facturacion":10374207,"unidades":294,"precioProm":35286},{"nombre":"Organizador Botas y Zapatos 9 Niveles 27 Pares (Negro)","sku":"ZAP-002","facturacion":9439483,"unidades":485,"precioProm":19463},{"nombre":"Organizador Botas y Zapatos 9 Niveles 27 Pares (Gris)","sku":"ZAP-001","facturacion":9026577,"unidades":495,"precioProm":18236}]},{"familia":"Exterior y aire libre","facturacion":28410489,"sharePct":4.3,"unidades":101,"precioProm":281292,"nProd":4,"productos":[{"nombre":"Cama Elástica Naku CE-03 con Red 3.66m de Diámetro","sku":"CE-3","facturacion":13017315,"unidades":36,"precioProm":361592},{"nombre":"Cama Elástica Naku CE-01 con Red 1.8m de Diámetro","sku":"CE-1","facturacion":9322928,"unidades":48,"precioProm":194228},{"nombre":"Cama Elástica Naku CE-02 con Red 3.05m de Diámetro","sku":"CE-2","facturacion":5731246,"unidades":16,"precioProm":358203}]}]},{"key":"Lucho","facturacion":318216132,"share":7.7,"ml":290714739,"tn":27501393,"unidades":6034,"ordenes":5898,"ticket":53946,"cuotas":2.9,"familias":[{"familia":"Exterior y aire libre","facturacion":268520025,"sharePct":84.4,"unidades":5381,"precioProm":49902,"nProd":24,"productos":[{"nombre":"Mesa Plegable MP-002 para Camping/Playa/Pesca con Bolso","sku":"MP-002","facturacion":77305850,"unidades":2559,"precioProm":30209},{"nombre":"Combo x2 Reposera con Reposapiés + Gazebo + Mesa Chica","sku":"GZB-002 A","facturacion":49901331,"unidades":376,"precioProm":132716},{"nombre":"Mesa Plegable Picnic 180x70 cm","sku":"MP-001","facturacion":46743033,"unidades":862,"precioProm":54226},{"nombre":"Combo x2 Reposera Gravedad Cero + Gazebo + Mesa Chica","sku":"REP-001 x2","facturacion":17093020,"unidades":232,"precioProm":73677}]},{"familia":"Gazebos","facturacion":42249894,"sharePct":13.3,"unidades":351,"precioProm":120370,"nProd":2,"productos":[{"nombre":"Gazebo Naku Rojo 3x3 Plegable con Paredes Impermeable","sku":"GZB-002 R","facturacion":34301636,"unidades":260,"precioProm":131929},{"nombre":"Gazebo Impermeable 3x3 Plegable Sker Rojo","sku":"GZB-001 R","facturacion":7948258,"unidades":91,"precioProm":87343}]},{"familia":"Sombrillas","facturacion":6574309,"sharePct":2.1,"unidades":290,"precioProm":22670,"nProd":2,"productos":[{"nombre":"Sombrilla Sker Som-02 Reclinable 1,9m Reforzada Roja","sku":"SOM-2 R","facturacion":6545810,"unidades":288,"precioProm":22729},{"nombre":"Sombrilla Naku Som-001 Reclinable 1,8m Reforzada Roja","sku":"SOM-1R","facturacion":28499,"unidades":2,"precioProm":14249}]}]},{"key":"Martin","facturacion":1141568912,"share":27.5,"ml":975979876,"tn":165589036,"unidades":21686,"ordenes":19194,"ticket":59576,"cuotas":4.1,"familias":[{"familia":"Soportes de monitor","facturacion":689450450,"sharePct":60.4,"unidades":19336,"precioProm":35656,"nProd":10,"productos":[{"nombre":"Soporte Hidráulico Monitor 13-32\" VESA 75x100","sku":"SS-1032M","facturacion":293703441,"unidades":8960,"precioProm":32779},{"nombre":"Soporte Doble Monitor Hidráulico SS-C024D 13-32\"","sku":"SS-C024D","facturacion":199480483,"unidades":3354,"precioProm":59475},{"nombre":"Soporte Brazo Articulado Naku SM-C012 de Mesa 13-32\"","sku":"SM-C012","facturacion":96428523,"unidades":3805,"precioProm":25343},{"nombre":"Soporte Articulado Naku SM-C024 de Mesa 13-32\"","sku":"SM-C024","facturacion":62251855,"unidades":2128,"precioProm":29254}]},{"familia":"Escritorios ergonómicos","facturacion":428201894,"sharePct":37.5,"unidades":1634,"precioProm":262057,"nProd":17,"productos":[{"nombre":"Escritorio Eléctrico Sit-Stand 135x60 Negro","sku":"22D-BEL NEGRO","facturacion":113276202,"unidades":439,"precioProm":258032},{"nombre":"Escritorio Eléctrico Sit-Stand 135x60 Madera","sku":"22D-BEL MADERA","facturacion":80630635,"unidades":274,"precioProm":294272},{"nombre":"Estructura Eléctrica Regulable 135x60 (sin tabla)","sku":"22D-BEL/ST","facturacion":54659315,"unidades":228,"precioProm":239734},{"nombre":"Escritorio Regulable Manual 135x60 con Manivela Madera","sku":"22D-B MADERA","facturacion":44460435,"unidades":193,"precioProm":230365}]},{"familia":"Soportes de micrófono","facturacion":13583869,"sharePct":1.2,"unidades":315,"precioProm":43123,"nProd":3,"productos":[{"nombre":"Soporte de Pared Naku SB-51 Para Parlantes Pack x2","sku":"SB-51","facturacion":13091542,"unidades":290,"precioProm":45143},{"nombre":"Soporte Articulado Naku S-M1 de Mesa Para Micrófono","sku":"S-M1","facturacion":344103,"unidades":16,"precioProm":21506}]}]},{"key":"Mario","facturacion":261364471,"share":6.3,"ml":254320391,"tn":7044080,"unidades":8644,"ordenes":7888,"ticket":33035,"cuotas":2.9,"familias":[{"familia":"Comercio","facturacion":239567367,"sharePct":91.7,"unidades":8085,"precioProm":29631,"nProd":17,"productos":[{"nombre":"Gaveta Dinero Electrónica CR-001 5 Compartimientos","sku":"CR-001","facturacion":80106155,"unidades":1220,"precioProm":65661},{"nombre":"Selladora Cortadora Naku SB-400 40cm Profesional","sku":"SB-400","facturacion":52617897,"unidades":1729,"precioProm":30433},{"nombre":"Selladora Cortadora SB-200 20cm con Repuesto","sku":"SB-200","facturacion":44843542,"unidades":2683,"precioProm":16714},{"nombre":"Selladora Cortadora SB-300 30cm con Repuesto","sku":"SB-300","facturacion":20448546,"unidades":982,"precioProm":20823}]},{"familia":"Herramientas y equipamiento","facturacion":21797104,"sharePct":8.3,"unidades":559,"precioProm":38993,"nProd":5,"productos":[{"nombre":"Escalera Plegable 4 Peldaños Antideslizante","sku":"ESC-009","facturacion":6304372,"unidades":169,"precioProm":37304},{"nombre":"Escalera Plegable y Compacta de Aluminio 2x5 Peldaños","sku":"ESC-006","facturacion":5990801,"unidades":52,"precioProm":115208},{"nombre":"Escalera Plegable 3 Peldaños Antideslizante","sku":"ESC-008","facturacion":4771722,"unidades":167,"precioProm":28573}]}]}],"sinAsignar":{"facturacion":354067065,"share":8.5,"top":[{"sku":"EARTH 2S","nombre":"Balde Mopa Centrífugo Lampazo Trapeador Escurridor","facturacion":78841319,"lines":4239},{"sku":"EARTH 4S","nombre":"Trapeador Mopa Plana Sker con Balde Escurridor 360°","facturacion":75819476,"lines":4244},{"sku":"S-46B","nombre":"Soporte S-46B Basculante Para TV/Monitor 37-86\"","facturacion":25850833,"lines":1349},{"sku":"VP-001N","nombre":"Proyector Velador Luz Galaxia LED Parlante Negro","facturacion":15234308,"lines":915},{"sku":"VP-001B","nombre":"Proyector Velador Luz Galaxia LED Parlante Blanco","facturacion":14663343,"lines":839},{"sku":"SOM-1 A","nombre":"Sombrilla Som-01 Reclinable 1,8m Reforzada Azul","facturacion":13585391,"lines":600}]}};
+let DATA = {"meta":{"ventana":"jun 2025 – jun 2026","updated":"2026-06-16"},"totales":{"facturacion":4157581386,"cobertura":91.5,"ordenes":99028,"ticket":41984},"personas":[{"key":"Juan","facturacion":1426774575,"share":34.3,"ml":1367601509,"tn":59173066,"unidades":36658,"ordenes":33037,"ticket":43189,"cuotas":3.1,"familias":[{"familia":"Móviles con Brazo","facturacion":834141609,"sharePct":58.5,"unidades":23453,"precioProm":35567,"nProd":22,"productos":[{"nombre":"Soporte Articulado Naku SP-446 de Pared Para TV de 32\" a 75\"","sku":"SP-446","facturacion":187195142,"unidades":4727,"precioProm":39601},{"nombre":"Soporte Articulado Naku SH-446 de Pared Para TV de 32\" a 75\"","sku":"SH-446","facturacion":177049284,"unidades":4514,"precioProm":39222},{"nombre":"Soporte Articulado Naku SE-446 de Pared Para TV de 20\" a 75\"","sku":"SE-446","facturacion":128270199,"unidades":4145,"precioProm":30946},{"nombre":"Soporte Articulado Naku SSP-223L de Pared Para TV de 15\" a 55\"","sku":"SSP-223L","facturacion":70658048,"unidades":2330,"precioProm":30325}]},{"familia":"Herramientas y equipamiento","facturacion":263856704,"sharePct":18.5,"unidades":2835,"precioProm":93071,"nProd":6,"productos":[{"nombre":"Escalera Naku ESC-001 de Aluminio Multipropósito 12 Escalones","sku":"ESC-001","facturacion":130410790,"unidades":1472,"precioProm":88594},{"nombre":"Escalera Naku ESC-003 de Aluminio Telescópica 9 Escalones 3,5 m","sku":"ESC-003","facturacion":77233659,"unidades":869,"precioProm":88876},{"nombre":"Escalera Naku ESC-002 de Aluminio Multipropósito 16 Escalones","sku":"ESC-002","facturacion":52566391,"unidades":429,"precioProm":122532},{"nombre":"Escalera Plegable y Compacta de Aluminio 2x4 Peldaños","sku":"ESC-005","facturacion":2284082,"unidades":22,"precioProm":103822}]},{"familia":"Rack y Stand TV","facturacion":116721938,"sharePct":8.2,"unidades":1727,"precioProm":67587,"nProd":3,"productos":[{"nombre":"Rack MTV-001 de Mesa Para TV de 32\" a 75\" con Base de Vidrio","sku":"MTV-001","facturacion":52440147,"unidades":1150,"precioProm":45600},{"nombre":"Rack Pedestal Naku TVR-004 con Ruedas y Estantes","sku":"TVR-004","facturacion":52281840,"unidades":448,"precioProm":116701},{"nombre":"Soporte Rack Naku TVR-001 con Ruedas y Estante","sku":"TVR-001","facturacion":11999951,"unidades":129,"precioProm":93023}]},{"familia":"Seguridad y vigilancia","facturacion":62031534,"sharePct":4.3,"unidades":1138,"precioProm":54509,"nProd":21,"productos":[{"nombre":"Kit x2 Cámara Seguridad Doble Lente WiFi Naku CV-002 Full HD 3MP","sku":"CV-002 X2","facturacion":12716987,"unidades":178,"precioProm":71444},{"nombre":"Kit x3 Cámara Seguridad WiFi Naku CV-001 Full HD 4MP","sku":"CV-001 X3","facturacion":11525168,"unidades":135,"precioProm":85372},{"nombre":"Kit x3 Cámara Seguridad Doble Lente WiFi Naku CV-002 3MP","sku":"CV-002 X3","facturacion":9561749,"unidades":93,"precioProm":102815},{"nombre":"Kit x2 Cámara Seguridad WiFi Naku CV-001 Full HD 4MP","sku":"CV-001 X2","facturacion":7645188,"unidades":135,"precioProm":56631}]},{"familia":"Techo","facturacion":57172472,"sharePct":4,"unidades":1272,"precioProm":44947,"nProd":4,"productos":[{"nombre":"Soporte de Techo Naku PLB-CE344 Para TV de 32\" a 75\"","sku":"PLB-CE344","facturacion":32826492,"unidades":809,"precioProm":40577},{"nombre":"Soporte de Techo Eléctrico Smart para TV hasta 75\"","sku":"ST-466","facturacion":13349249,"unidades":49,"precioProm":272434},{"nombre":"Soporte de Techo Naku S-504A Para TV de 15\" a 48\"","sku":"S-504A","facturacion":7372225,"unidades":305,"precioProm":24171},{"nombre":"Soporte de Techo Naku S-CM244 Rebatible 17\" a 60\"","sku":"S-CM244","facturacion":3624506,"unidades":109,"precioProm":33252}]}]},{"key":"Mariana","facturacion":655590231,"share":15.8,"ml":604534206,"tn":51056025,"unidades":19065,"ordenes":17558,"ticket":37300,"cuotas":3.4,"familias":[{"familia":"Máquinas de coser","facturacion":272193150,"sharePct":41.5,"unidades":7518,"precioProm":36206,"nProd":3,"productos":[{"nombre":"Máquina de Coser MC-002 Mini 12 Puntadas con Pedal y Luz LED","sku":"MC-002","facturacion":247739386,"unidades":6507,"precioProm":38073},{"nombre":"Mini Máquina de Coser Naku MC-001 Portátil 1 Puntada","sku":"MC-001","facturacion":12950791,"unidades":804,"precioProm":16108},{"nombre":"Máquina de Coser Naku MC-003 Profesional 12 Puntadas","sku":"MC-003","facturacion":11502973,"unidades":207,"precioProm":55570}]},{"familia":"Organizadores multiuso","facturacion":208489745,"sharePct":31.8,"unidades":6827,"precioProm":30539,"nProd":14,"productos":[{"nombre":"Carrito Organizador Auxiliar con Ruedas","sku":"ORG-004","facturacion":34964620,"unidades":1666,"precioProm":20987},{"nombre":"Estantería Plegable 5 niveles con Ruedas","sku":"ORG-008","facturacion":29161799,"unidades":446,"precioProm":65385},{"nombre":"Estantería Plegable 3 niveles con Ruedas Naku ORG-006","sku":"ORG-006","facturacion":28888252,"unidades":561,"precioProm":51494},{"nombre":"Carrito Organizador Auxiliar con Ruedas (Blanco)","sku":"ORG-004 BLANCO","facturacion":23492531,"unidades":1154,"precioProm":20357}]},{"familia":"Organización de ropa","facturacion":117673522,"sharePct":17.9,"unidades":3207,"precioProm":36693,"nProd":16,"productos":[{"nombre":"Organizador Zapatero Giratorio Naku ZAP-003 Melamina Blanco","sku":"ZAP-003","facturacion":53113830,"unidades":255,"precioProm":208290},{"nombre":"Perchero Metálico con Zapatero y Doble Barra Naku PER-005","sku":"PER-005","facturacion":10374207,"unidades":294,"precioProm":35286},{"nombre":"Organizador Botas y Zapatos 9 Niveles 27 Pares (Negro)","sku":"ZAP-002","facturacion":9439483,"unidades":485,"precioProm":19463},{"nombre":"Organizador Botas y Zapatos 9 Niveles 27 Pares (Gris)","sku":"ZAP-001","facturacion":9026577,"unidades":495,"precioProm":18236}]},{"familia":"Exterior y aire libre","facturacion":28410489,"sharePct":4.3,"unidades":101,"precioProm":281292,"nProd":4,"productos":[{"nombre":"Cama Elástica Naku CE-03 con Red 3.66m de Diámetro","sku":"CE-3","facturacion":13017315,"unidades":36,"precioProm":361592},{"nombre":"Cama Elástica Naku CE-01 con Red 1.8m de Diámetro","sku":"CE-1","facturacion":9322928,"unidades":48,"precioProm":194228},{"nombre":"Cama Elástica Naku CE-02 con Red 3.05m de Diámetro","sku":"CE-2","facturacion":5731246,"unidades":16,"precioProm":358203}]}]},{"key":"Lucho","facturacion":318216132,"share":7.7,"ml":290714739,"tn":27501393,"unidades":6034,"ordenes":5898,"ticket":53946,"cuotas":2.9,"familias":[{"familia":"Exterior y aire libre","facturacion":268520025,"sharePct":84.4,"unidades":5381,"precioProm":49902,"nProd":24,"productos":[{"nombre":"Mesa Plegable MP-002 para Camping/Playa/Pesca con Bolso","sku":"MP-002","facturacion":77305850,"unidades":2559,"precioProm":30209},{"nombre":"Combo x2 Reposera con Reposapiés + Gazebo + Mesa Chica","sku":"GZB-002 A","facturacion":49901331,"unidades":376,"precioProm":132716},{"nombre":"Mesa Plegable Picnic 180x70 cm","sku":"MP-001","facturacion":46743033,"unidades":862,"precioProm":54226},{"nombre":"Combo x2 Reposera Gravedad Cero + Gazebo + Mesa Chica","sku":"REP-001 x2","facturacion":17093020,"unidades":232,"precioProm":73677}]},{"familia":"Gazebos","facturacion":42249894,"sharePct":13.3,"unidades":351,"precioProm":120370,"nProd":2,"productos":[{"nombre":"Gazebo Naku Rojo 3x3 Plegable con Paredes Impermeable","sku":"GZB-002 R","facturacion":34301636,"unidades":260,"precioProm":131929},{"nombre":"Gazebo Impermeable 3x3 Plegable Sker Rojo","sku":"GZB-001 R","facturacion":7948258,"unidades":91,"precioProm":87343}]},{"familia":"Sombrillas","facturacion":6574309,"sharePct":2.1,"unidades":290,"precioProm":22670,"nProd":2,"productos":[{"nombre":"Sombrilla Sker Som-02 Reclinable 1,9m Reforzada Roja","sku":"SOM-2 R","facturacion":6545810,"unidades":288,"precioProm":22729},{"nombre":"Sombrilla Naku Som-001 Reclinable 1,8m Reforzada Roja","sku":"SOM-1R","facturacion":28499,"unidades":2,"precioProm":14249}]}]},{"key":"Martin","facturacion":1141568912,"share":27.5,"ml":975979876,"tn":165589036,"unidades":21686,"ordenes":19194,"ticket":59576,"cuotas":4.1,"familias":[{"familia":"Soportes de monitor","facturacion":689450450,"sharePct":60.4,"unidades":19336,"precioProm":35656,"nProd":10,"productos":[{"nombre":"Soporte Hidráulico Monitor 13-32\" VESA 75x100","sku":"SS-1032M","facturacion":293703441,"unidades":8960,"precioProm":32779},{"nombre":"Soporte Doble Monitor Hidráulico SS-C024D 13-32\"","sku":"SS-C024D","facturacion":199480483,"unidades":3354,"precioProm":59475},{"nombre":"Soporte Brazo Articulado Naku SM-C012 de Mesa 13-32\"","sku":"SM-C012","facturacion":96428523,"unidades":3805,"precioProm":25343},{"nombre":"Soporte Articulado Naku SM-C024 de Mesa 13-32\"","sku":"SM-C024","facturacion":62251855,"unidades":2128,"precioProm":29254}]},{"familia":"Escritorios ergonómicos","facturacion":428201894,"sharePct":37.5,"unidades":1634,"precioProm":262057,"nProd":17,"productos":[{"nombre":"Escritorio Eléctrico Sit-Stand 135x60 Negro","sku":"22D-BEL NEGRO","facturacion":113276202,"unidades":439,"precioProm":258032},{"nombre":"Escritorio Eléctrico Sit-Stand 135x60 Madera","sku":"22D-BEL MADERA","facturacion":80630635,"unidades":274,"precioProm":294272},{"nombre":"Estructura Eléctrica Regulable 135x60 (sin tabla)","sku":"22D-BEL/ST","facturacion":54659315,"unidades":228,"precioProm":239734},{"nombre":"Escritorio Regulable Manual 135x60 con Manivela Madera","sku":"22D-B MADERA","facturacion":44460435,"unidades":193,"precioProm":230365}]},{"familia":"Soportes de micrófono","facturacion":13583869,"sharePct":1.2,"unidades":315,"precioProm":43123,"nProd":3,"productos":[{"nombre":"Soporte de Pared Naku SB-51 Para Parlantes Pack x2","sku":"SB-51","facturacion":13091542,"unidades":290,"precioProm":45143},{"nombre":"Soporte Articulado Naku S-M1 de Mesa Para Micrófono","sku":"S-M1","facturacion":344103,"unidades":16,"precioProm":21506}]}]},{"key":"Mario","facturacion":261364471,"share":6.3,"ml":254320391,"tn":7044080,"unidades":8644,"ordenes":7888,"ticket":33035,"cuotas":2.9,"familias":[{"familia":"Comercio","facturacion":239567367,"sharePct":91.7,"unidades":8085,"precioProm":29631,"nProd":17,"productos":[{"nombre":"Gaveta Dinero Electrónica CR-001 5 Compartimientos","sku":"CR-001","facturacion":80106155,"unidades":1220,"precioProm":65661},{"nombre":"Selladora Cortadora Naku SB-400 40cm Profesional","sku":"SB-400","facturacion":52617897,"unidades":1729,"precioProm":30433},{"nombre":"Selladora Cortadora SB-200 20cm con Repuesto","sku":"SB-200","facturacion":44843542,"unidades":2683,"precioProm":16714},{"nombre":"Selladora Cortadora SB-300 30cm con Repuesto","sku":"SB-300","facturacion":20448546,"unidades":982,"precioProm":20823}]},{"familia":"Herramientas y equipamiento","facturacion":21797104,"sharePct":8.3,"unidades":559,"precioProm":38993,"nProd":5,"productos":[{"nombre":"Escalera Plegable 4 Peldaños Antideslizante","sku":"ESC-009","facturacion":6304372,"unidades":169,"precioProm":37304},{"nombre":"Escalera Plegable y Compacta de Aluminio 2x5 Peldaños","sku":"ESC-006","facturacion":5990801,"unidades":52,"precioProm":115208},{"nombre":"Escalera Plegable 3 Peldaños Antideslizante","sku":"ESC-008","facturacion":4771722,"unidades":167,"precioProm":28573}]}]}],"sinAsignar":{"facturacion":354067065,"share":8.5,"top":[{"sku":"EARTH 2S","nombre":"Balde Mopa Centrífugo Lampazo Trapeador Escurridor","facturacion":78841319,"lines":4239},{"sku":"EARTH 4S","nombre":"Trapeador Mopa Plana Sker con Balde Escurridor 360°","facturacion":75819476,"lines":4244},{"sku":"S-46B","nombre":"Soporte S-46B Basculante Para TV/Monitor 37-86\"","facturacion":25850833,"lines":1349},{"sku":"VP-001N","nombre":"Proyector Velador Luz Galaxia LED Parlante Negro","facturacion":15234308,"lines":915},{"sku":"VP-001B","nombre":"Proyector Velador Luz Galaxia LED Parlante Blanco","facturacion":14663343,"lines":839},{"sku":"SOM-1 A","nombre":"Sombrilla Som-01 Reclinable 1,8m Reforzada Azul","facturacion":13585391,"lines":600}]}};
 
 const META = {
   Juan:   {color:'var(--juan)',   tag:'El que resuelve la casa', blurb:'Soportes de TV, escaleras, racks. Entra a arreglar o instalar algo y se va con la solución. Es el #1 en volumen y facturación.'},
@@ -291,7 +1060,7 @@ function money(n){
   return '$'+nf.format(Math.round(n));
 }
 function facFor(p){ return state.canal==='MercadoLibre'?p.ml : state.canal==='TiendaNube'?p.tn : p.facturacion; }
-const UNASSIGNED = {Ambos:354067065, MercadoLibre:346275416, TiendaNube:7791649};
+let UNASSIGNED = {Ambos:354067065, MercadoLibre:346275416, TiendaNube:7791649};
 function canalTotal(){ return DATA.personas.reduce((a,p)=>a+facFor(p),0) + UNASSIGNED[state.canal]; }
 
 // ---- Contexto: personas lede
@@ -312,7 +1081,7 @@ function renderKPIs(){
   document.getElementById('kpis').innerHTML = `
     <div class="kpi"><div class="lab">Facturación</div><div class="val tnum">${money(total)}</div><div class="sub">${canalLbl} · 14 meses</div></div>
     <div class="kpi"><div class="lab">Comprador #1</div><div class="val tnum" style="color:${PC[lead.key]}">${lead.key}</div><div class="sub">${(100*facFor(lead)/total).toFixed(1)}% de la facturación</div></div>
-    <div class="kpi"><div class="lab">Cobertura maestro</div><div class="val tnum">91,5<small>%</small></div><div class="sub">8,5% sin asignar ↓</div></div>
+    <div class="kpi"><div class="lab">Cobertura maestro</div><div class="val tnum">${String(DATA.totales.cobertura).replace('.',',')}<small>%</small></div><div class="sub">${String(DATA.sinAsignar.share).replace('.',',')}% sin asignar ↓</div></div>
     <div class="kpi"><div class="lab">Órdenes</div><div class="val tnum">${nf.format(ord)}</div><div class="sub">ticket prom. ${money(DATA.totales.ticket)}</div></div>`;
 }
 
@@ -339,7 +1108,7 @@ function renderRank(){
 function renderDetail(){
   const p=DATA.personas.find(x=>x.key===state.persona), pc=PC[p.key], m=META[p.key];
   const fams=[...p.familias].sort((a,b)=>b.facturacion-a.facturacion);
-  const maxFam=fams[0].facturacion;
+  const maxFam=fams.length?fams[0].facturacion:1;
   const famHtml=fams.map((f,i)=>{
     const prods=[...f.productos].sort((a,b)=>state.sort==='unidades'?b.unidades-a.unidades:b.facturacion-a.facturacion);
     const rows=prods.map(pr=>`<div class="prod">
@@ -377,7 +1146,7 @@ function renderDetail(){
         <button data-sort="unidades" aria-pressed="${state.sort==='unidades'}">Unidades</button>
       </div>
     </div>
-    ${famHtml}
+    ${fams.length?famHtml:'<p class="imp-note" style="margin:10px 2px">Sin ventas de este comprador en los datos cargados.</p>'}
     <p style="font-family:var(--mono);font-size:10.5px;color:var(--muted);margin:10px 2px 0;line-height:1.5">El ranking ordena por <b>facturación</b> (impacto). Cambiá a <b>Unidades</b> y mirá cómo se reordena: los productos de mucho volumen y poco precio suben, pero no son los que más facturan.</p>
     <div class="xsell">
       <div class="xs-lab">Complementarios para <b>${p.key}</b> · qué más ofrecerle</div>
@@ -416,4 +1185,166 @@ document.querySelectorAll('.seg button').forEach(b=>b.addEventListener('click',(
 }));
 
 renderLede();renderKPIs();renderRank();renderDetail();renderCov();
+</script>
+
+<!-- ===== Importer: parse en el navegador -> motor -> re-render ===== -->
+<script>
+(function(){
+  const $=id=>document.getElementById(id);
+  const panel=$('imp-panel'),btn=$('btn-import'),closeBtn=$('imp-close'),drop=$('imp-drop'),
+        filesInput=$('imp-files'),listEl=$('imp-list'),runBtn=$('imp-run'),resetBtn=$('imp-reset'),
+        statusEl=$('imp-status'),reconEl=$('imp-recon'),maestroInput=$('imp-maestro'),dlBox=$('imp-dl');
+  const BASELINE=JSON.parse(JSON.stringify(DATA)), BASELINE_UN=Object.assign({},UNASSIGNED);
+  let picked=[], maestroFile=null, lastBuild=null;
+
+  // ---- CSV parser (mismo que tools/snapshot.mjs: comillas + delim configurable)
+  function parseCSV(text,delim){
+    const rows=[];let f='',row=[],q=false;
+    for(let i=0;i<text.length;i++){const c=text[i];
+      if(q){if(c==='"'){if(text[i+1]==='"'){f+='"';i++;}else q=false;}else f+=c;}
+      else if(c==='"')q=true;
+      else if(c===delim){row.push(f);f='';}
+      else if(c==='\n'){row.push(f);rows.push(row);row=[];f='';}
+      else if(c==='\r'){}else f+=c;}
+    if(f.length||row.length){row.push(f);rows.push(row);}return rows;
+  }
+
+  // ---- transform motor -> shape del tablero (port de tools/snapshot.mjs)
+  function buildSnapshotFromLines(lines){
+    const agg=aggregate(lines);
+    const canal={};
+    for(const r of agg.porMesCanalPersona){canal[r.buyer]=canal[r.buyer]||{MercadoLibre:0,TiendaNube:0};canal[r.buyer][r.canal]+=r.facturacion;}
+    const PERS=PERSONAS.filter(p=>p!=='Sin asignar');
+    const today=new Date().toISOString().slice(0,10);
+    const snapshot={
+      meta:{ventana:DATA.meta.ventana||'—',updated:today,canales:['MercadoLibre','TiendaNube']},
+      totales:{facturacion:agg.totales.facturacion,cobertura:agg.totales.coberturaPct,
+        ordenes:agg.totales.ordenes,lineas:agg.totales.lineas,
+        ticket:agg.totales.ordenes?Math.round(agg.totales.facturacion/agg.totales.ordenes):0},
+      personas:PERS.map(p=>{const b=agg.byPersona[p],c=canal[p]||{MercadoLibre:0,TiendaNube:0};return{
+        key:p,facturacion:b.facturacion,share:b.sharePct,ml:Math.round(c.MercadoLibre),tn:Math.round(c.TiendaNube),
+        unidades:b.unidades,ordenes:b.ordenes,ticket:b.ticket,cuotas:b.cuotas,
+        familias:agg.topByPersona[p].slice(0,6).map(f=>({familia:f.familia,facturacion:f.facturacion,sharePct:f.sharePct,unidades:f.unidades,precioProm:f.precioProm,nProd:f.productos.length,
+          productos:f.productos.slice(0,4).map(x=>({nombre:x.nombre,sku:x.sku,facturacion:x.facturacion,unidades:x.unidades,precioProm:x.precioProm}))}))
+      };}),
+      sinAsignar:{facturacion:agg.byPersona['Sin asignar'].facturacion,share:agg.byPersona['Sin asignar'].sharePct,
+        top:agg.unmapped.slice(0,8).map(u=>({sku:u.sku,nombre:u.nombre,facturacion:u.facturacion,lines:u.lines}))}
+    };
+    const un=canal['Sin asignar']||{MercadoLibre:0,TiendaNube:0};
+    const unassigned={MercadoLibre:Math.round(un.MercadoLibre),TiendaNube:Math.round(un.TiendaNube),Ambos:Math.round(un.MercadoLibre+un.TiendaNube)};
+    return {snapshot,unassigned,agg};
+  }
+
+  // ---- lectores por tipo
+  async function readMeli(file){
+    const wb=XLSX.read(await file.arrayBuffer(),{type:'array'});
+    const ws=wb.Sheets['Ventas AR']||wb.Sheets[wb.SheetNames[0]];
+    const aoa=XLSX.utils.sheet_to_json(ws,{header:1,raw:true,defval:''});
+    return ingestMeli(aoa,window.__match,file.name);
+  }
+  async function readTn(file){
+    const text=new TextDecoder('windows-1252').decode(await file.arrayBuffer());
+    return ingestTn(parseCSV(text,';'),window.__match,file.name);
+  }
+
+  // ---- UI helpers
+  function classify(f){const n=f.name.toLowerCase();return n.endsWith('.xlsx')?'ml':n.endsWith('.csv')?'tn':null;}
+  function addFiles(fl){for(const f of fl){const k=classify(f);if(!k)continue;if(picked.some(p=>p.file.name===f.name&&p.file.size===f.size))continue;picked.push({file:f,kind:k});}renderList();}
+  function renderList(){
+    const ml=picked.filter(p=>p.kind==='ml').length,tn=picked.filter(p=>p.kind==='tn').length;
+    listEl.innerHTML=picked.length?picked.map((p,i)=>`<div class="imp-f"><span class="imp-tag ${p.kind}">${p.kind==='ml'?'ML':'TN'}</span> ${p.file.name} <button data-i="${i}" class="imp-rm" type="button" aria-label="Quitar">✕</button></div>`).join(''):'<div class="imp-empty">Todavía no elegiste archivos.</div>';
+    listEl.querySelectorAll('.imp-rm').forEach(b=>b.onclick=()=>{picked.splice(+b.dataset.i,1);renderList();});
+    runBtn.disabled=!(ml||tn);
+    if(picked.length&&!statusEl.classList.contains('err'))statusEl.textContent=`${ml} de ML · ${tn} de TiendaNube`;
+  }
+  function setErr(m){statusEl.className='imp-status err';statusEl.textContent=m;}
+  function setMsg(m){statusEl.className='imp-status';statusEl.innerHTML=m;}
+  function applyRender(){renderLede();renderKPIs();renderRank();renderDetail();renderCov();}
+
+  function updateStatics(){
+    const cu=DATA.personas.map(p=>p.cuotas).filter(x=>x>0).sort((a,b)=>a-b);
+    const fmt1=x=>x.toFixed(1).replace('.',',');
+    $('hard-fac').textContent=money(DATA.totales.facturacion);
+    $('hard-ord').textContent=nf.format(DATA.totales.ordenes);
+    if(cu.length)$('hard-cuo').textContent=cu[0]===cu[cu.length-1]?fmt1(cu[0]):fmt1(cu[0])+'–'+fmt1(cu[cu.length-1]);
+    $('hard-cob').textContent=String(DATA.totales.cobertura).replace('.',',')+'%';
+    let d;try{d=new Date().toLocaleDateString('es-AR');}catch(e){d=DATA.meta.updated;}
+    $('stamp').innerHTML=`ventana <b>${DATA.meta.ventana}</b><br>MercadoLibre + TiendaNube · actualizado ${d}`;
+  }
+
+  function renderRecon(dd){
+    const rows=DATA.personas.map(p=>{
+      const base=(BASELINE.personas.find(x=>x.key===p.key)||{}).facturacion||0;
+      const d=base?100*(p.facturacion-base)/base:0;
+      const cls=d>0.05?'up':d<-0.05?'dn':'';
+      const arrow=d>0.05?'▲':d<-0.05?'▼':'·';
+      return `<tr><td>${p.key}</td><td>${money(p.facturacion)}</td><td>${p.share}%</td><td class="${cls}">${arrow} ${Math.abs(d).toFixed(1)}%</td></tr>`;
+    }).join('');
+    reconEl.hidden=false;
+    reconEl.innerHTML=`<table><thead><tr><th>Comprador</th><th>Facturación</th><th>Share</th><th>vs base</th></tr></thead><tbody>${rows}</tbody>
+      <tfoot><tr><td>Sin asignar</td><td>${money(DATA.sinAsignar.facturacion)}</td><td>${DATA.sinAsignar.share}%</td><td></td></tr></tfoot></table>
+      <div class="imp-note" style="margin-top:8px">Cobertura <b>${String(DATA.totales.cobertura).replace('.',',')}%</b> · ${nf.format(DATA.totales.ordenes)} órdenes · ${nf.format(DATA.totales.lineas)} líneas · ${nf.format(dd.dups)} duplicadas ignoradas. “vs base” compara contra los números que traía el tablero.</div>`;
+  }
+
+  function download(name,text,mime){
+    const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([text],{type:mime}));a.download=name;
+    document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),2000);
+  }
+
+  async function process(){
+    statusEl.className='imp-status';
+    if(typeof XLSX==='undefined'){setErr('No se pudo cargar el lector de Excel (SheetJS). Revisá la conexión a internet y reintentá.');return;}
+    if(!picked.length){setErr('Elegí al menos un archivo.');return;}
+    runBtn.disabled=true;setMsg('Procesando… (los Excel de ML pueden tardar unos segundos)');
+    try{
+      const maestroText=maestroFile?await maestroFile.text():$('maestroCSV').textContent;
+      if(!maestroText||maestroText.indexOf('__MAESTRO')===0){throw new Error('Falta el maestro embebido (¿el archivo no pasó por el build?). Cargá el maestro en Opciones avanzadas.');}
+      window.__match=makeMatcher(buildMaestro(parseCSV(maestroText,';')));
+      let all=[];
+      for(const p of picked){
+        setMsg(`Procesando… <b>${p.file.name}</b>`);
+        try{all=all.concat(p.kind==='ml'?await readMeli(p.file):await readTn(p.file));}
+        catch(e){throw new Error(`En “${p.file.name}”: ${e.message||e}`);}
+      }
+      const dd=dedupe(all);
+      if(!dd.lines.length)throw new Error('No se leyeron ventas de los archivos. Verificá que sean los exports correctos: los .xlsx de MercadoLibre y el .csv de TiendaNube tal cual los descarga cada plataforma.');
+      lastBuild=buildSnapshotFromLines(dd.lines);
+      DATA=lastBuild.snapshot;UNASSIGNED=lastBuild.unassigned;
+      applyRender();updateStatics();renderRecon(dd);
+      dlBox.hidden=false;resetBtn.hidden=false;
+      setMsg(`✓ Tablero actualizado con ${picked.length} archivo(s).`);
+    }catch(e){setErr('No se pudo procesar. '+(e.message||e));}
+    finally{runBtn.disabled=false;}
+  }
+
+  function resetData(){
+    DATA=JSON.parse(JSON.stringify(BASELINE));UNASSIGNED=Object.assign({},BASELINE_UN);
+    applyRender();
+    $('hard-fac').textContent='$4.158 M';$('hard-ord').textContent='99.028';$('hard-cuo').textContent='3,1–4,1';$('hard-cob').textContent='91,5%';
+    $('stamp').innerHTML='ventana <b>jun 2025 – jun 2026</b><br>MercadoLibre + TiendaNube · corte 16 jun 2026';
+    reconEl.hidden=true;dlBox.hidden=true;resetBtn.hidden=true;setMsg('Volviste a los datos base del tablero.');
+  }
+
+  // ---- eventos
+  function open(){panel.hidden=false;renderList();}
+  function close(){panel.hidden=true;}
+  btn.addEventListener('click',open);
+  closeBtn.addEventListener('click',close);
+  panel.addEventListener('click',e=>{if(e.target===panel)close();});
+  document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!panel.hidden)close();});
+  filesInput.addEventListener('change',e=>{addFiles(e.target.files);filesInput.value='';});
+  maestroInput.addEventListener('change',e=>{maestroFile=e.target.files[0]||null;});
+  ;['dragenter','dragover'].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.add('drag');}));
+  ;['dragleave','drop'].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.remove('drag');}));
+  drop.addEventListener('drop',e=>{if(e.dataTransfer&&e.dataTransfer.files)addFiles(e.dataTransfer.files);});
+  runBtn.addEventListener('click',process);
+  resetBtn.addEventListener('click',resetData);
+  $('dl-snap').addEventListener('click',()=>{if(lastBuild)download('snapshot.json',JSON.stringify(lastBuild.snapshot),'application/json');});
+  $('dl-unmapped').addEventListener('click',()=>{
+    if(!lastBuild)return;
+    const esc=s=>{s=String(s==null?'':s);return /[;"\n]/.test(s)?'"'+s.replace(/"/g,'""')+'"':s;};
+    const csv='sku;nombre;ventas;facturacion\n'+lastBuild.agg.unmapped.map(u=>[esc(u.sku),esc(u.nombre),u.lines,u.facturacion].join(';')).join('\n');
+    download('unmapped_skus.csv','﻿'+csv,'text/csv;charset=utf-8');
+  });
+})();
 </script>

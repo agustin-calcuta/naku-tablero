@@ -11,14 +11,14 @@ backend en Google Apps Script guarda el histórico en un Google Sheet.
 
 ```
 src/engine.mjs        Motor puro: normaliza, matchea SKU→comprador, agrega, cross-sell.
-web/tablero-v2.html   Tablero v2 (diseño nuevo). Self-contained.
-web/api.js            Cliente del backend (guardar/leer).
+web/tablero-v2.html   SOURCE del tablero v2 (incluye el importer; placeholders de motor + maestro).
+web/api.js            Cliente del backend (guardar/leer) — opcional, Fase 2.
 docs/                 ← lo que publica GitHub Pages
   index.html          Switcher entre las 2 versiones (?v=leo / ?v=nueva)
   leo.html            Deck original de Leonardo
-  nueva.html          Copia de tablero-v2.html
+  nueva.html          BUILD self-contained de tablero-v2 (lo genera tools/build-tablero.mjs)
 appsscript/           Backend Google Apps Script (Code.gs + README de setup)
-tools/                Scripts de validación (reconcile / snapshot / baskets) — dev
+tools/                build-tablero.mjs (arma nueva.html) + validación (reconcile/snapshot/baskets)
 ```
 
 ## Deploy del tablero → URL con GitHub Pages
@@ -58,12 +58,33 @@ Es "lo de Drive". Pasos completos en **`appsscript/README.md`**. Resumen:
 Quedan **dos URLs**: la de **GitHub Pages** (el tablero que ve Leo) y la de **Apps Script
 `/exec`** (el backend que guarda/lee los datos). El tablero le pega a la segunda.
 
-## Flujo cuando lleguen los exports nuevos de Leo
+## Actualizar los datos — el botón "Actualizar datos" (Fase 1, client-side)
 
-1. `npm install` y `node tools/reconcile.mjs` → confirma que el esquema de MeLi no cambió
-   y reconcilia la facturación (los tools esperan los exports en `../Tablero Buyer Naku/`).
-2. Subir los archivos desde el tablero → se guardan en el Sheet, se recomputa el rollup.
-3. Leo elige versión → instrumentamos la ganadora con `getRollup()` (datos en vivo).
+El tablero v2 (`?v=nueva`) trae un botón **Actualizar datos** que abre un box donde Leo
+**arrastra los 3 `.xlsx` de MercadoLibre + el `.csv` de TiendaNube**. Todo se procesa
+**en el navegador** (SheetJS + el motor inline + el maestro embebido): recalcula, re-renderiza
+las mismas tarjetas, muestra una **reconciliación por comprador** y deja descargar
+`snapshot.json` + `unmapped_skus.csv`. **Nada se sube a internet** — los archivos no salen de
+la máquina de Leo, y la versión pública del tablero no cambia con lo que él cargue.
+
+- No necesita hosting extra, ni Drive, ni credenciales. Leo solo abre la URL y dropea.
+- El maestro va **embebido** en `docs/nueva.html` (lo inyecta el build). Ojo: la URL de Pages
+  es pública → ver la nota de arriba sobre no exponer cifras en producción (Fase 2).
+
+### Rebuild (cuando cambie el motor o el maestro)
+
+```bash
+node tools/build-tablero.mjs   # lee src/engine.mjs + el maestro CSV → escribe docs/nueva.html
+```
+
+El source es `web/tablero-v2.html` (con placeholders `/*__ENGINE_JS__*/` y `__MAESTRO_CSV__`).
+El maestro se lee de `../Tablero Buyer Naku/Naku - SKU+Buyer+Cat.csv` (no versionado). Después
+del build: `git add docs/nueva.html && git commit && git push` → Pages actualiza en ~1 min.
+
+### Validar el schema antes de publicar
+
+`npm install` y `node tools/reconcile.mjs` → confirma que el esquema de MeLi no cambió y
+reconcilia la facturación (los tools esperan los exports en `../Tablero Buyer Naku/`).
 
 ## Dev
 

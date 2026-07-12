@@ -1,6 +1,50 @@
 <meta charset="utf-8">
 <title>NAKU · Tablero de compradores</title>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <style>
+  /* ---------- Importer (carga de exports) ---------- */
+  .imp-btn{font-family:var(--sans);font-size:12.5px;font-weight:700;color:#fff;background:var(--accent);border:0;border-radius:7px;padding:8px 13px;cursor:pointer;white-space:nowrap;display:inline-flex;align-items:center;gap:7px}
+  .imp-btn:hover{filter:brightness(1.08)}
+  .imp-btn:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+  .imp-backdrop{position:fixed;inset:0;background:rgba(25,30,25,.34);z-index:60;display:flex;align-items:flex-start;justify-content:center;padding:6vh 16px 16px;overflow:auto}
+  .imp-backdrop[hidden]{display:none}
+  .imp-card{background:var(--panel);border:1px solid var(--line);border-radius:14px;max-width:560px;width:100%;padding:20px 22px 22px;box-shadow:0 18px 50px rgba(25,30,25,.22)}
+  .imp-head{display:flex;align-items:center;gap:12px;margin-bottom:4px}
+  .imp-head b{font-size:16px;letter-spacing:-.01em}
+  .imp-x{margin-left:auto;background:none;border:0;font-size:16px;color:var(--muted);cursor:pointer;line-height:1;padding:4px}
+  .imp-sub{font-size:13px;color:var(--muted);line-height:1.5;margin:2px 0 14px}
+  .imp-sub b{color:var(--ink)}
+  .imp-drop{display:flex;flex-direction:column;align-items:center;gap:3px;text-align:center;border:1.5px dashed var(--line);border-radius:11px;padding:22px 16px;cursor:pointer;background:var(--panel2);transition:border-color .15s,background .15s}
+  .imp-drop:hover,.imp-drop.drag{border-color:var(--accent);background:var(--accent-soft)}
+  .imp-drop-ico{font-size:26px}
+  .imp-drop-t{font-weight:700;font-size:14px}
+  .imp-drop-s{font-size:11.5px;color:var(--muted)}
+  .imp-list{margin-top:12px;display:flex;flex-direction:column;gap:5px}
+  .imp-empty{font-size:12px;color:var(--faint);font-style:italic}
+  .imp-f{display:flex;align-items:center;gap:8px;font-size:12.5px;background:var(--panel2);border:1px solid var(--line2);border-radius:7px;padding:6px 9px}
+  .imp-tag{font-family:var(--mono);font-size:9.5px;font-weight:700;color:#fff;border-radius:4px;padding:1px 6px;letter-spacing:.04em}
+  .imp-tag.ml{background:var(--juan)} .imp-tag.tn{background:var(--mariana)}
+  .imp-rm{margin-left:auto;background:none;border:0;color:var(--muted);cursor:pointer;font-size:12px;padding:2px 4px}
+  .imp-adv{margin-top:12px;font-size:12px}
+  .imp-adv summary{cursor:pointer;color:var(--muted);font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase}
+  .imp-mrow{display:block;margin:10px 0 4px;font-size:12.5px}
+  .imp-mrow input{display:block;margin-top:6px;font-size:12px}
+  .imp-note{font-size:11px;color:var(--faint);line-height:1.5}
+  .imp-actions{display:flex;gap:9px;align-items:center;margin-top:16px}
+  .imp-run{font-family:var(--sans);font-size:13px;font-weight:700;color:#fff;background:var(--ink);border:0;border-radius:8px;padding:10px 16px;cursor:pointer}
+  .imp-run:disabled{opacity:.4;cursor:default}
+  .imp-ghost{font-family:var(--sans);font-size:12px;font-weight:600;color:var(--ink);background:var(--panel2);border:1px solid var(--line);border-radius:7px;padding:8px 12px;cursor:pointer}
+  .imp-status{margin-top:12px;font-size:12.5px;color:var(--muted);min-height:1.2em;line-height:1.5}
+  .imp-status.err{color:var(--crit);font-weight:600}
+  .imp-recon{margin-top:12px;border-top:1px solid var(--line);padding-top:12px}
+  .imp-recon table{width:100%;border-collapse:collapse;font-size:12px}
+  .imp-recon th{font-family:var(--mono);font-size:9.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);text-align:right;font-weight:600;padding:3px 6px}
+  .imp-recon th:first-child{text-align:left}
+  .imp-recon td{font-family:var(--mono);text-align:right;padding:3px 6px;border-top:1px solid var(--line2)}
+  .imp-recon td:first-child{text-align:left;font-family:var(--sans);font-weight:600}
+  .imp-recon .up{color:var(--good)} .imp-recon .dn{color:var(--crit)}
+  .imp-dl{margin-top:12px;display:flex;gap:9px;flex-wrap:wrap}
+  .imp-priv{margin-top:12px;font-size:11px;color:var(--faint);line-height:1.5;display:flex;gap:6px;align-items:flex-start}
   :root{
     --paper:#F1F2EC; --panel:#FBFBF7; --panel2:#F6F7F1;
     --ink:#191E19; --muted:#6C726A; --faint:#98A08F; --line:#D5D8CD; --line2:#E4E6DE;
@@ -187,9 +231,42 @@
         <button id="tab-contexto" role="tab" aria-selected="false" aria-controls="contexto">Contexto</button>
         <button id="tab-negocio" role="tab" aria-selected="true" aria-controls="negocio">El negocio</button>
       </div>
-      <div class="stamp">ventana <b>jun 2025 – jun 2026</b><br>MercadoLibre + TiendaNube · corte 16 jun 2026</div>
+      <button id="btn-import" class="imp-btn" type="button" aria-haspopup="dialog"><span aria-hidden="true">↑</span> Actualizar datos</button>
+      <div class="stamp" id="stamp">ventana <b>jun 2025 – jun 2026</b><br>MercadoLibre + TiendaNube · corte 16 jun 2026</div>
     </div>
   </header>
+
+  <!-- ===== Importer: cargar exports y recalcular en el navegador ===== -->
+  <div id="imp-panel" class="imp-backdrop" hidden role="dialog" aria-modal="true" aria-label="Actualizar el tablero con los exports">
+    <div class="imp-card">
+      <div class="imp-head"><b>Actualizar el tablero con los exports</b><button id="imp-close" class="imp-x" type="button" aria-label="Cerrar">✕</button></div>
+      <p class="imp-sub">Arrastrá (o elegí) los <b>3 Excel de MercadoLibre</b> + el <b>CSV de TiendaNube</b>. Se recalcula todo acá, en tu navegador — <b>nada se sube a internet</b>.</p>
+      <label id="imp-drop" class="imp-drop">
+        <input id="imp-files" type="file" accept=".xlsx,.csv" multiple hidden>
+        <span class="imp-drop-ico" aria-hidden="true">📄</span>
+        <span class="imp-drop-t">Soltá los archivos acá</span>
+        <span class="imp-drop-s">o hacé clic para elegirlos · <b>.xlsx</b> = ML · <b>.csv</b> = TiendaNube</span>
+      </label>
+      <div id="imp-list" class="imp-list"></div>
+      <details class="imp-adv">
+        <summary>Opciones avanzadas</summary>
+        <label class="imp-mrow">Reemplazar el maestro SKU→comprador (opcional):
+          <input id="imp-maestro" type="file" accept=".csv"></label>
+        <span class="imp-note">Si no cargás nada, se usa el maestro incluido en el tablero.</span>
+      </details>
+      <div class="imp-actions">
+        <button id="imp-run" class="imp-run" type="button" disabled>Procesar y actualizar</button>
+        <button id="imp-reset" class="imp-ghost" type="button" hidden>Volver a los datos base</button>
+      </div>
+      <div id="imp-status" class="imp-status" role="status" aria-live="polite"></div>
+      <div id="imp-recon" class="imp-recon" hidden></div>
+      <div id="imp-dl" class="imp-dl" hidden>
+        <button id="dl-snap" class="imp-ghost" type="button">↓ snapshot.json</button>
+        <button id="dl-unmapped" class="imp-ghost" type="button">↓ unmapped_skus.csv</button>
+      </div>
+      <div class="imp-priv"><span aria-hidden="true">🔒</span> <span>Los archivos no salen de tu computadora: el procesamiento es 100% local en el navegador. La versión pública del tablero no cambia con lo que cargues acá.</span></div>
+    </div>
+  </div>
 
   <div class="sheet">
 
@@ -203,10 +280,10 @@
       </div>
 
       <div class="hard">
-        <div class="cell"><div class="n tnum">$4.158 M</div><div class="c">Facturación analizada (14 meses, ambos canales)</div></div>
-        <div class="cell"><div class="n tnum">99.028</div><div class="c">Órdenes procesadas</div></div>
-        <div class="cell"><div class="n tnum">3,1–4,1</div><div class="c">Cuotas promedio según persona</div></div>
-        <div class="cell"><div class="n tnum">91,5%</div><div class="c">De la facturación ya asignada a una persona</div></div>
+        <div class="cell"><div class="n tnum" id="hard-fac">$4.158 M</div><div class="c">Facturación analizada (14 meses, ambos canales)</div></div>
+        <div class="cell"><div class="n tnum" id="hard-ord">99.028</div><div class="c">Órdenes procesadas</div></div>
+        <div class="cell"><div class="n tnum" id="hard-cuo">3,1–4,1</div><div class="c">Cuotas promedio según persona</div></div>
+        <div class="cell"><div class="n tnum" id="hard-cob">91,5%</div><div class="c">De la facturación ya asignada a una persona</div></div>
       </div>
 
       <div class="eyebrow"><span class="lab">Los cinco</span><span class="ruler"></span></div>
@@ -253,8 +330,13 @@
   </div>
 </div>
 
+<!-- Motor de normalización/matching/agregación (inline; copia de src/engine.mjs — lo inyecta el build) -->
+<script id="engine">/*__ENGINE_JS__*/</script>
+<!-- Maestro SKU→comprador embebido (lo inyecta el build desde el CSV; editable por la agencia) -->
+<script type="text/plain" id="maestroCSV">__MAESTRO_CSV__</script>
+
 <script>
-const DATA = {"meta":{"ventana":"jun 2025 – jun 2026","updated":"2026-06-16"},"totales":{"facturacion":4157581386,"cobertura":91.5,"ordenes":99028,"ticket":41984},"personas":[{"key":"Juan","facturacion":1426774575,"share":34.3,"ml":1367601509,"tn":59173066,"unidades":36658,"ordenes":33037,"ticket":43189,"cuotas":3.1,"familias":[{"familia":"Móviles con Brazo","facturacion":834141609,"sharePct":58.5,"unidades":23453,"precioProm":35567,"nProd":22,"productos":[{"nombre":"Soporte Articulado Naku SP-446 de Pared Para TV de 32\" a 75\"","sku":"SP-446","facturacion":187195142,"unidades":4727,"precioProm":39601},{"nombre":"Soporte Articulado Naku SH-446 de Pared Para TV de 32\" a 75\"","sku":"SH-446","facturacion":177049284,"unidades":4514,"precioProm":39222},{"nombre":"Soporte Articulado Naku SE-446 de Pared Para TV de 20\" a 75\"","sku":"SE-446","facturacion":128270199,"unidades":4145,"precioProm":30946},{"nombre":"Soporte Articulado Naku SSP-223L de Pared Para TV de 15\" a 55\"","sku":"SSP-223L","facturacion":70658048,"unidades":2330,"precioProm":30325}]},{"familia":"Herramientas y equipamiento","facturacion":263856704,"sharePct":18.5,"unidades":2835,"precioProm":93071,"nProd":6,"productos":[{"nombre":"Escalera Naku ESC-001 de Aluminio Multipropósito 12 Escalones","sku":"ESC-001","facturacion":130410790,"unidades":1472,"precioProm":88594},{"nombre":"Escalera Naku ESC-003 de Aluminio Telescópica 9 Escalones 3,5 m","sku":"ESC-003","facturacion":77233659,"unidades":869,"precioProm":88876},{"nombre":"Escalera Naku ESC-002 de Aluminio Multipropósito 16 Escalones","sku":"ESC-002","facturacion":52566391,"unidades":429,"precioProm":122532},{"nombre":"Escalera Plegable y Compacta de Aluminio 2x4 Peldaños","sku":"ESC-005","facturacion":2284082,"unidades":22,"precioProm":103822}]},{"familia":"Rack y Stand TV","facturacion":116721938,"sharePct":8.2,"unidades":1727,"precioProm":67587,"nProd":3,"productos":[{"nombre":"Rack MTV-001 de Mesa Para TV de 32\" a 75\" con Base de Vidrio","sku":"MTV-001","facturacion":52440147,"unidades":1150,"precioProm":45600},{"nombre":"Rack Pedestal Naku TVR-004 con Ruedas y Estantes","sku":"TVR-004","facturacion":52281840,"unidades":448,"precioProm":116701},{"nombre":"Soporte Rack Naku TVR-001 con Ruedas y Estante","sku":"TVR-001","facturacion":11999951,"unidades":129,"precioProm":93023}]},{"familia":"Seguridad y vigilancia","facturacion":62031534,"sharePct":4.3,"unidades":1138,"precioProm":54509,"nProd":21,"productos":[{"nombre":"Kit x2 Cámara Seguridad Doble Lente WiFi Naku CV-002 Full HD 3MP","sku":"CV-002 X2","facturacion":12716987,"unidades":178,"precioProm":71444},{"nombre":"Kit x3 Cámara Seguridad WiFi Naku CV-001 Full HD 4MP","sku":"CV-001 X3","facturacion":11525168,"unidades":135,"precioProm":85372},{"nombre":"Kit x3 Cámara Seguridad Doble Lente WiFi Naku CV-002 3MP","sku":"CV-002 X3","facturacion":9561749,"unidades":93,"precioProm":102815},{"nombre":"Kit x2 Cámara Seguridad WiFi Naku CV-001 Full HD 4MP","sku":"CV-001 X2","facturacion":7645188,"unidades":135,"precioProm":56631}]},{"familia":"Techo","facturacion":57172472,"sharePct":4,"unidades":1272,"precioProm":44947,"nProd":4,"productos":[{"nombre":"Soporte de Techo Naku PLB-CE344 Para TV de 32\" a 75\"","sku":"PLB-CE344","facturacion":32826492,"unidades":809,"precioProm":40577},{"nombre":"Soporte de Techo Eléctrico Smart para TV hasta 75\"","sku":"ST-466","facturacion":13349249,"unidades":49,"precioProm":272434},{"nombre":"Soporte de Techo Naku S-504A Para TV de 15\" a 48\"","sku":"S-504A","facturacion":7372225,"unidades":305,"precioProm":24171},{"nombre":"Soporte de Techo Naku S-CM244 Rebatible 17\" a 60\"","sku":"S-CM244","facturacion":3624506,"unidades":109,"precioProm":33252}]}]},{"key":"Mariana","facturacion":655590231,"share":15.8,"ml":604534206,"tn":51056025,"unidades":19065,"ordenes":17558,"ticket":37300,"cuotas":3.4,"familias":[{"familia":"Máquinas de coser","facturacion":272193150,"sharePct":41.5,"unidades":7518,"precioProm":36206,"nProd":3,"productos":[{"nombre":"Máquina de Coser MC-002 Mini 12 Puntadas con Pedal y Luz LED","sku":"MC-002","facturacion":247739386,"unidades":6507,"precioProm":38073},{"nombre":"Mini Máquina de Coser Naku MC-001 Portátil 1 Puntada","sku":"MC-001","facturacion":12950791,"unidades":804,"precioProm":16108},{"nombre":"Máquina de Coser Naku MC-003 Profesional 12 Puntadas","sku":"MC-003","facturacion":11502973,"unidades":207,"precioProm":55570}]},{"familia":"Organizadores multiuso","facturacion":208489745,"sharePct":31.8,"unidades":6827,"precioProm":30539,"nProd":14,"productos":[{"nombre":"Carrito Organizador Auxiliar con Ruedas","sku":"ORG-004","facturacion":34964620,"unidades":1666,"precioProm":20987},{"nombre":"Estantería Plegable 5 niveles con Ruedas","sku":"ORG-008","facturacion":29161799,"unidades":446,"precioProm":65385},{"nombre":"Estantería Plegable 3 niveles con Ruedas Naku ORG-006","sku":"ORG-006","facturacion":28888252,"unidades":561,"precioProm":51494},{"nombre":"Carrito Organizador Auxiliar con Ruedas (Blanco)","sku":"ORG-004 BLANCO","facturacion":23492531,"unidades":1154,"precioProm":20357}]},{"familia":"Organización de ropa","facturacion":117673522,"sharePct":17.9,"unidades":3207,"precioProm":36693,"nProd":16,"productos":[{"nombre":"Organizador Zapatero Giratorio Naku ZAP-003 Melamina Blanco","sku":"ZAP-003","facturacion":53113830,"unidades":255,"precioProm":208290},{"nombre":"Perchero Metálico con Zapatero y Doble Barra Naku PER-005","sku":"PER-005","facturacion":10374207,"unidades":294,"precioProm":35286},{"nombre":"Organizador Botas y Zapatos 9 Niveles 27 Pares (Negro)","sku":"ZAP-002","facturacion":9439483,"unidades":485,"precioProm":19463},{"nombre":"Organizador Botas y Zapatos 9 Niveles 27 Pares (Gris)","sku":"ZAP-001","facturacion":9026577,"unidades":495,"precioProm":18236}]},{"familia":"Exterior y aire libre","facturacion":28410489,"sharePct":4.3,"unidades":101,"precioProm":281292,"nProd":4,"productos":[{"nombre":"Cama Elástica Naku CE-03 con Red 3.66m de Diámetro","sku":"CE-3","facturacion":13017315,"unidades":36,"precioProm":361592},{"nombre":"Cama Elástica Naku CE-01 con Red 1.8m de Diámetro","sku":"CE-1","facturacion":9322928,"unidades":48,"precioProm":194228},{"nombre":"Cama Elástica Naku CE-02 con Red 3.05m de Diámetro","sku":"CE-2","facturacion":5731246,"unidades":16,"precioProm":358203}]}]},{"key":"Lucho","facturacion":318216132,"share":7.7,"ml":290714739,"tn":27501393,"unidades":6034,"ordenes":5898,"ticket":53946,"cuotas":2.9,"familias":[{"familia":"Exterior y aire libre","facturacion":268520025,"sharePct":84.4,"unidades":5381,"precioProm":49902,"nProd":24,"productos":[{"nombre":"Mesa Plegable MP-002 para Camping/Playa/Pesca con Bolso","sku":"MP-002","facturacion":77305850,"unidades":2559,"precioProm":30209},{"nombre":"Combo x2 Reposera con Reposapiés + Gazebo + Mesa Chica","sku":"GZB-002 A","facturacion":49901331,"unidades":376,"precioProm":132716},{"nombre":"Mesa Plegable Picnic 180x70 cm","sku":"MP-001","facturacion":46743033,"unidades":862,"precioProm":54226},{"nombre":"Combo x2 Reposera Gravedad Cero + Gazebo + Mesa Chica","sku":"REP-001 x2","facturacion":17093020,"unidades":232,"precioProm":73677}]},{"familia":"Gazebos","facturacion":42249894,"sharePct":13.3,"unidades":351,"precioProm":120370,"nProd":2,"productos":[{"nombre":"Gazebo Naku Rojo 3x3 Plegable con Paredes Impermeable","sku":"GZB-002 R","facturacion":34301636,"unidades":260,"precioProm":131929},{"nombre":"Gazebo Impermeable 3x3 Plegable Sker Rojo","sku":"GZB-001 R","facturacion":7948258,"unidades":91,"precioProm":87343}]},{"familia":"Sombrillas","facturacion":6574309,"sharePct":2.1,"unidades":290,"precioProm":22670,"nProd":2,"productos":[{"nombre":"Sombrilla Sker Som-02 Reclinable 1,9m Reforzada Roja","sku":"SOM-2 R","facturacion":6545810,"unidades":288,"precioProm":22729},{"nombre":"Sombrilla Naku Som-001 Reclinable 1,8m Reforzada Roja","sku":"SOM-1R","facturacion":28499,"unidades":2,"precioProm":14249}]}]},{"key":"Martin","facturacion":1141568912,"share":27.5,"ml":975979876,"tn":165589036,"unidades":21686,"ordenes":19194,"ticket":59576,"cuotas":4.1,"familias":[{"familia":"Soportes de monitor","facturacion":689450450,"sharePct":60.4,"unidades":19336,"precioProm":35656,"nProd":10,"productos":[{"nombre":"Soporte Hidráulico Monitor 13-32\" VESA 75x100","sku":"SS-1032M","facturacion":293703441,"unidades":8960,"precioProm":32779},{"nombre":"Soporte Doble Monitor Hidráulico SS-C024D 13-32\"","sku":"SS-C024D","facturacion":199480483,"unidades":3354,"precioProm":59475},{"nombre":"Soporte Brazo Articulado Naku SM-C012 de Mesa 13-32\"","sku":"SM-C012","facturacion":96428523,"unidades":3805,"precioProm":25343},{"nombre":"Soporte Articulado Naku SM-C024 de Mesa 13-32\"","sku":"SM-C024","facturacion":62251855,"unidades":2128,"precioProm":29254}]},{"familia":"Escritorios ergonómicos","facturacion":428201894,"sharePct":37.5,"unidades":1634,"precioProm":262057,"nProd":17,"productos":[{"nombre":"Escritorio Eléctrico Sit-Stand 135x60 Negro","sku":"22D-BEL NEGRO","facturacion":113276202,"unidades":439,"precioProm":258032},{"nombre":"Escritorio Eléctrico Sit-Stand 135x60 Madera","sku":"22D-BEL MADERA","facturacion":80630635,"unidades":274,"precioProm":294272},{"nombre":"Estructura Eléctrica Regulable 135x60 (sin tabla)","sku":"22D-BEL/ST","facturacion":54659315,"unidades":228,"precioProm":239734},{"nombre":"Escritorio Regulable Manual 135x60 con Manivela Madera","sku":"22D-B MADERA","facturacion":44460435,"unidades":193,"precioProm":230365}]},{"familia":"Soportes de micrófono","facturacion":13583869,"sharePct":1.2,"unidades":315,"precioProm":43123,"nProd":3,"productos":[{"nombre":"Soporte de Pared Naku SB-51 Para Parlantes Pack x2","sku":"SB-51","facturacion":13091542,"unidades":290,"precioProm":45143},{"nombre":"Soporte Articulado Naku S-M1 de Mesa Para Micrófono","sku":"S-M1","facturacion":344103,"unidades":16,"precioProm":21506}]}]},{"key":"Mario","facturacion":261364471,"share":6.3,"ml":254320391,"tn":7044080,"unidades":8644,"ordenes":7888,"ticket":33035,"cuotas":2.9,"familias":[{"familia":"Comercio","facturacion":239567367,"sharePct":91.7,"unidades":8085,"precioProm":29631,"nProd":17,"productos":[{"nombre":"Gaveta Dinero Electrónica CR-001 5 Compartimientos","sku":"CR-001","facturacion":80106155,"unidades":1220,"precioProm":65661},{"nombre":"Selladora Cortadora Naku SB-400 40cm Profesional","sku":"SB-400","facturacion":52617897,"unidades":1729,"precioProm":30433},{"nombre":"Selladora Cortadora SB-200 20cm con Repuesto","sku":"SB-200","facturacion":44843542,"unidades":2683,"precioProm":16714},{"nombre":"Selladora Cortadora SB-300 30cm con Repuesto","sku":"SB-300","facturacion":20448546,"unidades":982,"precioProm":20823}]},{"familia":"Herramientas y equipamiento","facturacion":21797104,"sharePct":8.3,"unidades":559,"precioProm":38993,"nProd":5,"productos":[{"nombre":"Escalera Plegable 4 Peldaños Antideslizante","sku":"ESC-009","facturacion":6304372,"unidades":169,"precioProm":37304},{"nombre":"Escalera Plegable y Compacta de Aluminio 2x5 Peldaños","sku":"ESC-006","facturacion":5990801,"unidades":52,"precioProm":115208},{"nombre":"Escalera Plegable 3 Peldaños Antideslizante","sku":"ESC-008","facturacion":4771722,"unidades":167,"precioProm":28573}]}]}],"sinAsignar":{"facturacion":354067065,"share":8.5,"top":[{"sku":"EARTH 2S","nombre":"Balde Mopa Centrífugo Lampazo Trapeador Escurridor","facturacion":78841319,"lines":4239},{"sku":"EARTH 4S","nombre":"Trapeador Mopa Plana Sker con Balde Escurridor 360°","facturacion":75819476,"lines":4244},{"sku":"S-46B","nombre":"Soporte S-46B Basculante Para TV/Monitor 37-86\"","facturacion":25850833,"lines":1349},{"sku":"VP-001N","nombre":"Proyector Velador Luz Galaxia LED Parlante Negro","facturacion":15234308,"lines":915},{"sku":"VP-001B","nombre":"Proyector Velador Luz Galaxia LED Parlante Blanco","facturacion":14663343,"lines":839},{"sku":"SOM-1 A","nombre":"Sombrilla Som-01 Reclinable 1,8m Reforzada Azul","facturacion":13585391,"lines":600}]}};
+let DATA = {"meta":{"ventana":"jun 2025 – jun 2026","updated":"2026-06-16"},"totales":{"facturacion":4157581386,"cobertura":91.5,"ordenes":99028,"ticket":41984},"personas":[{"key":"Juan","facturacion":1426774575,"share":34.3,"ml":1367601509,"tn":59173066,"unidades":36658,"ordenes":33037,"ticket":43189,"cuotas":3.1,"familias":[{"familia":"Móviles con Brazo","facturacion":834141609,"sharePct":58.5,"unidades":23453,"precioProm":35567,"nProd":22,"productos":[{"nombre":"Soporte Articulado Naku SP-446 de Pared Para TV de 32\" a 75\"","sku":"SP-446","facturacion":187195142,"unidades":4727,"precioProm":39601},{"nombre":"Soporte Articulado Naku SH-446 de Pared Para TV de 32\" a 75\"","sku":"SH-446","facturacion":177049284,"unidades":4514,"precioProm":39222},{"nombre":"Soporte Articulado Naku SE-446 de Pared Para TV de 20\" a 75\"","sku":"SE-446","facturacion":128270199,"unidades":4145,"precioProm":30946},{"nombre":"Soporte Articulado Naku SSP-223L de Pared Para TV de 15\" a 55\"","sku":"SSP-223L","facturacion":70658048,"unidades":2330,"precioProm":30325}]},{"familia":"Herramientas y equipamiento","facturacion":263856704,"sharePct":18.5,"unidades":2835,"precioProm":93071,"nProd":6,"productos":[{"nombre":"Escalera Naku ESC-001 de Aluminio Multipropósito 12 Escalones","sku":"ESC-001","facturacion":130410790,"unidades":1472,"precioProm":88594},{"nombre":"Escalera Naku ESC-003 de Aluminio Telescópica 9 Escalones 3,5 m","sku":"ESC-003","facturacion":77233659,"unidades":869,"precioProm":88876},{"nombre":"Escalera Naku ESC-002 de Aluminio Multipropósito 16 Escalones","sku":"ESC-002","facturacion":52566391,"unidades":429,"precioProm":122532},{"nombre":"Escalera Plegable y Compacta de Aluminio 2x4 Peldaños","sku":"ESC-005","facturacion":2284082,"unidades":22,"precioProm":103822}]},{"familia":"Rack y Stand TV","facturacion":116721938,"sharePct":8.2,"unidades":1727,"precioProm":67587,"nProd":3,"productos":[{"nombre":"Rack MTV-001 de Mesa Para TV de 32\" a 75\" con Base de Vidrio","sku":"MTV-001","facturacion":52440147,"unidades":1150,"precioProm":45600},{"nombre":"Rack Pedestal Naku TVR-004 con Ruedas y Estantes","sku":"TVR-004","facturacion":52281840,"unidades":448,"precioProm":116701},{"nombre":"Soporte Rack Naku TVR-001 con Ruedas y Estante","sku":"TVR-001","facturacion":11999951,"unidades":129,"precioProm":93023}]},{"familia":"Seguridad y vigilancia","facturacion":62031534,"sharePct":4.3,"unidades":1138,"precioProm":54509,"nProd":21,"productos":[{"nombre":"Kit x2 Cámara Seguridad Doble Lente WiFi Naku CV-002 Full HD 3MP","sku":"CV-002 X2","facturacion":12716987,"unidades":178,"precioProm":71444},{"nombre":"Kit x3 Cámara Seguridad WiFi Naku CV-001 Full HD 4MP","sku":"CV-001 X3","facturacion":11525168,"unidades":135,"precioProm":85372},{"nombre":"Kit x3 Cámara Seguridad Doble Lente WiFi Naku CV-002 3MP","sku":"CV-002 X3","facturacion":9561749,"unidades":93,"precioProm":102815},{"nombre":"Kit x2 Cámara Seguridad WiFi Naku CV-001 Full HD 4MP","sku":"CV-001 X2","facturacion":7645188,"unidades":135,"precioProm":56631}]},{"familia":"Techo","facturacion":57172472,"sharePct":4,"unidades":1272,"precioProm":44947,"nProd":4,"productos":[{"nombre":"Soporte de Techo Naku PLB-CE344 Para TV de 32\" a 75\"","sku":"PLB-CE344","facturacion":32826492,"unidades":809,"precioProm":40577},{"nombre":"Soporte de Techo Eléctrico Smart para TV hasta 75\"","sku":"ST-466","facturacion":13349249,"unidades":49,"precioProm":272434},{"nombre":"Soporte de Techo Naku S-504A Para TV de 15\" a 48\"","sku":"S-504A","facturacion":7372225,"unidades":305,"precioProm":24171},{"nombre":"Soporte de Techo Naku S-CM244 Rebatible 17\" a 60\"","sku":"S-CM244","facturacion":3624506,"unidades":109,"precioProm":33252}]}]},{"key":"Mariana","facturacion":655590231,"share":15.8,"ml":604534206,"tn":51056025,"unidades":19065,"ordenes":17558,"ticket":37300,"cuotas":3.4,"familias":[{"familia":"Máquinas de coser","facturacion":272193150,"sharePct":41.5,"unidades":7518,"precioProm":36206,"nProd":3,"productos":[{"nombre":"Máquina de Coser MC-002 Mini 12 Puntadas con Pedal y Luz LED","sku":"MC-002","facturacion":247739386,"unidades":6507,"precioProm":38073},{"nombre":"Mini Máquina de Coser Naku MC-001 Portátil 1 Puntada","sku":"MC-001","facturacion":12950791,"unidades":804,"precioProm":16108},{"nombre":"Máquina de Coser Naku MC-003 Profesional 12 Puntadas","sku":"MC-003","facturacion":11502973,"unidades":207,"precioProm":55570}]},{"familia":"Organizadores multiuso","facturacion":208489745,"sharePct":31.8,"unidades":6827,"precioProm":30539,"nProd":14,"productos":[{"nombre":"Carrito Organizador Auxiliar con Ruedas","sku":"ORG-004","facturacion":34964620,"unidades":1666,"precioProm":20987},{"nombre":"Estantería Plegable 5 niveles con Ruedas","sku":"ORG-008","facturacion":29161799,"unidades":446,"precioProm":65385},{"nombre":"Estantería Plegable 3 niveles con Ruedas Naku ORG-006","sku":"ORG-006","facturacion":28888252,"unidades":561,"precioProm":51494},{"nombre":"Carrito Organizador Auxiliar con Ruedas (Blanco)","sku":"ORG-004 BLANCO","facturacion":23492531,"unidades":1154,"precioProm":20357}]},{"familia":"Organización de ropa","facturacion":117673522,"sharePct":17.9,"unidades":3207,"precioProm":36693,"nProd":16,"productos":[{"nombre":"Organizador Zapatero Giratorio Naku ZAP-003 Melamina Blanco","sku":"ZAP-003","facturacion":53113830,"unidades":255,"precioProm":208290},{"nombre":"Perchero Metálico con Zapatero y Doble Barra Naku PER-005","sku":"PER-005","facturacion":10374207,"unidades":294,"precioProm":35286},{"nombre":"Organizador Botas y Zapatos 9 Niveles 27 Pares (Negro)","sku":"ZAP-002","facturacion":9439483,"unidades":485,"precioProm":19463},{"nombre":"Organizador Botas y Zapatos 9 Niveles 27 Pares (Gris)","sku":"ZAP-001","facturacion":9026577,"unidades":495,"precioProm":18236}]},{"familia":"Exterior y aire libre","facturacion":28410489,"sharePct":4.3,"unidades":101,"precioProm":281292,"nProd":4,"productos":[{"nombre":"Cama Elástica Naku CE-03 con Red 3.66m de Diámetro","sku":"CE-3","facturacion":13017315,"unidades":36,"precioProm":361592},{"nombre":"Cama Elástica Naku CE-01 con Red 1.8m de Diámetro","sku":"CE-1","facturacion":9322928,"unidades":48,"precioProm":194228},{"nombre":"Cama Elástica Naku CE-02 con Red 3.05m de Diámetro","sku":"CE-2","facturacion":5731246,"unidades":16,"precioProm":358203}]}]},{"key":"Lucho","facturacion":318216132,"share":7.7,"ml":290714739,"tn":27501393,"unidades":6034,"ordenes":5898,"ticket":53946,"cuotas":2.9,"familias":[{"familia":"Exterior y aire libre","facturacion":268520025,"sharePct":84.4,"unidades":5381,"precioProm":49902,"nProd":24,"productos":[{"nombre":"Mesa Plegable MP-002 para Camping/Playa/Pesca con Bolso","sku":"MP-002","facturacion":77305850,"unidades":2559,"precioProm":30209},{"nombre":"Combo x2 Reposera con Reposapiés + Gazebo + Mesa Chica","sku":"GZB-002 A","facturacion":49901331,"unidades":376,"precioProm":132716},{"nombre":"Mesa Plegable Picnic 180x70 cm","sku":"MP-001","facturacion":46743033,"unidades":862,"precioProm":54226},{"nombre":"Combo x2 Reposera Gravedad Cero + Gazebo + Mesa Chica","sku":"REP-001 x2","facturacion":17093020,"unidades":232,"precioProm":73677}]},{"familia":"Gazebos","facturacion":42249894,"sharePct":13.3,"unidades":351,"precioProm":120370,"nProd":2,"productos":[{"nombre":"Gazebo Naku Rojo 3x3 Plegable con Paredes Impermeable","sku":"GZB-002 R","facturacion":34301636,"unidades":260,"precioProm":131929},{"nombre":"Gazebo Impermeable 3x3 Plegable Sker Rojo","sku":"GZB-001 R","facturacion":7948258,"unidades":91,"precioProm":87343}]},{"familia":"Sombrillas","facturacion":6574309,"sharePct":2.1,"unidades":290,"precioProm":22670,"nProd":2,"productos":[{"nombre":"Sombrilla Sker Som-02 Reclinable 1,9m Reforzada Roja","sku":"SOM-2 R","facturacion":6545810,"unidades":288,"precioProm":22729},{"nombre":"Sombrilla Naku Som-001 Reclinable 1,8m Reforzada Roja","sku":"SOM-1R","facturacion":28499,"unidades":2,"precioProm":14249}]}]},{"key":"Martin","facturacion":1141568912,"share":27.5,"ml":975979876,"tn":165589036,"unidades":21686,"ordenes":19194,"ticket":59576,"cuotas":4.1,"familias":[{"familia":"Soportes de monitor","facturacion":689450450,"sharePct":60.4,"unidades":19336,"precioProm":35656,"nProd":10,"productos":[{"nombre":"Soporte Hidráulico Monitor 13-32\" VESA 75x100","sku":"SS-1032M","facturacion":293703441,"unidades":8960,"precioProm":32779},{"nombre":"Soporte Doble Monitor Hidráulico SS-C024D 13-32\"","sku":"SS-C024D","facturacion":199480483,"unidades":3354,"precioProm":59475},{"nombre":"Soporte Brazo Articulado Naku SM-C012 de Mesa 13-32\"","sku":"SM-C012","facturacion":96428523,"unidades":3805,"precioProm":25343},{"nombre":"Soporte Articulado Naku SM-C024 de Mesa 13-32\"","sku":"SM-C024","facturacion":62251855,"unidades":2128,"precioProm":29254}]},{"familia":"Escritorios ergonómicos","facturacion":428201894,"sharePct":37.5,"unidades":1634,"precioProm":262057,"nProd":17,"productos":[{"nombre":"Escritorio Eléctrico Sit-Stand 135x60 Negro","sku":"22D-BEL NEGRO","facturacion":113276202,"unidades":439,"precioProm":258032},{"nombre":"Escritorio Eléctrico Sit-Stand 135x60 Madera","sku":"22D-BEL MADERA","facturacion":80630635,"unidades":274,"precioProm":294272},{"nombre":"Estructura Eléctrica Regulable 135x60 (sin tabla)","sku":"22D-BEL/ST","facturacion":54659315,"unidades":228,"precioProm":239734},{"nombre":"Escritorio Regulable Manual 135x60 con Manivela Madera","sku":"22D-B MADERA","facturacion":44460435,"unidades":193,"precioProm":230365}]},{"familia":"Soportes de micrófono","facturacion":13583869,"sharePct":1.2,"unidades":315,"precioProm":43123,"nProd":3,"productos":[{"nombre":"Soporte de Pared Naku SB-51 Para Parlantes Pack x2","sku":"SB-51","facturacion":13091542,"unidades":290,"precioProm":45143},{"nombre":"Soporte Articulado Naku S-M1 de Mesa Para Micrófono","sku":"S-M1","facturacion":344103,"unidades":16,"precioProm":21506}]}]},{"key":"Mario","facturacion":261364471,"share":6.3,"ml":254320391,"tn":7044080,"unidades":8644,"ordenes":7888,"ticket":33035,"cuotas":2.9,"familias":[{"familia":"Comercio","facturacion":239567367,"sharePct":91.7,"unidades":8085,"precioProm":29631,"nProd":17,"productos":[{"nombre":"Gaveta Dinero Electrónica CR-001 5 Compartimientos","sku":"CR-001","facturacion":80106155,"unidades":1220,"precioProm":65661},{"nombre":"Selladora Cortadora Naku SB-400 40cm Profesional","sku":"SB-400","facturacion":52617897,"unidades":1729,"precioProm":30433},{"nombre":"Selladora Cortadora SB-200 20cm con Repuesto","sku":"SB-200","facturacion":44843542,"unidades":2683,"precioProm":16714},{"nombre":"Selladora Cortadora SB-300 30cm con Repuesto","sku":"SB-300","facturacion":20448546,"unidades":982,"precioProm":20823}]},{"familia":"Herramientas y equipamiento","facturacion":21797104,"sharePct":8.3,"unidades":559,"precioProm":38993,"nProd":5,"productos":[{"nombre":"Escalera Plegable 4 Peldaños Antideslizante","sku":"ESC-009","facturacion":6304372,"unidades":169,"precioProm":37304},{"nombre":"Escalera Plegable y Compacta de Aluminio 2x5 Peldaños","sku":"ESC-006","facturacion":5990801,"unidades":52,"precioProm":115208},{"nombre":"Escalera Plegable 3 Peldaños Antideslizante","sku":"ESC-008","facturacion":4771722,"unidades":167,"precioProm":28573}]}]}],"sinAsignar":{"facturacion":354067065,"share":8.5,"top":[{"sku":"EARTH 2S","nombre":"Balde Mopa Centrífugo Lampazo Trapeador Escurridor","facturacion":78841319,"lines":4239},{"sku":"EARTH 4S","nombre":"Trapeador Mopa Plana Sker con Balde Escurridor 360°","facturacion":75819476,"lines":4244},{"sku":"S-46B","nombre":"Soporte S-46B Basculante Para TV/Monitor 37-86\"","facturacion":25850833,"lines":1349},{"sku":"VP-001N","nombre":"Proyector Velador Luz Galaxia LED Parlante Negro","facturacion":15234308,"lines":915},{"sku":"VP-001B","nombre":"Proyector Velador Luz Galaxia LED Parlante Blanco","facturacion":14663343,"lines":839},{"sku":"SOM-1 A","nombre":"Sombrilla Som-01 Reclinable 1,8m Reforzada Azul","facturacion":13585391,"lines":600}]}};
 
 const META = {
   Juan:   {color:'var(--juan)',   tag:'El que resuelve la casa', blurb:'Soportes de TV, escaleras, racks. Entra a arreglar o instalar algo y se va con la solución. Es el #1 en volumen y facturación.'},
@@ -291,7 +373,7 @@ function money(n){
   return '$'+nf.format(Math.round(n));
 }
 function facFor(p){ return state.canal==='MercadoLibre'?p.ml : state.canal==='TiendaNube'?p.tn : p.facturacion; }
-const UNASSIGNED = {Ambos:354067065, MercadoLibre:346275416, TiendaNube:7791649};
+let UNASSIGNED = {Ambos:354067065, MercadoLibre:346275416, TiendaNube:7791649};
 function canalTotal(){ return DATA.personas.reduce((a,p)=>a+facFor(p),0) + UNASSIGNED[state.canal]; }
 
 // ---- Contexto: personas lede
@@ -312,7 +394,7 @@ function renderKPIs(){
   document.getElementById('kpis').innerHTML = `
     <div class="kpi"><div class="lab">Facturación</div><div class="val tnum">${money(total)}</div><div class="sub">${canalLbl} · 14 meses</div></div>
     <div class="kpi"><div class="lab">Comprador #1</div><div class="val tnum" style="color:${PC[lead.key]}">${lead.key}</div><div class="sub">${(100*facFor(lead)/total).toFixed(1)}% de la facturación</div></div>
-    <div class="kpi"><div class="lab">Cobertura maestro</div><div class="val tnum">91,5<small>%</small></div><div class="sub">8,5% sin asignar ↓</div></div>
+    <div class="kpi"><div class="lab">Cobertura maestro</div><div class="val tnum">${String(DATA.totales.cobertura).replace('.',',')}<small>%</small></div><div class="sub">${String(DATA.sinAsignar.share).replace('.',',')}% sin asignar ↓</div></div>
     <div class="kpi"><div class="lab">Órdenes</div><div class="val tnum">${nf.format(ord)}</div><div class="sub">ticket prom. ${money(DATA.totales.ticket)}</div></div>`;
 }
 
@@ -339,7 +421,7 @@ function renderRank(){
 function renderDetail(){
   const p=DATA.personas.find(x=>x.key===state.persona), pc=PC[p.key], m=META[p.key];
   const fams=[...p.familias].sort((a,b)=>b.facturacion-a.facturacion);
-  const maxFam=fams[0].facturacion;
+  const maxFam=fams.length?fams[0].facturacion:1;
   const famHtml=fams.map((f,i)=>{
     const prods=[...f.productos].sort((a,b)=>state.sort==='unidades'?b.unidades-a.unidades:b.facturacion-a.facturacion);
     const rows=prods.map(pr=>`<div class="prod">
@@ -377,7 +459,7 @@ function renderDetail(){
         <button data-sort="unidades" aria-pressed="${state.sort==='unidades'}">Unidades</button>
       </div>
     </div>
-    ${famHtml}
+    ${fams.length?famHtml:'<p class="imp-note" style="margin:10px 2px">Sin ventas de este comprador en los datos cargados.</p>'}
     <p style="font-family:var(--mono);font-size:10.5px;color:var(--muted);margin:10px 2px 0;line-height:1.5">El ranking ordena por <b>facturación</b> (impacto). Cambiá a <b>Unidades</b> y mirá cómo se reordena: los productos de mucho volumen y poco precio suben, pero no son los que más facturan.</p>
     <div class="xsell">
       <div class="xs-lab">Complementarios para <b>${p.key}</b> · qué más ofrecerle</div>
@@ -416,4 +498,166 @@ document.querySelectorAll('.seg button').forEach(b=>b.addEventListener('click',(
 }));
 
 renderLede();renderKPIs();renderRank();renderDetail();renderCov();
+</script>
+
+<!-- ===== Importer: parse en el navegador -> motor -> re-render ===== -->
+<script>
+(function(){
+  const $=id=>document.getElementById(id);
+  const panel=$('imp-panel'),btn=$('btn-import'),closeBtn=$('imp-close'),drop=$('imp-drop'),
+        filesInput=$('imp-files'),listEl=$('imp-list'),runBtn=$('imp-run'),resetBtn=$('imp-reset'),
+        statusEl=$('imp-status'),reconEl=$('imp-recon'),maestroInput=$('imp-maestro'),dlBox=$('imp-dl');
+  const BASELINE=JSON.parse(JSON.stringify(DATA)), BASELINE_UN=Object.assign({},UNASSIGNED);
+  let picked=[], maestroFile=null, lastBuild=null;
+
+  // ---- CSV parser (mismo que tools/snapshot.mjs: comillas + delim configurable)
+  function parseCSV(text,delim){
+    const rows=[];let f='',row=[],q=false;
+    for(let i=0;i<text.length;i++){const c=text[i];
+      if(q){if(c==='"'){if(text[i+1]==='"'){f+='"';i++;}else q=false;}else f+=c;}
+      else if(c==='"')q=true;
+      else if(c===delim){row.push(f);f='';}
+      else if(c==='\n'){row.push(f);rows.push(row);row=[];f='';}
+      else if(c==='\r'){}else f+=c;}
+    if(f.length||row.length){row.push(f);rows.push(row);}return rows;
+  }
+
+  // ---- transform motor -> shape del tablero (port de tools/snapshot.mjs)
+  function buildSnapshotFromLines(lines){
+    const agg=aggregate(lines);
+    const canal={};
+    for(const r of agg.porMesCanalPersona){canal[r.buyer]=canal[r.buyer]||{MercadoLibre:0,TiendaNube:0};canal[r.buyer][r.canal]+=r.facturacion;}
+    const PERS=PERSONAS.filter(p=>p!=='Sin asignar');
+    const today=new Date().toISOString().slice(0,10);
+    const snapshot={
+      meta:{ventana:DATA.meta.ventana||'—',updated:today,canales:['MercadoLibre','TiendaNube']},
+      totales:{facturacion:agg.totales.facturacion,cobertura:agg.totales.coberturaPct,
+        ordenes:agg.totales.ordenes,lineas:agg.totales.lineas,
+        ticket:agg.totales.ordenes?Math.round(agg.totales.facturacion/agg.totales.ordenes):0},
+      personas:PERS.map(p=>{const b=agg.byPersona[p],c=canal[p]||{MercadoLibre:0,TiendaNube:0};return{
+        key:p,facturacion:b.facturacion,share:b.sharePct,ml:Math.round(c.MercadoLibre),tn:Math.round(c.TiendaNube),
+        unidades:b.unidades,ordenes:b.ordenes,ticket:b.ticket,cuotas:b.cuotas,
+        familias:agg.topByPersona[p].slice(0,6).map(f=>({familia:f.familia,facturacion:f.facturacion,sharePct:f.sharePct,unidades:f.unidades,precioProm:f.precioProm,nProd:f.productos.length,
+          productos:f.productos.slice(0,4).map(x=>({nombre:x.nombre,sku:x.sku,facturacion:x.facturacion,unidades:x.unidades,precioProm:x.precioProm}))}))
+      };}),
+      sinAsignar:{facturacion:agg.byPersona['Sin asignar'].facturacion,share:agg.byPersona['Sin asignar'].sharePct,
+        top:agg.unmapped.slice(0,8).map(u=>({sku:u.sku,nombre:u.nombre,facturacion:u.facturacion,lines:u.lines}))}
+    };
+    const un=canal['Sin asignar']||{MercadoLibre:0,TiendaNube:0};
+    const unassigned={MercadoLibre:Math.round(un.MercadoLibre),TiendaNube:Math.round(un.TiendaNube),Ambos:Math.round(un.MercadoLibre+un.TiendaNube)};
+    return {snapshot,unassigned,agg};
+  }
+
+  // ---- lectores por tipo
+  async function readMeli(file){
+    const wb=XLSX.read(await file.arrayBuffer(),{type:'array'});
+    const ws=wb.Sheets['Ventas AR']||wb.Sheets[wb.SheetNames[0]];
+    const aoa=XLSX.utils.sheet_to_json(ws,{header:1,raw:true,defval:''});
+    return ingestMeli(aoa,window.__match,file.name);
+  }
+  async function readTn(file){
+    const text=new TextDecoder('windows-1252').decode(await file.arrayBuffer());
+    return ingestTn(parseCSV(text,';'),window.__match,file.name);
+  }
+
+  // ---- UI helpers
+  function classify(f){const n=f.name.toLowerCase();return n.endsWith('.xlsx')?'ml':n.endsWith('.csv')?'tn':null;}
+  function addFiles(fl){for(const f of fl){const k=classify(f);if(!k)continue;if(picked.some(p=>p.file.name===f.name&&p.file.size===f.size))continue;picked.push({file:f,kind:k});}renderList();}
+  function renderList(){
+    const ml=picked.filter(p=>p.kind==='ml').length,tn=picked.filter(p=>p.kind==='tn').length;
+    listEl.innerHTML=picked.length?picked.map((p,i)=>`<div class="imp-f"><span class="imp-tag ${p.kind}">${p.kind==='ml'?'ML':'TN'}</span> ${p.file.name} <button data-i="${i}" class="imp-rm" type="button" aria-label="Quitar">✕</button></div>`).join(''):'<div class="imp-empty">Todavía no elegiste archivos.</div>';
+    listEl.querySelectorAll('.imp-rm').forEach(b=>b.onclick=()=>{picked.splice(+b.dataset.i,1);renderList();});
+    runBtn.disabled=!(ml||tn);
+    if(picked.length&&!statusEl.classList.contains('err'))statusEl.textContent=`${ml} de ML · ${tn} de TiendaNube`;
+  }
+  function setErr(m){statusEl.className='imp-status err';statusEl.textContent=m;}
+  function setMsg(m){statusEl.className='imp-status';statusEl.innerHTML=m;}
+  function applyRender(){renderLede();renderKPIs();renderRank();renderDetail();renderCov();}
+
+  function updateStatics(){
+    const cu=DATA.personas.map(p=>p.cuotas).filter(x=>x>0).sort((a,b)=>a-b);
+    const fmt1=x=>x.toFixed(1).replace('.',',');
+    $('hard-fac').textContent=money(DATA.totales.facturacion);
+    $('hard-ord').textContent=nf.format(DATA.totales.ordenes);
+    if(cu.length)$('hard-cuo').textContent=cu[0]===cu[cu.length-1]?fmt1(cu[0]):fmt1(cu[0])+'–'+fmt1(cu[cu.length-1]);
+    $('hard-cob').textContent=String(DATA.totales.cobertura).replace('.',',')+'%';
+    let d;try{d=new Date().toLocaleDateString('es-AR');}catch(e){d=DATA.meta.updated;}
+    $('stamp').innerHTML=`ventana <b>${DATA.meta.ventana}</b><br>MercadoLibre + TiendaNube · actualizado ${d}`;
+  }
+
+  function renderRecon(dd){
+    const rows=DATA.personas.map(p=>{
+      const base=(BASELINE.personas.find(x=>x.key===p.key)||{}).facturacion||0;
+      const d=base?100*(p.facturacion-base)/base:0;
+      const cls=d>0.05?'up':d<-0.05?'dn':'';
+      const arrow=d>0.05?'▲':d<-0.05?'▼':'·';
+      return `<tr><td>${p.key}</td><td>${money(p.facturacion)}</td><td>${p.share}%</td><td class="${cls}">${arrow} ${Math.abs(d).toFixed(1)}%</td></tr>`;
+    }).join('');
+    reconEl.hidden=false;
+    reconEl.innerHTML=`<table><thead><tr><th>Comprador</th><th>Facturación</th><th>Share</th><th>vs base</th></tr></thead><tbody>${rows}</tbody>
+      <tfoot><tr><td>Sin asignar</td><td>${money(DATA.sinAsignar.facturacion)}</td><td>${DATA.sinAsignar.share}%</td><td></td></tr></tfoot></table>
+      <div class="imp-note" style="margin-top:8px">Cobertura <b>${String(DATA.totales.cobertura).replace('.',',')}%</b> · ${nf.format(DATA.totales.ordenes)} órdenes · ${nf.format(DATA.totales.lineas)} líneas · ${nf.format(dd.dups)} duplicadas ignoradas. “vs base” compara contra los números que traía el tablero.</div>`;
+  }
+
+  function download(name,text,mime){
+    const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([text],{type:mime}));a.download=name;
+    document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),2000);
+  }
+
+  async function process(){
+    statusEl.className='imp-status';
+    if(typeof XLSX==='undefined'){setErr('No se pudo cargar el lector de Excel (SheetJS). Revisá la conexión a internet y reintentá.');return;}
+    if(!picked.length){setErr('Elegí al menos un archivo.');return;}
+    runBtn.disabled=true;setMsg('Procesando… (los Excel de ML pueden tardar unos segundos)');
+    try{
+      const maestroText=maestroFile?await maestroFile.text():$('maestroCSV').textContent;
+      if(!maestroText||maestroText.indexOf('__MAESTRO')===0){throw new Error('Falta el maestro embebido (¿el archivo no pasó por el build?). Cargá el maestro en Opciones avanzadas.');}
+      window.__match=makeMatcher(buildMaestro(parseCSV(maestroText,';')));
+      let all=[];
+      for(const p of picked){
+        setMsg(`Procesando… <b>${p.file.name}</b>`);
+        try{all=all.concat(p.kind==='ml'?await readMeli(p.file):await readTn(p.file));}
+        catch(e){throw new Error(`En “${p.file.name}”: ${e.message||e}`);}
+      }
+      const dd=dedupe(all);
+      if(!dd.lines.length)throw new Error('No se leyeron ventas de los archivos. Verificá que sean los exports correctos: los .xlsx de MercadoLibre y el .csv de TiendaNube tal cual los descarga cada plataforma.');
+      lastBuild=buildSnapshotFromLines(dd.lines);
+      DATA=lastBuild.snapshot;UNASSIGNED=lastBuild.unassigned;
+      applyRender();updateStatics();renderRecon(dd);
+      dlBox.hidden=false;resetBtn.hidden=false;
+      setMsg(`✓ Tablero actualizado con ${picked.length} archivo(s).`);
+    }catch(e){setErr('No se pudo procesar. '+(e.message||e));}
+    finally{runBtn.disabled=false;}
+  }
+
+  function resetData(){
+    DATA=JSON.parse(JSON.stringify(BASELINE));UNASSIGNED=Object.assign({},BASELINE_UN);
+    applyRender();
+    $('hard-fac').textContent='$4.158 M';$('hard-ord').textContent='99.028';$('hard-cuo').textContent='3,1–4,1';$('hard-cob').textContent='91,5%';
+    $('stamp').innerHTML='ventana <b>jun 2025 – jun 2026</b><br>MercadoLibre + TiendaNube · corte 16 jun 2026';
+    reconEl.hidden=true;dlBox.hidden=true;resetBtn.hidden=true;setMsg('Volviste a los datos base del tablero.');
+  }
+
+  // ---- eventos
+  function open(){panel.hidden=false;renderList();}
+  function close(){panel.hidden=true;}
+  btn.addEventListener('click',open);
+  closeBtn.addEventListener('click',close);
+  panel.addEventListener('click',e=>{if(e.target===panel)close();});
+  document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!panel.hidden)close();});
+  filesInput.addEventListener('change',e=>{addFiles(e.target.files);filesInput.value='';});
+  maestroInput.addEventListener('change',e=>{maestroFile=e.target.files[0]||null;});
+  ;['dragenter','dragover'].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.add('drag');}));
+  ;['dragleave','drop'].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.remove('drag');}));
+  drop.addEventListener('drop',e=>{if(e.dataTransfer&&e.dataTransfer.files)addFiles(e.dataTransfer.files);});
+  runBtn.addEventListener('click',process);
+  resetBtn.addEventListener('click',resetData);
+  $('dl-snap').addEventListener('click',()=>{if(lastBuild)download('snapshot.json',JSON.stringify(lastBuild.snapshot),'application/json');});
+  $('dl-unmapped').addEventListener('click',()=>{
+    if(!lastBuild)return;
+    const esc=s=>{s=String(s==null?'':s);return /[;"\n]/.test(s)?'"'+s.replace(/"/g,'""')+'"':s;};
+    const csv='sku;nombre;ventas;facturacion\n'+lastBuild.agg.unmapped.map(u=>[esc(u.sku),esc(u.nombre),u.lines,u.facturacion].join(';')).join('\n');
+    download('unmapped_skus.csv','﻿'+csv,'text/csv;charset=utf-8');
+  });
+})();
 </script>
