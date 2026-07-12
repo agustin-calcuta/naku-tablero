@@ -59,6 +59,22 @@
   .flt-presets button{font-family:var(--mono);font-size:11px;font-weight:600;color:var(--muted);background:none;border:0;padding:5px 10px;border-radius:5px;cursor:pointer}
   .flt-presets button[aria-pressed="true"]{background:var(--ink);color:var(--paper)}
   .flt-presets button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+  /* gráfico mensual */
+  .chart-mes{margin:16px 0 2px;background:var(--panel);border:1px solid var(--line);border-radius:11px;padding:14px 16px 10px}
+  .chart-mes[hidden]{display:none}
+  .chart-mes svg{display:block}
+  .chart-cap{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;font-family:var(--mono);font-size:10.5px;color:var(--muted);margin-top:4px}
+  .chart-cap b{color:var(--ink)}
+  /* forma de envío (en el detalle) */
+  .envio{margin:14px 0 2px}
+  .envio-h{font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+  .envio-h span{letter-spacing:0;text-transform:none}
+  .envio-bar{display:flex;height:9px;border-radius:5px;overflow:hidden;background:var(--line2)}
+  .envio-bar i{height:100%}
+  .envio-leg{display:flex;flex-wrap:wrap;gap:10px;margin-top:7px;font-size:11px;color:var(--muted)}
+  .envio-leg span{display:flex;align-items:center;gap:5px}
+  .envio-leg i{width:9px;height:9px;border-radius:2px}
+  .envio-leg b{color:var(--ink);font-family:var(--mono)}
   :root{
     --paper:#F1F2EC; --panel:#FBFBF7; --panel2:#F6F7F1;
     --ink:#191E19; --muted:#6C726A; --faint:#98A08F; --line:#D5D8CD; --line2:#E4E6DE;
@@ -340,6 +356,8 @@
 
       <div class="kpis" id="kpis"></div>
 
+      <div id="chart-mes" class="chart-mes"></div>
+
       <div class="grid2">
         <div>
           <div class="rank" id="rank"></div>
@@ -471,6 +489,10 @@ function renderDetail(){
     </details>`;
   }).join('');
 
+  const ENVCOL={Flex:'var(--accent)',Colecta:'var(--juan)',Full:'var(--lucho)','Correo/Andreani':'var(--mariana)','Retiro/Acuerdo':'var(--mario)','Envío a domicilio':'var(--faint)',Otros:'var(--line2)'};
+  const env=(p.envio||[]).filter(e=>e.bucket!=='Sin dato'&&e.pct>=1), envTot=env.reduce((a,e)=>a+e.pct,0)||1;
+  const envBlock=env.length?`<div class="envio"><div class="envio-h">🚚 Forma de envío <span>· ${nf.format(p.ordenes)} órdenes</span></div><div class="envio-bar">${env.map(e=>`<i style="width:${(100*e.pct/envTot).toFixed(1)}%;background:${ENVCOL[e.bucket]||'var(--muted)'}" title="${e.bucket}: ${e.pct}%"></i>`).join('')}</div><div class="envio-leg">${env.slice(0,5).map(e=>`<span><i style="background:${ENVCOL[e.bucket]||'var(--muted)'}"></i>${e.bucket} <b>${String(e.pct).replace('.',',')}%</b></span>`).join('')}</div></div>`:'';
+  const combos=(p.bundles&&p.bundles.length)?p.bundles.map(b=>({h:b.hero,s:b.sug,n:b.n})):(XSELL[p.key]||[]);
   document.getElementById('detail').style.setProperty('--pc',pc);
   document.getElementById('detail').innerHTML = `
     <div class="dt-head"><span class="dot"></span><div><h3>${p.key}</h3><div class="tag">${m.tag}</div></div></div>
@@ -482,6 +504,7 @@ function renderDetail(){
       <div><div class="l">Órdenes</div><div class="v">${nf.format(p.ordenes)}</div></div>
       <div><div class="l">ML / TN</div><div class="v" style="font-size:12.5px">${money(p.ml)} · ${money(p.tn)}</div></div>
     </div>
+    ${envBlock}
     <div class="fam-head"><span class="t">Top familias · clic para abrir</span>
       <div class="sortbtns" role="group" aria-label="Ordenar productos" style="--pc:${pc}">
         <button data-sort="facturacion" aria-pressed="${state.sort==='facturacion'}">Facturación</button>
@@ -491,8 +514,8 @@ function renderDetail(){
     ${fams.length?famHtml:'<p class="imp-note" style="margin:10px 2px">Sin ventas de este comprador en los datos cargados.</p>'}
     <p style="font-family:var(--mono);font-size:10.5px;color:var(--muted);margin:10px 2px 0;line-height:1.5">El ranking ordena por <b>facturación</b> (impacto). Cambiá a <b>Unidades</b> y mirá cómo se reordena: los productos de mucho volumen y poco precio suben, pero no son los que más facturan.</p>
     <div class="xsell">
-      <div class="xs-lab">Complementarios para <b>${p.key}</b> · qué más ofrecerle</div>
-      ${(XSELL[p.key]||[]).map(x=>`<div class="bundle"><div class="bx"><span class="h">compra</span> ${x.s ? `${x.h} <span class="arw">→</span> <span class="s">${x.s}</span>`:x.h}</div><div class="cnt">${x.n}× juntos</div></div>`).join('')}
+      <div class="xs-lab">Combos naturales de <b>${p.key}</b> · co-compra real en la misma orden</div>
+      ${combos.length?combos.map(x=>`<div class="bundle"><div class="bx"><span class="h">compra</span> ${x.s ? `${x.h} <span class="arw">→</span> <span class="s">${x.s}</span>`:x.h}</div><div class="cnt">${x.n}× juntos</div></div>`).join(''):'<div class="imp-note" style="margin:2px">Sin co-compras registradas en este período.</div>'}
       <div class="xs-lab" style="margin-top:13px">Deberías ofrecerle <span style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--faint)">· hace a su perfil, hoy no lo vende</span></div>
       <div class="chips">${(COMPL[p.key]||[]).map(c=>`<span class="chip">${c}</span>`).join('')}</div>
       <div class="xs-note">Combos naturales = productos comprados en la misma orden (señal real, baja). “Deberías ofrecerle” = sugerencia editable de la agencia, no sale de los datos de venta.</div>
@@ -508,6 +531,27 @@ function renderCov(){
     <h4>Cobertura ${DATA.totales.cobertura}% — faltan ${money(s.facturacion)} por asignar (${s.share}%)</h4>
     <p>Estos SKU se vendieron pero todavía no están mapeados a un comprador en el maestro. No se descartan: caen en “Sin asignar” para que el total cuadre. Ordenados por lo que más facturan — completá estos primero y el share sube. (Ej.: los baldes/mopas <b>EARTH</b> son claramente de Mariana.)</p>
     <div class="un">${s.top.map(u=>`<div class="u"><div class="un-n">${u.nombre}<br><span class="sku">${u.sku}</span> · ${nf.format(u.lines)} ventas</div><div class="un-f">${money(u.facturacion)}</div></div>`).join('')}</div>`;
+}
+
+// ---- Gráfico de evolución mensual (SVG, ambos canales; respeta el filtro de fecha)
+const MES3B=['','ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
+function mesLbl(ym){return (!ym||ym.length<7)?(ym||''):MES3B[+ym.slice(5,7)]+" '"+ym.slice(2,4);}
+function renderChart(){
+  const el=document.getElementById('chart-mes'); if(!el) return;
+  const pm=(DATA.porMes||[]).filter(m=>m.mes);
+  if(pm.length<2){el.innerHTML='';el.hidden=true;return;} el.hidden=false;
+  const max=Math.max.apply(null,pm.map(m=>m.facturacion).concat([1]));
+  const W=1000,H=150,pad=6,top=14,base=H-22,bw=(W-2*pad)/pm.length;
+  const peak=pm.reduce((a,m)=>m.facturacion>a.facturacion?m:a,pm[0]);
+  const bars=pm.map((m,i)=>{
+    const h=Math.max(1,(m.facturacion/max)*(base-top)),x=pad+i*bw,y=base-h;
+    const isPeak=m===peak;
+    return `<g><rect x="${(x+bw*0.14).toFixed(1)}" y="${y.toFixed(1)}" width="${(bw*0.72).toFixed(1)}" height="${h.toFixed(1)}" rx="2" fill="${isPeak?'var(--warn)':'var(--accent)'}"><title>${mesLbl(m.mes)}: ${money(m.facturacion)} · ${nf.format(m.unidades)} u</title></rect>`
+      +`<text x="${(x+bw/2).toFixed(1)}" y="${H-6}" font-size="9" text-anchor="middle" fill="var(--muted)" font-family="var(--mono)">${MES3B[+m.mes.slice(5,7)]}</text></g>`;
+  }).join('');
+  el.innerHTML=`<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" width="100%" height="140" role="img" aria-label="Facturación por mes">`
+    +`<line x1="${pad}" y1="${base}" x2="${W-pad}" y2="${base}" stroke="var(--line)" stroke-width="1"/>${bars}</svg>`
+    +`<div class="chart-cap"><span>Facturación por mes · ambos canales</span><span>pico: <b>${mesLbl(peak.mes)}</b> ${money(peak.facturacion)}</span></div>`;
 }
 
 // ---- tabs & canal
@@ -526,7 +570,7 @@ document.querySelectorAll('.seg button').forEach(b=>b.addEventListener('click',(
   renderKPIs();renderRank();
 }));
 
-renderLede();renderKPIs();renderRank();renderDetail();renderCov();
+renderLede();renderKPIs();renderRank();renderDetail();renderCov();renderChart();
 </script>
 
 <!-- ===== Importer: parse en el navegador -> motor -> re-render ===== -->
@@ -560,7 +604,7 @@ renderLede();renderKPIs();renderRank();renderDetail();renderCov();
   async function idbSet(k,v){const db=await idb();return new Promise((res,rej)=>{const t=db.transaction('kv','readwrite').objectStore('kv').put(v,k);t.onsuccess=()=>res();t.onerror=()=>rej(t.error);});}
   async function idbClear(){const db=await idb();return new Promise((res,rej)=>{const t=db.transaction('kv','readwrite').objectStore('kv').clear();t.onsuccess=()=>res();t.onerror=()=>rej(t.error);});}
   // solo los campos que el motor necesita para agregar + filtrar (líviano para guardar)
-  function compact(l){return {canal:l.canal,order_id:l.order_id,mes:l.mes,buyer:l.buyer,familia:l.familia,nombre:l.nombre,sku:l.sku,sku_raw:l.sku_raw,unidades:l.unidades,facturacion:l.facturacion,cuotas:l.cuotas};}
+  function compact(l){return {canal:l.canal,order_id:l.order_id,mes:l.mes,buyer:l.buyer,familia:l.familia,nombre:l.nombre,sku:l.sku,sku_raw:l.sku_raw,unidades:l.unidades,facturacion:l.facturacion,cuotas:l.cuotas,envio:l.envio,billable:l.billable};}
   // clave de dedup = misma que engine.lineKey (canal|orden|sku|unidades|facturacion)
   function keyOf(l){return l.canal+'|'+l.order_id+'|'+l.sku+'|'+l.unidades+'|'+l.facturacion;}
   async function persist(){try{await idbSet('lines',LINES);await idbSet('manifest',MANIFEST);}catch(e){/* modo privado: queda en memoria de la sesión */}}
@@ -571,8 +615,10 @@ renderLede();renderKPIs();renderRank();renderDetail();renderCov();
   function windowLabel(ms){return !ms.length?'—':ms.length===1?mesLabel(ms[0]):mesLabel(ms[0])+' – '+mesLabel(ms[ms.length-1]);}
 
   // ---- transform motor -> shape del tablero (port de tools/snapshot.mjs)
+  function envioPct(e){const tot=Object.values(e).reduce((a,x)=>a+x.ordenes,0)||1;return Object.entries(e).map(([bucket,v])=>({bucket,ordenes:v.ordenes,pct:+(100*v.ordenes/tot).toFixed(1)})).sort((a,b)=>b.ordenes-a.ordenes);}
   function buildSnapshotFromLines(lines){
     const agg=aggregate(lines);
+    const bundles=bundlesByPersona(lines);
     const canal={};
     for(const r of agg.porMesCanalPersona){canal[r.buyer]=canal[r.buyer]||{MercadoLibre:0,TiendaNube:0};canal[r.buyer][r.canal]+=r.facturacion;}
     const PERS=PERSONAS.filter(p=>p!=='Sin asignar');
@@ -582,11 +628,14 @@ renderLede();renderKPIs();renderRank();renderDetail();renderCov();
       totales:{facturacion:agg.totales.facturacion,cobertura:agg.totales.coberturaPct,
         ordenes:agg.totales.ordenes,lineas:agg.totales.lineas,
         ticket:agg.totales.ordenes?Math.round(agg.totales.facturacion/agg.totales.ordenes):0},
+      porMes:agg.porMes.map(m=>({mes:m.mes,facturacion:Math.round(m.facturacion),unidades:m.unidades})),
       personas:PERS.map(p=>{const b=agg.byPersona[p],c=canal[p]||{MercadoLibre:0,TiendaNube:0};return{
         key:p,facturacion:b.facturacion,share:b.sharePct,ml:Math.round(c.MercadoLibre),tn:Math.round(c.TiendaNube),
         unidades:b.unidades,ordenes:b.ordenes,ticket:b.ticket,cuotas:b.cuotas,
         familias:agg.topByPersona[p].slice(0,6).map(f=>({familia:f.familia,facturacion:f.facturacion,sharePct:f.sharePct,unidades:f.unidades,precioProm:f.precioProm,nProd:f.productos.length,
-          productos:f.productos.slice(0,4).map(x=>({nombre:x.nombre,sku:x.sku,facturacion:x.facturacion,unidades:x.unidades,precioProm:x.precioProm}))}))
+          productos:f.productos.slice(0,4).map(x=>({nombre:x.nombre,sku:x.sku,facturacion:x.facturacion,unidades:x.unidades,precioProm:x.precioProm}))})),
+        envio:envioPct(agg.envioByPersona[p]),
+        bundles:(bundles[p]||[]).map(x=>({sug:x.sugNombre,sugSku:x.sugSku,hero:x.heroNombre,cruza:x.cruzaFamilia,n:x.n}))
       };}),
       sinAsignar:{facturacion:agg.byPersona['Sin asignar'].facturacion,share:agg.byPersona['Sin asignar'].sharePct,
         top:agg.unmapped.slice(0,8).map(u=>({sku:u.sku,nombre:u.nombre,facturacion:u.facturacion,lines:u.lines}))}
@@ -620,7 +669,7 @@ renderLede();renderKPIs();renderRank();renderDetail();renderCov();
   }
   function setErr(m){statusEl.className='imp-status err';statusEl.textContent=m;}
   function setMsg(m){statusEl.className='imp-status';statusEl.innerHTML=m;}
-  function applyRender(){renderLede();renderKPIs();renderRank();renderDetail();renderCov();}
+  function applyRender(){renderLede();renderKPIs();renderRank();renderDetail();renderCov();renderChart();}
   function nowLabel(){try{return new Date().toLocaleDateString('es-AR');}catch(e){return DATA.meta.updated;}}
 
   // ---- núcleo: vista actual = líneas (filtradas) o baseline de ejemplo

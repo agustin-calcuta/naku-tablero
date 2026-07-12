@@ -20,6 +20,20 @@
 export const CANCEL_RE = /cancel|devoluc|reembol/i;
 export const PERSONAS = ['Juan', 'Mariana', 'Lucho', 'Martin', 'Mario', 'Sin asignar'];
 
+// Normaliza la forma de envío (ML: 'Forma de entrega'; TN: 'Medio de envío') a
+// cubetas legibles y comparables entre canales. '' si no hay dato.
+export function bucketEnvio(s) {
+  const t = (s == null ? '' : String(s)).toLowerCase().trim();
+  if (!t) return '';
+  if (t.includes('flex')) return 'Flex';
+  if (t.includes('colecta')) return 'Colecta';
+  if (t.includes('full')) return 'Full';
+  if (t.includes('retiro') || t.includes('deposito') || t.includes('depósito') || t.includes('acuerdo')) return 'Retiro/Acuerdo';
+  if (t.includes('correo') || t.includes('andreani') || t.includes('oca') || t.includes('urbano') || t.includes('andesmar') || t.includes('mostto') || t.includes('despacho') || t.includes('nube')) return 'Correo/Andreani';
+  if (t.includes('lastmile') || t.includes('domicilio')) return 'Envío a domicilio';
+  return 'Otros';
+}
+
 const MESES_ES = {
   enero: 1, febrero: 2, marzo: 3, abril: 4, mayo: 5, junio: 6,
   julio: 7, agosto: 8, septiembre: 9, setiembre: 9, octubre: 10,
@@ -210,6 +224,7 @@ export function ingestMeli(aoa, match, sourceFile = '') {
   const iFecha = H.first('Fecha de venta');
   const iTitulo = H.first('Título de la publicación');
   const iProv = H.provinciaIdx();
+  const iEnvio = H.first('Forma de entrega'); // primera ocurrencia (dup en el export)
   for (const need of [['# de venta', iVenta], ['SKU', iSKU], ['Total (ARS)', iTotal]]) {
     if (need[1] < 0) throw new Error(`MeLi: falta columna requerida "${need[0]}" (¿schema drift?)`);
   }
@@ -241,6 +256,7 @@ export function ingestMeli(aoa, match, sourceFile = '') {
       facturacion: billable ? parseNumberES(row[iTotal]) : 0,
       cuotas: 0,
       provincia: iProv >= 0 ? String(row[iProv] ?? '').trim() : '',
+      envio: iEnvio >= 0 ? String(row[iEnvio] ?? '').trim() : '',
       estado_orden: billable ? 'valida' : 'cancel_devol',
       billable,
       source_file: sourceFile,
@@ -263,6 +279,7 @@ export function ingestTn(aoa, match, sourceFile = '') {
   const iCant = H.first('Cantidad del producto');
   const iCuotas = H.first('Cantidad de cuotas');
   const iProv = H.first('Provincia o estado');
+  const iEnvio = H.first('Medio de envío');
   const lines = [];
   for (let r = 1; r < aoa.length; r++) {
     const row = aoa[r];
@@ -292,6 +309,7 @@ export function ingestTn(aoa, match, sourceFile = '') {
       facturacion: billable ? precio * cant : 0,
       cuotas: iCuotas >= 0 ? parseNumberES(row[iCuotas]) : 0,
       provincia: iProv >= 0 ? String(row[iProv] ?? '').trim() : '',
+      envio: iEnvio >= 0 ? String(row[iEnvio] ?? '').trim() : '',
       estado_orden: billable ? (estado || 'desconocido') : 'cancelada',
       billable,
       source_file: sourceFile,
@@ -387,9 +405,10 @@ export function aggregate(lines) {
     byMesCanalPersona.set(mk, mc);
     // órdenes (ticket y # órdenes) — persona dominante = la de mayor facturación de línea
     const ok = `${l.canal}|${l.order_id}`;
-    const o = orders.get(ok) || { total: 0, cuotas: l.cuotas || 0, best: -1, persona: 'Sin asignar' };
+    const o = orders.get(ok) || { total: 0, cuotas: l.cuotas || 0, best: -1, persona: 'Sin asignar', envio: '' };
     o.total += l.facturacion;
     if (l.cuotas) o.cuotas = Math.max(o.cuotas, l.cuotas);
+    if (!o.envio && l.envio) o.envio = l.envio;
     if (l.facturacion > o.best) { o.best = l.facturacion; o.persona = p; }
     orders.set(ok, o);
     // facturación/unidades por persona
@@ -412,12 +431,25 @@ export function aggregate(lines) {
   }
 
   const ordCount = {}, ordSum = {}, cuoSum = {}, cuoCnt = {};
+  const envioByPersona = {}; for (const p of PERSONAS) envioByPersona[p] = {};
   for (const o of orders.values()) {
     const p = o.persona;
     ordCount[p] = (ordCount[p] || 0) + 1;
     ordSum[p] = (ordSum[p] || 0) + o.total;
     if (o.cuotas > 0) { cuoSum[p] = (cuoSum[p] || 0) + o.cuotas; cuoCnt[p] = (cuoCnt[p] || 0) + 1; }
+    const eb = bucketEnvio(o.envio) || 'Sin dato';
+    const e = envioByPersona[p][eb] || (envioByPersona[p][eb] = { ordenes: 0, facturacion: 0 });
+    e.ordenes++; e.facturacion += o.total;
   }
+  // evolución mensual (total, todos los canales/personas) — respeta el filtro porque
+  // aggregate ya recibe las líneas filtradas.
+  const porMesMap = new Map();
+  for (const r of byMesCanalPersona.values()) {
+    if (!r.mes) continue;
+    const m = porMesMap.get(r.mes) || { mes: r.mes, facturacion: 0, unidades: 0 };
+    m.facturacion += r.facturacion; m.unidades += r.unidades; porMesMap.set(r.mes, m);
+  }
+  const porMes = [...porMesMap.values()].sort((a, b) => (a.mes < b.mes ? -1 : 1));
   for (const p of PERSONAS) {
     byPersona[p].ordenes = ordCount[p] || 0;
     byPersona[p].ticket = ordCount[p] ? Math.round(ordSum[p] / ordCount[p]) : 0;
@@ -460,6 +492,8 @@ export function aggregate(lines) {
   return {
     byPersona,
     topByPersona,
+    envioByPersona,
+    porMes,
     porMesCanalPersona: Array.from(byMesCanalPersona.values()),
     unmapped: Array.from(unmapped.values())
       .map((u) => ({ ...u, facturacion: Math.round(u.facturacion) }))
