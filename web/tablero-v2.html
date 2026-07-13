@@ -47,6 +47,9 @@
   .imp-recon .up{color:var(--good)} .imp-recon .dn{color:var(--crit)}
   .imp-dl{margin-top:12px;display:flex;gap:9px;flex-wrap:wrap}
   .imp-priv{margin-top:12px;font-size:11px;color:var(--faint);line-height:1.5;display:flex;gap:6px;align-items:flex-start}
+  .imp-sec+.imp-sec{border-top:1px solid var(--line);padding-top:16px;margin-top:16px}
+  .imp-sec-h{display:flex;align-items:center;gap:8px;font-size:14px;font-weight:700;margin-bottom:6px}
+  .imp-num{display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:50%;background:var(--accent);color:#fff;font-size:11px;font-weight:700;font-family:var(--mono);flex:none}
   /* fuente de datos + filtros */
   .src-badge{margin:14px 0 2px;font-size:12.5px;color:var(--muted);background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:9px 13px;line-height:1.5}
   .src-badge.on{display:flex;align-items:center;gap:12px;flex-wrap:wrap;border-color:var(--accent);background:var(--accent-soft);color:var(--ink)}
@@ -278,29 +281,35 @@
   <div id="imp-panel" class="imp-backdrop" hidden role="dialog" aria-modal="true" aria-label="Actualizar el tablero con los exports">
     <div class="imp-card">
       <div class="imp-head"><b>Actualizar el tablero con los exports</b><button id="imp-close" class="imp-x" type="button" aria-label="Cerrar">✕</button></div>
-      <p class="imp-sub">Cuando Leo tenga exports nuevos, soltá acá el <b>Excel de MercadoLibre (.xlsx)</b> + el <b>CSV de TiendaNube (.csv)</b>. Se <b>suman</b> a los datos actuales (no duplica lo que ya está) — <b>nada se sube a internet</b>.</p>
-      <label id="imp-drop" class="imp-drop">
-        <input id="imp-files" type="file" accept=".xlsx,.csv" multiple hidden>
-        <span class="imp-drop-ico" aria-hidden="true">📄</span>
-        <span class="imp-drop-t">Soltá los archivos acá</span>
-        <span class="imp-drop-s">o hacé clic para elegirlos · <b>.xlsx</b> = ML · <b>.csv</b> = TiendaNube</span>
-      </label>
-      <div id="imp-list" class="imp-list"></div>
-      <details class="imp-adv">
-        <summary>Opciones avanzadas</summary>
-        <label class="imp-mrow">Reemplazar el maestro SKU→comprador (opcional):
-          <input id="imp-maestro" type="file" accept=".csv"></label>
-        <span class="imp-note">Si no cargás nada, se usa el maestro incluido en el tablero.</span>
-      </details>
-      <div class="imp-actions">
-        <button id="imp-run" class="imp-run" type="button" disabled>Procesar y actualizar</button>
-        <button id="imp-reset" class="imp-ghost" type="button" hidden>Volver a los datos base</button>
+      <div class="imp-sec">
+        <div class="imp-sec-h"><span class="imp-num">1</span> Ventas nuevas</div>
+        <p class="imp-sub">Soltá el <b>Excel de MercadoLibre (.xlsx)</b> + el <b>CSV de TiendaNube (.csv)</b>. Se <b>suman</b> a los datos actuales (no duplica lo que ya está) — <b>nada se sube a internet</b>.</p>
+        <label id="imp-drop" class="imp-drop">
+          <input id="imp-files" type="file" accept=".xlsx,.csv" multiple hidden>
+          <span class="imp-drop-ico" aria-hidden="true">📄</span>
+          <span class="imp-drop-t">Soltá los archivos acá</span>
+          <span class="imp-drop-s">o hacé clic para elegirlos · <b>.xlsx</b> = ML · <b>.csv</b> = TiendaNube</span>
+        </label>
+        <div id="imp-list" class="imp-list"></div>
+        <div class="imp-actions">
+          <button id="imp-run" class="imp-run" type="button" disabled>Procesar ventas</button>
+          <button id="imp-reset" class="imp-ghost" type="button" hidden>Restaurar base</button>
+        </div>
+        <div id="imp-status" class="imp-status" role="status" aria-live="polite"></div>
+        <div id="imp-recon" class="imp-recon" hidden></div>
+        <div id="imp-dl" class="imp-dl" hidden>
+          <button id="dl-snap" class="imp-ghost" type="button">↓ snapshot.json</button>
+          <button id="dl-unmapped" class="imp-ghost" type="button">↓ unmapped_skus.csv</button>
+        </div>
       </div>
-      <div id="imp-status" class="imp-status" role="status" aria-live="polite"></div>
-      <div id="imp-recon" class="imp-recon" hidden></div>
-      <div id="imp-dl" class="imp-dl" hidden>
-        <button id="dl-snap" class="imp-ghost" type="button">↓ snapshot.json</button>
-        <button id="dl-unmapped" class="imp-ghost" type="button">↓ unmapped_skus.csv</button>
+      <div class="imp-sec">
+        <div class="imp-sec-h"><span class="imp-num">2</span> Mapeo SKU → Comprador</div>
+        <p class="imp-sub">Si hay productos nuevos o querés cambiar a qué comprador va un SKU, subí el <b>CSV del maestro</b> (columnas <span class="mono">SKU</span> y <span class="mono">Buyer Persona</span>). Se re-aplica a <b>todo el histórico</b> al instante.</p>
+        <label class="imp-mrow"><input id="imp-maestro" type="file" accept=".csv"></label>
+        <div class="imp-actions">
+          <button id="imp-maestro-run" class="imp-run" type="button" disabled>Aplicar mapeo</button>
+        </div>
+        <div id="imp-maestro-status" class="imp-status" role="status" aria-live="polite"></div>
       </div>
       <div class="imp-priv"><span aria-hidden="true">🔒</span> <span>Los archivos no salen de tu computadora: el procesamiento es 100% local en el navegador. La versión pública del tablero no cambia con lo que cargues acá.</span></div>
     </div>
@@ -347,7 +356,6 @@
         </div>
       </div>
 
-      <div id="src-badge" class="src-badge"></div>
       <div id="flt" class="flt" hidden>
         <span class="flt-lab">Período</span>
         <select id="flt-desde" class="flt-sel" aria-label="Mes desde"></select>
@@ -374,12 +382,9 @@
         <div class="detail" id="detail"></div>
       </div>
 
-      <div class="eyebrow"><span class="lab">Cobertura del maestro</span><span class="ruler"></span></div>
-      <div class="cov" id="cov"></div>
-
       <div class="foot">
-        <div>NAKU · tablero de compradores · maqueta v2<br>Números reales calculados por el motor sobre los exports.</div>
-        <div>Ranking por <b>facturación</b> (impacto = unidades × precio).<br>El toggle Facturación/Unidades muestra por qué el volumen engaña.</div>
+        <div>Desarrollado por <b>CALCUTA</b></div>
+        <div>NAKU · MercadoLibre + TiendaNube · números reales calculados por el motor.</div>
       </div>
     </section>
   </div>
@@ -538,8 +543,9 @@ function renderDetail(){
 
 // ---- Coverage
 function renderCov(){
+  const el=document.getElementById('cov'); if(!el)return;
   const s=DATA.sinAsignar;
-  document.getElementById('cov').innerHTML = `
+  el.innerHTML = `
     <h4>Cobertura ${DATA.totales.cobertura}% — faltan ${money(s.facturacion)} por asignar (${s.share}%)</h4>
     <p>Estos SKU se vendieron pero todavía no están mapeados a un comprador en el maestro. No se descartan: caen en “Sin asignar” para que el total cuadre. Ordenados por lo que más facturan — completá estos primero y el share sube. (Ej.: los baldes/mopas <b>EARTH</b> son claramente de Mariana.)</p>
     <div class="un">${s.top.map(u=>`<div class="u"><div class="un-n">${u.nombre}<br><span class="sku">${u.sku}</span> · ${nf.format(u.lines)} ventas</div><div class="un-f">${money(u.facturacion)}</div></div>`).join('')}</div>`;
@@ -555,16 +561,19 @@ function renderChart(){
   const val=m=>state.canal==='MercadoLibre'?(m.ml||0):state.canal==='TiendaNube'?(m.tn||0):m.facturacion;
   const canalLbl=state.canal==='Ambos'?'ambos canales':state.canal;
   const max=Math.max.apply(null,pm.map(val).concat([1]));
-  const W=1000,H=150,pad=6,top=14,base=H-22,bw=(W-2*pad)/pm.length;
+  const cmp=v=>v>=1e9?('$'+(v/1e9).toFixed(1).replace('.',',')+'MM'):v>=1e6?('$'+Math.round(v/1e6)+'M'):v>=1e3?('$'+Math.round(v/1e3)+'K'):('$'+Math.round(v));
+  const W=1000,H=180,padL=10,padR=10,top=28,base=H-24,bw=(W-padL-padR)/pm.length;
   const peak=pm.reduce((a,m)=>val(m)>val(a)?m:a,pm[0]);
+  const yOf=v=>base-(v/max)*(base-top);
+  const grid=[max,max/2].map(g=>`<line x1="${padL}" y1="${yOf(g).toFixed(1)}" x2="${W-padR}" y2="${yOf(g).toFixed(1)}" stroke="var(--line2)" stroke-width="1"/><text x="${padL}" y="${(yOf(g)-3).toFixed(1)}" font-size="9" fill="var(--faint)" font-family="var(--mono)">${cmp(g)}</text>`).join('');
   const bars=pm.map((m,i)=>{
-    const h=Math.max(1,(val(m)/max)*(base-top)),x=pad+i*bw,y=base-h;
-    const isPeak=m===peak;
-    return `<g><rect x="${(x+bw*0.14).toFixed(1)}" y="${y.toFixed(1)}" width="${(bw*0.72).toFixed(1)}" height="${h.toFixed(1)}" rx="2" fill="${isPeak?'var(--warn)':'var(--accent)'}"><title>${mesLbl(m.mes)}: ${money(val(m))}</title></rect>`
-      +`<text x="${(x+bw/2).toFixed(1)}" y="${H-6}" font-size="9" text-anchor="middle" fill="var(--muted)" font-family="var(--mono)">${MES3B[+m.mes.slice(5,7)]}</text></g>`;
+    const v=val(m),h=Math.max(1,(v/max)*(base-top)),x=padL+i*bw,by=base-h,isPeak=m===peak,show=v/max>0.05;
+    return `<g><rect x="${(x+bw*0.16).toFixed(1)}" y="${by.toFixed(1)}" width="${(bw*0.68).toFixed(1)}" height="${h.toFixed(1)}" rx="2" fill="${isPeak?'var(--warn)':'var(--accent)'}"><title>${mesLbl(m.mes)}: ${money(v)}</title></rect>`
+      +(show?`<text x="${(x+bw/2).toFixed(1)}" y="${(by-4).toFixed(1)}" font-size="9.5" text-anchor="middle" fill="${isPeak?'var(--warn)':'var(--muted)'}" font-family="var(--mono)" font-weight="600">${cmp(v)}</text>`:'')
+      +`<text x="${(x+bw/2).toFixed(1)}" y="${(H-8).toFixed(1)}" font-size="9.5" text-anchor="middle" fill="var(--muted)" font-family="var(--mono)">${MES3B[+m.mes.slice(5,7)]}</text></g>`;
   }).join('');
-  el.innerHTML=`<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" width="100%" height="140" role="img" aria-label="Facturación por mes">`
-    +`<line x1="${pad}" y1="${base}" x2="${W-pad}" y2="${base}" stroke="var(--line)" stroke-width="1"/>${bars}</svg>`
+  el.innerHTML=`<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid meet" style="width:100%;height:auto;display:block" role="img" aria-label="Facturación por mes">`
+    +`${grid}<line x1="${padL}" y1="${base}" x2="${W-padR}" y2="${base}" stroke="var(--line)" stroke-width="1"/>${bars}</svg>`
     +`<div class="chart-cap"><span>Facturación por mes · ${canalLbl}</span><span>pico: <b>${mesLbl(peak.mes)}</b> ${money(val(peak))}</span></div>`;
 }
 
@@ -591,10 +600,11 @@ renderLede();renderKPIs();renderRank();renderDetail();renderCov();renderChart();
   const panel=$('imp-panel'),btn=$('btn-import'),closeBtn=$('imp-close'),drop=$('imp-drop'),
         filesInput=$('imp-files'),listEl=$('imp-list'),runBtn=$('imp-run'),resetBtn=$('imp-reset'),
         statusEl=$('imp-status'),reconEl=$('imp-recon'),maestroInput=$('imp-maestro'),dlBox=$('imp-dl'),
-        elBadge=$('src-badge'),elFlt=$('flt'),elDesde=$('flt-desde'),elHasta=$('flt-hasta');
+        maestroRunBtn=$('imp-maestro-run'),maestroStatusEl=$('imp-maestro-status'),
+        elFlt=$('flt'),elDesde=$('flt-desde'),elHasta=$('flt-hasta');
   const BASELINE=JSON.parse(JSON.stringify(DATA)), BASELINE_UN=Object.assign({},UNASSIGNED);
   const MES3=['','ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
-  let picked=[], maestroFile=null, lastBuild=null;
+  let picked=[], maestroFile=null, lastBuild=null, MAESTRO_TEXT=null;
   let LINES=[], SEEN=new Set(), MANIFEST=[], FILTER={desde:null,hasta:null,canal:'Ambos'};
 
   // ---- CSV parser (mismo que tools/snapshot.mjs: comillas + delim configurable)
@@ -718,20 +728,11 @@ renderLede();renderKPIs();renderRank();renderDetail();renderCov();renderChart();
     const has=LINES.length>0;
     if(has){
       const ms=monthsOf(LINES);
-      const nArch=new Set(MANIFEST.map(m=>m.file)).size||MANIFEST.length;
-      const updated=MANIFEST.length>1;
-      elBadge.className='src-badge on';
-      elBadge.innerHTML=`<span>Datos <b>${windowLabel(ms)}</b> · ${nf.format(LINES.length)} líneas${updated?` · ${nArch} archivos cargados`:''}. Para actualizar, tocá <b>“↑ Actualizar datos”</b>.</span>${updated?'<button id="badge-clear" class="src-clear" type="button">Restaurar base</button>':''}`;
-      const bc=$('badge-clear'); if(bc)bc.onclick=clearHistory;
       const opt=sel=>ms.map(m=>`<option value="${m}"${m===sel?' selected':''}>${mesLabel(m)}</option>`).join('');
       elDesde.innerHTML=opt(FILTER.desde||ms[0]);
       elHasta.innerHTML=opt(FILTER.hasta||ms[ms.length-1]);
-      elFlt.hidden=false;
-    }else{
-      elBadge.className='src-badge';
-      elBadge.innerHTML=`Mostrando los <b>números base</b>. (No se pudo cargar el detalle por línea para filtrar por fecha — reintentá recargando.)`;
-      elFlt.hidden=true;
     }
+    elFlt.hidden=!has;
     resetBtn.hidden=!(MANIFEST.length>1);dlBox.hidden=!has;
   }
 
@@ -759,8 +760,8 @@ renderLede();renderKPIs();renderRank();renderDetail();renderCov();renderChart();
     if(!picked.length){setErr('Elegí al menos un archivo.');return;}
     runBtn.disabled=true;setMsg('Procesando… (los Excel de ML pueden tardar unos segundos)');
     try{
-      const maestroText=maestroFile?await maestroFile.text():$('maestroCSV').textContent;
-      if(!maestroText||maestroText.indexOf('__MAESTRO')===0){throw new Error('Falta el maestro embebido (¿el archivo no pasó por el build?). Cargá el maestro en Opciones avanzadas.');}
+      const maestroText=MAESTRO_TEXT||$('maestroCSV').textContent;
+      if(!maestroText||maestroText.indexOf('__MAESTRO')===0){throw new Error('Falta el maestro base (¿el archivo no pasó por el build?).');}
       window.__match=makeMatcher(buildMaestro(parseCSV(maestroText,';')));
       let nuevas=0,dups=0;
       for(const p of picked){
@@ -787,11 +788,34 @@ renderLede();renderKPIs();renderRank();renderDetail();renderCov();renderChart();
 
   async function clearHistory(){
     if(!confirm('¿Borrar los updates que cargaste y volver a los datos base?'))return;
-    LINES=[];SEEN=new Set();MANIFEST=[];FILTER={desde:null,hasta:null,canal:'Ambos'};
+    LINES=[];SEEN=new Set();MANIFEST=[];MAESTRO_TEXT=null;FILTER={desde:null,hasta:null,canal:'Ambos'};
     try{await idbClear();}catch(e){}
-    reconEl.hidden=true;
+    reconEl.hidden=true;maestroStatusEl.textContent='';
     await seedFromServer();
     recompute();setMsg('Volviste a los datos base.');
+  }
+
+  // Sube un maestro SKU→comprador nuevo y lo RE-APLICA a todo el histórico guardado.
+  async function applyMaestro(){
+    if(!maestroFile){maestroStatusEl.className='imp-status err';maestroStatusEl.textContent='Elegí primero el CSV del maestro.';return;}
+    maestroRunBtn.disabled=true;maestroStatusEl.className='imp-status';maestroStatusEl.textContent='Aplicando mapeo a todo el histórico…';
+    try{
+      const text=await maestroFile.text();
+      const match=makeMatcher(buildMaestro(parseCSV(text,';')));
+      let cambios=0;
+      for(const l of LINES){
+        const m=match(l.sku_raw||l.sku,l.nombre);
+        const nb=m.buyer, nfa=m.familia||l.familia;
+        if(nb!==l.buyer||nfa!==l.familia)cambios++;
+        l.buyer=nb; l.familia=nfa; if(m.nombre)l.nombre=m.nombre;
+      }
+      MAESTRO_TEXT=text;
+      try{await idbSet('lines',LINES);await idbSet('maestro',MAESTRO_TEXT);}catch(e){}
+      recompute();
+      maestroStatusEl.className='imp-status';
+      maestroStatusEl.innerHTML=`✓ Mapeo aplicado · <b>${nf.format(cambios)}</b> líneas reasignadas · cobertura ${String(DATA.totales.cobertura).replace('.',',')}%.`;
+    }catch(e){maestroStatusEl.className='imp-status err';maestroStatusEl.textContent='No se pudo aplicar: '+(e.message||e);}
+    finally{maestroRunBtn.disabled=false;}
   }
 
   // ---- eventos
@@ -802,7 +826,8 @@ renderLede();renderKPIs();renderRank();renderDetail();renderCov();renderChart();
   panel.addEventListener('click',e=>{if(e.target===panel)close();});
   document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!panel.hidden)close();});
   filesInput.addEventListener('change',e=>{addFiles(e.target.files);filesInput.value='';});
-  maestroInput.addEventListener('change',e=>{maestroFile=e.target.files[0]||null;});
+  maestroInput.addEventListener('change',e=>{maestroFile=e.target.files[0]||null;maestroRunBtn.disabled=!maestroFile;maestroStatusEl.textContent=maestroFile?maestroFile.name:'';});
+  maestroRunBtn.addEventListener('click',applyMaestro);
   ;['dragenter','dragover'].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.add('drag');}));
   ;['dragleave','drop'].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.remove('drag');}));
   drop.addEventListener('drop',e=>{if(e.dataTransfer&&e.dataTransfer.files)addFiles(e.dataTransfer.files);});
@@ -849,8 +874,9 @@ renderLede();renderKPIs();renderRank();renderDetail();renderCov();renderChart();
   (async function init(){
     resetBtn.textContent='Restaurar datos base';
     try{
-      const [ls,mf]=await Promise.all([idbGet('lines'),idbGet('manifest')]);
+      const [ls,mf,mt]=await Promise.all([idbGet('lines'),idbGet('manifest'),idbGet('maestro')]);
       if(Array.isArray(ls)&&ls.length){LINES=ls;MANIFEST=Array.isArray(mf)?mf:[];SEEN=new Set(LINES.map(keyOf));}
+      if(typeof mt==='string')MAESTRO_TEXT=mt;
     }catch(e){/* IDB no disponible */}
     if(!LINES.length) await seedFromServer();
     recompute();
