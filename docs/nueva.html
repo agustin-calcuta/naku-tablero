@@ -283,7 +283,7 @@
       <div class="imp-head"><b>Actualizar el tablero con los exports</b><button id="imp-close" class="imp-x" type="button" aria-label="Cerrar">✕</button></div>
       <div class="imp-sec">
         <div class="imp-sec-h"><span class="imp-num">1</span> Ventas nuevas</div>
-        <p class="imp-sub">Soltá el <b>Excel de MercadoLibre (.xlsx)</b> + el <b>CSV de TiendaNube (.csv)</b>. Se <b>suman</b> a los datos actuales (no duplica lo que ya está) — <b>nada se sube a internet</b>.</p>
+        <p class="imp-sub">Soltá el <b>Excel de MercadoLibre (.xlsx)</b> + el <b>CSV de TiendaNube (.csv)</b>. Se <b>suman</b> a los datos actuales (no duplica lo que ya está).</p>
         <label id="imp-drop" class="imp-drop">
           <input id="imp-files" type="file" accept=".xlsx,.csv" multiple hidden>
           <span class="imp-drop-ico" aria-hidden="true">📄</span>
@@ -297,10 +297,6 @@
         </div>
         <div id="imp-status" class="imp-status" role="status" aria-live="polite"></div>
         <div id="imp-recon" class="imp-recon" hidden></div>
-        <div id="imp-dl" class="imp-dl" hidden>
-          <button id="dl-snap" class="imp-ghost" type="button">↓ snapshot.json</button>
-          <button id="dl-unmapped" class="imp-ghost" type="button">↓ unmapped_skus.csv</button>
-        </div>
       </div>
       <div class="imp-sec">
         <div class="imp-sec-h"><span class="imp-num">2</span> Mapeo SKU → Comprador</div>
@@ -314,7 +310,6 @@
         </div>
         <div id="imp-maestro-status" class="imp-status" role="status" aria-live="polite"></div>
       </div>
-      <div class="imp-priv"><span aria-hidden="true">🔒</span> <span>Los archivos no salen de tu computadora: el procesamiento es 100% local en el navegador. La versión pública del tablero no cambia con lo que cargues acá.</span></div>
     </div>
   </div>
 
@@ -1362,7 +1357,7 @@ renderLede();renderKPIs();renderRank();renderDetail();renderCov();renderChart();
   const $=id=>document.getElementById(id);
   const panel=$('imp-panel'),btn=$('btn-import'),closeBtn=$('imp-close'),drop=$('imp-drop'),
         filesInput=$('imp-files'),listEl=$('imp-list'),runBtn=$('imp-run'),resetBtn=$('imp-reset'),
-        statusEl=$('imp-status'),reconEl=$('imp-recon'),maestroInput=$('imp-maestro'),dlBox=$('imp-dl'),
+        statusEl=$('imp-status'),reconEl=$('imp-recon'),maestroInput=$('imp-maestro'),
         maestroRunBtn=$('imp-maestro-run'),maestroStatusEl=$('imp-maestro-status'),
         elFlt=$('flt'),elDesde=$('flt-desde'),elHasta=$('flt-hasta');
   const BASELINE=JSON.parse(JSON.stringify(DATA)), BASELINE_UN=Object.assign({},UNASSIGNED);
@@ -1496,7 +1491,7 @@ renderLede();renderKPIs();renderRank();renderDetail();renderCov();renderChart();
       elHasta.innerHTML=opt(FILTER.hasta||ms[ms.length-1]);
     }
     elFlt.hidden=!has;
-    resetBtn.hidden=!(MANIFEST.length>1);dlBox.hidden=!has;
+    resetBtn.hidden=!(MANIFEST.length>1);
   }
 
   function renderRecon(info){
@@ -1624,13 +1619,6 @@ renderLede();renderKPIs();renderRank();renderDetail();renderCov();renderChart();
     recompute();
   }));
   $('dl-template').addEventListener('click',downloadTemplate);
-  $('dl-snap').addEventListener('click',()=>{if(lastBuild)download('snapshot.json',JSON.stringify(lastBuild.snapshot),'application/json');});
-  $('dl-unmapped').addEventListener('click',()=>{
-    if(!lastBuild)return;
-    const esc=s=>{s=String(s==null?'':s);return /[;"\n]/.test(s)?'"'+s.replace(/"/g,'""')+'"':s;};
-    const csv='sku;nombre;ventas;facturacion\n'+lastBuild.agg.unmapped.map(u=>[esc(u.sku),esc(u.nombre),u.lines,u.facturacion].join(';')).join('\n');
-    download('unmapped_skus.csv','﻿'+csv,'text/csv;charset=utf-8');
-  });
 
   // Baja el histórico base (líneas) la 1ª visita y lo siembra en IndexedDB.
   async function seedFromServer(){
