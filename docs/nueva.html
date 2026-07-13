@@ -1,6 +1,8 @@
 <meta charset="utf-8">
 <title>NAKU · Tablero de compradores</title>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,600&display=swap" rel="stylesheet">
 <style>
   /* ---------- Importer (carga de exports) ---------- */
   .imp-btn{font-family:var(--sans);font-size:12.5px;font-weight:700;color:#fff;background:var(--accent);border:0;border-radius:7px;padding:8px 13px;cursor:pointer;white-space:nowrap;display:inline-flex;align-items:center;gap:7px}
@@ -82,13 +84,13 @@
   .geo-b i{display:block;height:100%;background:var(--pc)}
   .geo-p{font-family:var(--mono);font-size:11px;color:var(--muted);text-align:right}
   :root{
-    --paper:#F1F2EC; --panel:#FBFBF7; --panel2:#F6F7F1;
-    --ink:#191E19; --muted:#6C726A; --faint:#98A08F; --line:#D5D8CD; --line2:#E4E6DE;
-    --accent:#12564A; --accent-soft:#E1EBE4;
-    --juan:#2E6C8C; --martin:#1F6A5A; --lucho:#BC6E38; --mariana:#8B5388; --mario:#A9832C; --sin:#98A08F;
-    --good:#2E7D5B; --warn:#BC6E38; --crit:#A8443A;
-    --serif:"Iowan Old Style","Palatino Linotype",Palatino,"Book Antiqua",Georgia,serif;
-    --sans:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    --paper:#F3F6FD; --panel:#FFFFFF; --panel2:#F1F5FE;
+    --ink:#0E1526; --muted:#5A6478; --faint:#98A1B5; --line:#DBE2F1; --line2:#E9EEF9;
+    --accent:#084AD6; --accent-soft:#E7EEFC; --lime:#E7F67F;
+    --juan:#084AD6; --martin:#1F6A5A; --lucho:#E0722B; --mariana:#8B5388; --mario:#C79A2E; --sin:#98A1B5;
+    --good:#1F9D57; --warn:#E0722B; --crit:#D63A3A;
+    --serif:"Public Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+    --sans:"Public Sans",system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
     --mono:ui-monospace,"SF Mono","Cascadia Mono",Menlo,Consolas,monospace;
     --sp:22px;
   }
@@ -104,16 +106,16 @@
   .mono{font-family:var(--mono)}
 
   /* header */
-  header.top{position:sticky;top:0;z-index:20;background:rgba(241,242,236,.9);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+  header.top{position:sticky;top:0;z-index:20;background:rgba(243,246,253,.92);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
   .topin{max-width:1120px;margin:0 auto;padding:14px 24px;display:flex;align-items:center;gap:18px;flex-wrap:wrap}
-  .brand{display:flex;align-items:baseline;gap:10px;font-weight:800;letter-spacing:-.02em;font-size:19px}
-  .brand b{font-weight:800}
-  .brand .k{font-family:var(--mono);font-weight:600;font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--accent);border:1px solid var(--accent);border-radius:3px;padding:2px 6px}
+  .brand{display:flex;align-items:center;gap:12px;font-weight:800;letter-spacing:-.02em;font-size:18px}
+  .brand-logo{height:26px;width:auto;display:block}
+  .brand b{font-weight:700;color:var(--muted);font-size:15px;padding-left:12px;border-left:1px solid var(--line)}
   .stamp{margin-left:auto;font-family:var(--mono);font-size:11px;color:var(--muted);letter-spacing:.02em;text-align:right}
   .stamp b{color:var(--ink);font-weight:600}
   .tabs{display:flex;gap:2px;background:var(--panel2);border:1px solid var(--line);border-radius:7px;padding:3px}
   .tabs button{font-family:var(--sans);font-size:13px;font-weight:600;color:var(--muted);background:none;border:0;padding:6px 14px;border-radius:5px;cursor:pointer}
-  .tabs button[aria-selected="true"]{background:var(--ink);color:var(--paper)}
+  .tabs button[aria-selected="true"]{background:var(--accent);color:#fff}
   .tabs button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 
   /* eyebrow / ticks */
@@ -262,7 +264,7 @@
 <div class="wrap">
   <header class="top">
     <div class="topin">
-      <div class="brand"><span class="k">Naku</span> <b>Tablero de compradores</b></div>
+      <div class="brand"><img class="brand-logo" src="data:image/webp;base64,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" alt="NAKU"> <b>Tablero de compradores</b></div>
       <div class="tabs" role="tablist" aria-label="Vista">
         <button id="tab-contexto" role="tab" aria-selected="false" aria-controls="contexto">Contexto</button>
         <button id="tab-negocio" role="tab" aria-selected="true" aria-controls="negocio">El negocio</button>
@@ -1158,7 +1160,7 @@ const META = {
   Mariana:{color:'var(--mariana)',tag:'La que organiza',         blurb:'Máquinas de coser, organizadores, zapateros y perchas. Ordena la casa y el lavadero.'},
   Mario:  {color:'var(--mario)',  tag:'El del mostrador',        blurb:'Gavetas de dinero, selladoras. No compra para su casa: compra para su comercio.'},
 };
-const PC = {Juan:'#2E6C8C',Martin:'#1F6A5A',Lucho:'#BC6E38',Mariana:'#8B5388',Mario:'#A9832C'};
+const PC = {Juan:'#084AD6',Martin:'#1F6A5A',Lucho:'#E0722B',Mariana:'#8B5388',Mario:'#C79A2E'};
 
 // Combos naturales (co-compra real en la misma orden — señal baja pero real)
 const XSELL = {

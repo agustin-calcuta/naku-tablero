@@ -16,6 +16,7 @@ const ROOT = path.resolve(HERE, '..');                 // .../naku-tablero
 const SRC = path.join(ROOT, 'web', 'tablero-v2.html');
 const ENGINE = path.join(ROOT, 'src', 'engine.mjs');
 const SNAPSHOT = path.join(ROOT, 'web', 'data', 'snapshot.json');
+const LOGO = path.join(ROOT, 'web', 'naku-logo.webp');
 const OUT = path.join(ROOT, 'docs', 'nueva.html');
 // El maestro vive fuera del repo (no versionado), igual que los exports (ver README).
 const MAESTRO = path.resolve(ROOT, '..', 'Tablero Buyer Naku', 'Naku - SKU+Buyer+Cat.csv');
@@ -42,6 +43,12 @@ const baseline = fs.readFileSync(SNAPSHOT, 'utf8').trim();
 const DATA_RE = /let DATA = [\s\S]*?;\n\nconst META =/;
 if (!DATA_RE.test(html)) { console.error('✗ no encontré el literal `let DATA = …;` antes de `const META =`'); process.exit(1); }
 html = html.replace(DATA_RE, () => `let DATA = ${baseline};\n\nconst META =`);
+
+// Logo NAKU embebido como data URI (self-contained).
+if (fs.existsSync(LOGO) && html.includes('__LOGO_DATAURI__')) {
+  const logo = 'data:image/webp;base64,' + fs.readFileSync(LOGO).toString('base64');
+  html = html.replace(/__LOGO_DATAURI__/g, () => logo);
+}
 
 fs.writeFileSync(OUT, html);
 const kb = n => (n / 1024).toFixed(0) + ' KB';
