@@ -304,8 +304,11 @@
       </div>
       <div class="imp-sec">
         <div class="imp-sec-h"><span class="imp-num">2</span> Mapeo SKU → Comprador</div>
-        <p class="imp-sub">Si hay productos nuevos o querés cambiar a qué comprador va un SKU, subí el <b>CSV del maestro</b> (columnas <span class="mono">SKU</span> y <span class="mono">Buyer Persona</span>). Se re-aplica a <b>todo el histórico</b> al instante.</p>
-        <label class="imp-mrow"><input id="imp-maestro" type="file" accept=".csv"></label>
+        <p class="imp-sub"><b>1)</b> Descargá la plantilla (trae todos los SKU con su comprador y familia). <b>2)</b> Agregá los SKU nuevos o corregí el comprador. <b>3)</b> Subila y tocá <b>Aplicar mapeo</b> — se re-aplica a <b>todo el histórico</b> al instante (los repetidos se reemplazan, los nuevos se agregan).</p>
+        <div class="imp-actions" style="margin-top:2px">
+          <button id="dl-template" class="imp-ghost" type="button">↓ Descargar plantilla (SKU · Familia · Comprador)</button>
+        </div>
+        <label class="imp-mrow" style="margin-top:12px"><input id="imp-maestro" type="file" accept=".csv"></label>
         <div class="imp-actions">
           <button id="imp-maestro-run" class="imp-run" type="button" disabled>Aplicar mapeo</button>
         </div>
@@ -1513,6 +1516,15 @@ renderLede();renderKPIs();renderRank();renderDetail();renderCov();renderChart();
     const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([text],{type:mime}));a.download=name;
     document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),2000);
   }
+  // Plantilla del maestro: todos los SKU actuales con su comprador/familia, para editar y re-subir.
+  function downloadTemplate(){
+    const esc=s=>{s=String(s==null?'':s);return /[;"\n]/.test(s)?'"'+s.replace(/"/g,'""')+'"':s;};
+    const seen=new Map();
+    for(const l of LINES){const k=(l.sku||l.nombre);if(!k)continue;if(!seen.has(k))seen.set(k,{sku:l.sku_raw||l.sku,nombre:l.nombre,familia:l.familia,buyer:l.buyer});}
+    const rows=[...seen.values()].sort((a,b)=>a.buyer<b.buyer?-1:a.buyer>b.buyer?1:(String(a.sku)<String(b.sku)?-1:1));
+    const csv='SKU;Nombre;Categorías;Familia;Buyer Persona\n'+rows.map(r=>[esc(r.sku),esc(r.nombre),'',esc(r.familia),esc(r.buyer)].join(';')).join('\n');
+    download('maestro-naku.csv','﻿'+csv,'text/csv;charset=utf-8');
+  }
 
   async function process(){
     statusEl.className='imp-status';
@@ -1561,7 +1573,10 @@ renderLede();renderKPIs();renderRank();renderDetail();renderCov();renderChart();
     maestroRunBtn.disabled=true;maestroStatusEl.className='imp-status';maestroStatusEl.textContent='Aplicando mapeo a todo el histórico…';
     try{
       const text=await maestroFile.text();
-      const match=makeMatcher(buildMaestro(parseCSV(text,';')));
+      const rows=parseCSV(text,';');
+      const hdr=(rows[0]||[]).map(h=>String(h).trim());
+      if(!hdr.includes('SKU')||!hdr.includes('Buyer Persona')){throw new Error('El archivo tiene que tener columnas "SKU" y "Buyer Persona". Descargá la plantilla y editá esa.');}
+      const match=makeMatcher(buildMaestro(rows));
       let cambios=0;
       for(const l of LINES){
         const m=match(l.sku_raw||l.sku,l.nombre);
@@ -1608,6 +1623,7 @@ renderLede();renderKPIs();renderRank();renderDetail();renderCov();renderChart();
     document.querySelectorAll('.seg button').forEach(x=>x.setAttribute('aria-pressed',x===b));
     recompute();
   }));
+  $('dl-template').addEventListener('click',downloadTemplate);
   $('dl-snap').addEventListener('click',()=>{if(lastBuild)download('snapshot.json',JSON.stringify(lastBuild.snapshot),'application/json');});
   $('dl-unmapped').addEventListener('click',()=>{
     if(!lastBuild)return;
