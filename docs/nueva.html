@@ -64,6 +64,41 @@
   .flt-presets button{font-family:var(--mono);font-size:11px;font-weight:600;color:var(--muted);background:none;border:0;padding:5px 10px;border-radius:5px;cursor:pointer}
   .flt-presets button[aria-pressed="true"]{background:var(--ink);color:var(--paper)}
   .flt-presets button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+  /* filtro por comprador (pills en la barra de filtros) */
+  .flt-personas{display:flex;gap:5px;flex-wrap:wrap}
+  .flt-personas button{font-family:var(--sans);font-size:11.5px;font-weight:700;color:var(--muted);background:var(--panel);border:1px solid var(--line);border-radius:20px;padding:4px 10px;cursor:pointer;display:inline-flex;align-items:center;gap:6px}
+  .flt-personas button i{width:8px;height:8px;border-radius:2px;background:var(--bc,var(--muted))}
+  .flt-personas button[aria-pressed="true"]{color:#fff;background:var(--bc,var(--ink));border-color:var(--bc,var(--ink))}
+  .flt-personas button[aria-pressed="true"] i{background:#fff}
+  .flt-personas button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+  /* detalle por persona: todas las ventas (modal) */
+  .pv-open{margin-left:auto;align-self:center;font-family:var(--sans);font-size:12px;font-weight:700;color:var(--pc,var(--accent));background:var(--panel2);border:1px solid var(--line);border-radius:7px;padding:7px 11px;cursor:pointer;white-space:nowrap}
+  .pv-open:hover{border-color:var(--pc,var(--accent))}
+  .pv-open:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+  .pv-card{max-width:880px}
+  .pv-personas{display:flex;gap:6px;flex-wrap:wrap;margin:10px 0 0}
+  .pv-personas button{font-family:var(--sans);font-size:12.5px;font-weight:700;color:var(--muted);background:var(--panel2);border:1px solid var(--line);border-radius:20px;padding:6px 13px;cursor:pointer;display:inline-flex;align-items:center;gap:7px}
+  .pv-personas button i{width:9px;height:9px;border-radius:2px;background:var(--bc,var(--muted))}
+  .pv-personas button[aria-pressed="true"]{color:#fff;background:var(--bc,var(--ink));border-color:var(--bc,var(--ink))}
+  .pv-personas button[aria-pressed="true"] i{background:#fff}
+  .pv-personas button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+  .pv-sum{font-size:12.5px;color:var(--muted);margin:10px 0 0;line-height:1.6}
+  .pv-sum b{color:var(--ink);font-family:var(--mono);font-weight:600}
+  .pv-controls{display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin:12px 0 10px}
+  .pv-q{flex:1;min-width:170px;font-family:var(--sans);font-size:12.5px;color:var(--ink);background:var(--panel2);border:1px solid var(--line);border-radius:7px;padding:8px 11px}
+  .pv-q:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+  .pv-body{max-height:56vh;overflow:auto;border:1px solid var(--line);border-radius:9px;background:var(--panel)}
+  .pv-fam{position:sticky;top:0;z-index:1;display:flex;justify-content:space-between;gap:10px;align-items:baseline;background:var(--panel2);border-top:1px solid var(--line);border-bottom:1px solid var(--line2);padding:7px 12px;font-size:12px;font-weight:700}
+  .pv-fam:first-of-type{border-top:0}
+  .pv-fam .pv-fm{font-family:var(--mono);font-weight:600;font-size:10.5px;color:var(--muted);white-space:nowrap}
+  .pv-row{display:grid;grid-template-columns:minmax(170px,1fr) 68px 86px 100px 46px;gap:10px;align-items:baseline;padding:7px 12px;border-bottom:1px solid var(--line2);font-size:12.5px}
+  .pv-row:last-child{border-bottom:0}
+  .pv-row .n{line-height:1.35}
+  .pv-row .n .sku{font-family:var(--mono);font-size:10px;color:var(--muted);border:1px solid var(--line);border-radius:3px;padding:0 4px;margin-left:5px;white-space:nowrap}
+  .pv-row .v{font-family:var(--mono);font-size:12px;text-align:right;white-space:nowrap}
+  .pv-row .v.hi{font-weight:700}
+  .pv-row.hdr{border-bottom:1px solid var(--line);padding:6px 12px}
+  .pv-row.hdr div{font-family:var(--mono);font-size:9.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:600}
   /* gráfico mensual */
   .chart-mes{margin:16px 0 2px;background:var(--panel);border:1px solid var(--line);border-radius:11px;padding:14px 16px 10px}
   .chart-mes[hidden]{display:none}
@@ -313,6 +348,26 @@
     </div>
   </div>
 
+  <!-- ===== Detalle por comprador: todas las ventas ===== -->
+  <div id="pv-panel" class="imp-backdrop" hidden role="dialog" aria-modal="true" aria-label="Todas las ventas por comprador">
+    <div class="imp-card pv-card">
+      <div class="imp-head"><b>Todas las ventas</b><button id="pv-close" class="imp-x" type="button" aria-label="Cerrar">✕</button></div>
+      <p class="imp-sub" style="margin-bottom:2px">Elegí un comprador y mirá <b>todo lo que compra</b>, familia por familia, sin recortes.</p>
+      <div id="pv-personas" class="pv-personas" role="group" aria-label="Comprador"></div>
+      <div id="pv-sum" class="pv-sum"></div>
+      <div class="pv-controls">
+        <input id="pv-q" class="pv-q" type="search" placeholder="Buscar producto o SKU…" aria-label="Buscar producto o SKU">
+        <div id="pv-sort" class="sortbtns" role="group" aria-label="Ordenar por">
+          <button data-sort="facturacion" type="button" aria-pressed="true">Facturación</button>
+          <button data-sort="unidades" type="button" aria-pressed="false">Unidades</button>
+        </div>
+        <button id="pv-csv" class="imp-ghost" type="button">↓ Descargar CSV</button>
+      </div>
+      <div id="pv-body" class="pv-body"></div>
+      <p class="imp-note" style="margin-top:10px">Respeta el <b>período</b> y el <b>canal</b> elegidos en el tablero. El CSV baja el detalle venta por venta (mes, canal, orden, SKU, unidades, facturación) listo para Excel.</p>
+    </div>
+  </div>
+
   <div class="sheet">
 
     <!-- ================= CONTEXTO ================= -->
@@ -366,6 +421,8 @@
           <button data-preset="6" type="button" aria-pressed="false">6 meses</button>
           <button data-preset="ytd" type="button" aria-pressed="false">Este año</button>
         </div>
+        <span class="flt-lab" style="margin-left:6px">Comprador</span>
+        <div id="flt-personas" class="flt-personas" role="group" aria-label="Filtrar por comprador"></div>
       </div>
 
       <div class="kpis" id="kpis"></div>
@@ -1182,7 +1239,7 @@ const COMPL = {
   Mario:['Impresora de tickets','Lector de código de barras','Etiquetadora de precios','Rollos y consumibles'],
 };
 
-const state = {tab:'negocio', canal:'Ambos', persona:'Juan', sort:'facturacion'};
+const state = {tab:'negocio', canal:'Ambos', persona:'Juan', sort:'facturacion', openFams:new Set()};
 
 const nf = new Intl.NumberFormat('es-AR');
 function money(n){
@@ -1208,8 +1265,21 @@ function renderKPIs(){
   const ps=DATA.personas;
   const total = canalTotal();
   const ord = DATA.totales.ordenes;
-  const lead = [...ps].sort((a,b)=>facFor(b)-facFor(a))[0];
   const canalLbl = state.canal==='Ambos'?'ambos canales':state.canal;
+  const pf = window.__personaFilter ? window.__personaFilter() : null;
+  if(pf){
+    // modo persona: los KPIs hablan de ese comprador; el peso se calcula contra el total sin filtrar
+    const rb = window.__rankBy ? window.__rankBy() : null;
+    const share = rb&&rb.total ? 100*((rb.by[pf]||{facturacion:0}).facturacion)/rb.total : 100;
+    const pd = ps.find(x=>x.key===pf)||{cuotas:0};
+    document.getElementById('kpis').innerHTML = `
+      <div class="kpi"><div class="lab">Facturación</div><div class="val tnum" style="color:${PC[pf]}">${money(total)}</div><div class="sub">${pf} · ${canalLbl} · ${DATA.meta.ventana}</div></div>
+      <div class="kpi"><div class="lab">Peso en el total</div><div class="val tnum" style="color:${PC[pf]}">${share.toFixed(1).replace('.',',')}<small>%</small></div><div class="sub">${pf} sobre los cinco compradores</div></div>
+      <div class="kpi"><div class="lab">Cuotas prom.</div><div class="val tnum">${String(pd.cuotas||0).replace('.',',')}</div><div class="sub">promedio por orden de ${pf}</div></div>
+      <div class="kpi"><div class="lab">Órdenes</div><div class="val tnum">${nf.format(ord)}</div><div class="sub">ticket prom. ${money(DATA.totales.ticket)}</div></div>`;
+    return;
+  }
+  const lead = [...ps].sort((a,b)=>facFor(b)-facFor(a))[0];
   document.getElementById('kpis').innerHTML = `
     <div class="kpi"><div class="lab">Facturación</div><div class="val tnum">${money(total)}</div><div class="sub">${canalLbl} · ${DATA.meta.ventana}</div></div>
     <div class="kpi"><div class="lab">Comprador #1</div><div class="val tnum" style="color:${PC[lead.key]}">${lead.key}</div><div class="sub">${(100*facFor(lead)/total).toFixed(1)}% de la facturación</div></div>
@@ -1219,11 +1289,16 @@ function renderKPIs(){
 
 // ---- Ranking
 function renderRank(){
-  const ps=[...DATA.personas].sort((a,b)=>facFor(b)-facFor(a));
-  const totAsig = canalTotal();
+  // con filtro de comprador activo, el ranking se calcula SIN ese filtro:
+  // sigue comparando a los cinco y sirve para saltar de uno a otro.
+  const rb = window.__rankBy ? window.__rankBy() : null;
+  const ps = rb
+    ? DATA.personas.map(p=>({key:p.key,facturacion:(rb.by[p.key]||{facturacion:0}).facturacion,ml:(rb.by[p.key]||{ml:0}).ml,tn:(rb.by[p.key]||{tn:0}).tn})).sort((a,b)=>b.facturacion-a.facturacion)
+    : [...DATA.personas].sort((a,b)=>facFor(b)-facFor(a));
+  const totAsig = rb ? (rb.total||1) : canalTotal();
   document.getElementById('rank').innerHTML = ps.map(p=>{
-    const f=facFor(p), pc=PC[p.key], sh=(100*f/totAsig).toFixed(1);
-    const mlp = p.facturacion? 100*p.ml/(p.ml+p.tn):0;
+    const f=p.facturacion, pc=PC[p.key], sh=(100*f/totAsig).toFixed(1);
+    const mlp = f? 100*p.ml/(p.ml+p.tn):0;
     const splitHtml = state.canal==='Ambos'
       ? `<div class="split"><i class="ml" style="width:${mlp}%;background:${pc}"></i><i class="tn" style="width:${100-mlp}%;background:${pc}"></i></div>` : '';
     return `<button class="prow" data-p="${p.key}" style="--pc:${pc}" aria-current="${state.persona===p.key}">
@@ -1233,16 +1308,29 @@ function renderRank(){
       ${splitHtml}
     </button>`;
   }).join('');
-  document.querySelectorAll('.prow').forEach(b=>b.addEventListener('click',()=>{state.persona=b.dataset.p;renderRank();renderDetail();}));
+  document.querySelectorAll('.prow').forEach(b=>b.addEventListener('click',()=>{
+    state.persona=b.dataset.p;
+    // si hay filtro de comprador activo, el click además mueve el filtro (recalcula todo)
+    if(!(window.__onPersonaPick&&window.__onPersonaPick(b.dataset.p))){renderRank();renderDetail();}
+  }));
 }
 
 // ---- Detail
+let lastDetailFor=null;
 function renderDetail(){
+  // el DOM es la verdad: antes de re-render, capturar qué familias están abiertas
+  // (así cambiar el orden o los filtros no las cierra; cambiar de persona arranca cerrado)
+  if(lastDetailFor===state.persona){
+    const cur=[...document.querySelectorAll('#detail .fam')];
+    if(cur.length)state.openFams=new Set(cur.filter(d=>d.open).map(d=>d.dataset.fam).filter(Boolean));
+  }else{state.openFams.clear();}
+  lastDetailFor=state.persona;
   const p=DATA.personas.find(x=>x.key===state.persona), pc=PC[p.key], m=META[p.key];
-  const fams=[...p.familias].sort((a,b)=>b.facturacion-a.facturacion);
-  const maxFam=fams.length?fams[0].facturacion:1;
+  const mval=x=>state.sort==='unidades'?x.unidades:x.facturacion; // métrica activa: ordena familias y productos
+  const fams=[...p.familias].sort((a,b)=>mval(b)-mval(a));
+  const maxFam=fams.length?mval(fams[0]):1;
   const famHtml=fams.map((f,i)=>{
-    const prods=[...f.productos].sort((a,b)=>state.sort==='unidades'?b.unidades-a.unidades:b.facturacion-a.facturacion);
+    const prods=[...f.productos].sort((a,b)=>mval(b)-mval(a));
     const rows=prods.map(pr=>`<div class="prod">
         <div class="pn">${pr.nombre}<span class="sku">${pr.sku}</span></div>
         <div class="m ${state.sort==='unidades'?'hi':''}"><span class="h">unid.</span>${nf.format(pr.unidades)}</div>
@@ -1250,12 +1338,12 @@ function renderDetail(){
         <div class="m ${state.sort==='facturacion'?'hi':''}"><span class="h">factura</span>${money(pr.facturacion)}</div>
       </div>`).join('');
     const extra=f.nProd>f.productos.length?`<div class="prod"><div class="pn" style="color:var(--muted)">+ ${f.nProd-f.productos.length} productos más en esta familia</div><div></div><div></div><div></div></div>`:'';
-    return `<details class="fam" style="--pc:${pc}">
+    return `<details class="fam" style="--pc:${pc}"${state.openFams.has(f.familia)?' open':''} data-fam="${String(f.familia).replace(/"/g,'&quot;')}">
       <summary>
         <div class="fn"><span class="chev">›</span>${f.familia} <small>· ${f.nProd} SKU</small></div>
-        <div class="ff tnum">${money(f.facturacion)}</div>
-        <div class="fbar"><i style="width:${100*f.facturacion/maxFam}%"></i></div>
-        <div class="fmeta"><span>${f.sharePct}% de ${p.key}</span><span>${nf.format(f.unidades)} u</span><span>precio prom. ${money(f.precioProm)}</span></div>
+        <div class="ff tnum">${state.sort==='unidades'?nf.format(f.unidades)+' u':money(f.facturacion)}</div>
+        <div class="fbar"><i style="width:${100*mval(f)/maxFam}%"></i></div>
+        <div class="fmeta"><span>${f.sharePct}% de ${p.key}</span><span>${state.sort==='unidades'?money(f.facturacion):nf.format(f.unidades)+' u'}</span><span>precio prom. ${money(f.precioProm)}</span></div>
       </summary>
       <div class="prods"><div class="prod colhdr"><div class="pn" style="font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)">Producto</div><div class="m"></div><div class="m"></div><div class="m"></div></div>${rows}${extra}</div>
     </details>`;
@@ -1269,7 +1357,7 @@ function renderDetail(){
   const combos=(p.bundles&&p.bundles.length)?p.bundles.map(b=>({h:b.hero,s:b.sug,n:b.n})):(XSELL[p.key]||[]);
   document.getElementById('detail').style.setProperty('--pc',pc);
   document.getElementById('detail').innerHTML = `
-    <div class="dt-head"><span class="dot"></span><div><h3>${p.key}</h3><div class="tag">${m.tag}</div></div></div>
+    <div class="dt-head"><span class="dot"></span><div><h3>${p.key}</h3><div class="tag">${m.tag}</div></div>${(window.__hasLines&&window.__hasLines())?'<button id="btn-ventas" class="pv-open" type="button">Todas las ventas <span aria-hidden="true">→</span></button>':''}</div>
     <div class="dt-sub">
       <div><div class="l">Facturación</div><div class="v">${money(p.facturacion)}</div></div>
       <div><div class="l">Ticket prom.</div><div class="v">${money(p.ticket)}</div></div>
@@ -1287,7 +1375,7 @@ function renderDetail(){
       </div>
     </div>
     ${fams.length?famHtml:'<p class="imp-note" style="margin:10px 2px">Sin ventas de este comprador en los datos cargados.</p>'}
-    <p style="font-family:var(--mono);font-size:10.5px;color:var(--muted);margin:10px 2px 0;line-height:1.5">El ranking ordena por <b>facturación</b> (impacto). Cambiá a <b>Unidades</b> y mirá cómo se reordena: los productos de mucho volumen y poco precio suben, pero no son los que más facturan.</p>
+    <p style="font-family:var(--mono);font-size:10.5px;color:var(--muted);margin:10px 2px 0;line-height:1.5"><b>Facturación</b> mide impacto ($); <b>Unidades</b>, volumen. Cambiá el orden y mirá cómo se reordenan familias y productos: los de mucho volumen y poco precio suben, pero no son los que más facturan.</p>
     <div class="xsell">
       <div class="xs-lab">Combos naturales de <b>${p.key}</b> · co-compra real en la misma orden</div>
       ${combos.length?combos.map(x=>`<div class="bundle"><div class="bx"><span class="h">compra</span> ${x.s ? `${x.h} <span class="arw">→</span> <span class="s">${x.s}</span>`:x.h}</div><div class="cnt">${x.n}× juntos</div></div>`).join(''):'<div class="imp-note" style="margin:2px">Sin co-compras registradas en este período.</div>'}
@@ -1296,7 +1384,9 @@ function renderDetail(){
       <div class="xs-note">Combos naturales = productos comprados en la misma orden (señal real, baja). “Deberías ofrecerle” = sugerencia editable de la agencia, no sale de los datos de venta.</div>
     </div>`;
 
-  document.querySelectorAll('.sortbtns button').forEach(b=>b.addEventListener('click',()=>{state.sort=b.dataset.sort;renderDetail();}));
+  document.querySelectorAll('#detail .sortbtns button').forEach(b=>b.addEventListener('click',()=>{state.sort=b.dataset.sort;renderDetail();}));
+  const bv=document.getElementById('btn-ventas');
+  if(bv)bv.addEventListener('click',()=>{if(window.__openVentas)window.__openVentas(state.persona);});
 }
 
 // ---- Coverage
@@ -1317,7 +1407,9 @@ function renderChart(){
   const pm=(DATA.porMes||[]).filter(m=>m.mes);
   if(pm.length<2){el.innerHTML='';el.hidden=true;return;} el.hidden=false;
   const val=m=>state.canal==='MercadoLibre'?(m.ml||0):state.canal==='TiendaNube'?(m.tn||0):m.facturacion;
-  const canalLbl=state.canal==='Ambos'?'ambos canales':state.canal;
+  const pf=window.__personaFilter?window.__personaFilter():null;
+  const barCol=pf?PC[pf]:'var(--accent)';
+  const canalLbl=(state.canal==='Ambos'?'ambos canales':state.canal)+(pf?' · '+pf:'');
   const max=Math.max.apply(null,pm.map(val).concat([1]));
   const cmp=v=>v>=1e9?('$'+(v/1e9).toFixed(1).replace('.',',')+'MM'):v>=1e6?('$'+Math.round(v/1e6)+'M'):v>=1e3?('$'+Math.round(v/1e3)+'K'):('$'+Math.round(v));
   const W=1000,H=180,padL=10,padR=10,top=28,base=H-24,bw=(W-padL-padR)/pm.length;
@@ -1326,7 +1418,7 @@ function renderChart(){
   const grid=[max,max/2].map(g=>`<line x1="${padL}" y1="${yOf(g).toFixed(1)}" x2="${W-padR}" y2="${yOf(g).toFixed(1)}" stroke="var(--line2)" stroke-width="1"/><text x="${padL}" y="${(yOf(g)-3).toFixed(1)}" font-size="9" fill="var(--faint)" font-family="var(--mono)">${cmp(g)}</text>`).join('');
   const bars=pm.map((m,i)=>{
     const v=val(m),h=Math.max(1,(v/max)*(base-top)),x=padL+i*bw,by=base-h,isPeak=m===peak,show=v/max>0.05;
-    return `<g><rect x="${(x+bw*0.16).toFixed(1)}" y="${by.toFixed(1)}" width="${(bw*0.68).toFixed(1)}" height="${h.toFixed(1)}" rx="2" fill="${isPeak?'var(--warn)':'var(--accent)'}"><title>${mesLbl(m.mes)}: ${money(v)}</title></rect>`
+    return `<g><rect x="${(x+bw*0.16).toFixed(1)}" y="${by.toFixed(1)}" width="${(bw*0.68).toFixed(1)}" height="${h.toFixed(1)}" rx="2" fill="${isPeak?'var(--warn)':barCol}"><title>${mesLbl(m.mes)}: ${money(v)}</title></rect>`
       +(show?`<text x="${(x+bw/2).toFixed(1)}" y="${(by-4).toFixed(1)}" font-size="9.5" text-anchor="middle" fill="${isPeak?'var(--warn)':'var(--muted)'}" font-family="var(--mono)" font-weight="600">${cmp(v)}</text>`:'')
       +`<text x="${(x+bw/2).toFixed(1)}" y="${(H-8).toFixed(1)}" font-size="9.5" text-anchor="middle" fill="var(--muted)" font-family="var(--mono)">${MES3B[+m.mes.slice(5,7)]}</text></g>`;
   }).join('');
@@ -1363,7 +1455,8 @@ renderLede();renderKPIs();renderRank();renderDetail();renderCov();renderChart();
   const BASELINE=JSON.parse(JSON.stringify(DATA)), BASELINE_UN=Object.assign({},UNASSIGNED);
   const MES3=['','ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
   let picked=[], maestroFile=null, lastBuild=null, MAESTRO_TEXT=null;
-  let LINES=[], SEEN=new Set(), MANIFEST=[], FILTER={desde:null,hasta:null,canal:'Ambos'};
+  let LINES=[], SEEN=new Set(), MANIFEST=[], FILTER={desde:null,hasta:null,canal:'Ambos',persona:null};
+  let RANKBY=null; // {by:{persona:{facturacion,ml,tn}},total} — ranking sin filtro de comprador
 
   // ---- CSV parser (mismo que tools/snapshot.mjs: comillas + delim configurable)
   function parseCSV(text,delim){
@@ -1450,26 +1543,55 @@ renderLede();renderKPIs();renderRank();renderDetail();renderCov();renderChart();
   }
   function setErr(m){statusEl.className='imp-status err';statusEl.textContent=m;}
   function setMsg(m){statusEl.className='imp-status';statusEl.innerHTML=m;}
-  function applyRender(){renderLede();renderKPIs();renderRank();renderDetail();renderCov();renderChart();}
+  function applyRender(){renderLede();renderKPIs();renderRank();renderDetail();renderCov();renderChart();if(pvPanel&&!pvPanel.hidden)renderPv();}
   function nowLabel(){try{return new Date().toLocaleDateString('es-AR');}catch(e){return DATA.meta.updated;}}
 
   // ---- núcleo: vista actual = líneas (filtradas) o baseline de ejemplo
-  function currentLines(){
+  // withPersona=false: aplica período+canal pero ignora el filtro de comprador
+  // (lo usan el ranking y el modal "Todas las ventas", que eligen persona por su cuenta).
+  function filteredLines(withPersona){
     if(!LINES.length)return null;
     const cf=FILTER.canal&&FILTER.canal!=='Ambos';
-    if(!FILTER.desde&&!FILTER.hasta&&!cf)return LINES;
+    const pf=withPersona?FILTER.persona:null;
+    if(!FILTER.desde&&!FILTER.hasta&&!cf&&!pf)return LINES;
     return LINES.filter(l=>{const m=l.mes||'';
       if(FILTER.desde&&m<FILTER.desde)return false;
       if(FILTER.hasta&&m>FILTER.hasta)return false;
       if(cf&&l.canal!==FILTER.canal)return false;
+      if(pf&&l.buyer!==pf)return false;
       return true;});
+  }
+  function currentLines(){return filteredLines(true);}
+  // rollup liviano para el ranking cuando hay filtro de comprador (una pasada, sin aggregate)
+  function rankTotals(ls){
+    const by={};let total=0;
+    for(const l of ls){
+      const p=l.buyer;
+      if(!p||p==='Sin asignar')continue;
+      const o=by[p]||(by[p]={facturacion:0,ml:0,tn:0});
+      o.facturacion+=l.facturacion;total+=l.facturacion;
+      if(l.canal==='MercadoLibre')o.ml+=l.facturacion;else o.tn+=l.facturacion;
+    }
+    return {by,total};
   }
   function recompute(){
     const ls=currentLines();
-    if(ls===null){DATA=JSON.parse(JSON.stringify(BASELINE));UNASSIGNED=Object.assign({},BASELINE_UN);lastBuild=null;}
-    else{lastBuild=buildSnapshotFromLines(ls);DATA=lastBuild.snapshot;UNASSIGNED=lastBuild.unassigned;}
+    pvAggCache=null; // los datos o filtros cambiaron: el modal se recalcula al abrirse
+    if(ls===null){DATA=JSON.parse(JSON.stringify(BASELINE));UNASSIGNED=Object.assign({},BASELINE_UN);lastBuild=null;RANKBY=null;}
+    else{
+      lastBuild=buildSnapshotFromLines(ls);DATA=lastBuild.snapshot;UNASSIGNED=lastBuild.unassigned;
+      RANKBY=FILTER.persona?rankTotals(filteredLines(false)):null;
+    }
     applyRender();updateStatics();refreshUI();
   }
+  // puentes para los renders globales (script de arriba)
+  window.__personaFilter=()=>FILTER.persona;
+  window.__rankBy=()=>RANKBY;
+  // click en el ranking con filtro activo -> mueve el filtro a esa persona y recalcula todo
+  window.__onPersonaPick=(p)=>{
+    if(!FILTER.persona||FILTER.persona===p)return false;
+    FILTER.persona=p;recompute();return true;
+  };
 
   function updateStatics(){
     const cu=DATA.personas.map(p=>p.cuotas).filter(x=>x>0).sort((a,b)=>a-b);
@@ -1478,7 +1600,7 @@ renderLede();renderKPIs();renderRank();renderDetail();renderCov();renderChart();
     $('hard-ord').textContent=nf.format(DATA.totales.ordenes);
     $('hard-cuo').textContent=cu.length?(cu[0]===cu[cu.length-1]?f1(cu[0]):f1(cu[0])+'–'+f1(cu[cu.length-1])):'—';
     $('hard-cob').textContent=String(DATA.totales.cobertura).replace('.',',')+'%';
-    $('stamp').innerHTML=`ventana <b>${DATA.meta.ventana}</b><br>MercadoLibre + TiendaNube · ${LINES.length?('actualizado '+nowLabel()):'datos de ejemplo'}`;
+    $('stamp').innerHTML=`ventana <b>${DATA.meta.ventana}</b>${FILTER.persona?' · <b>'+FILTER.persona+'</b>':''}<br>MercadoLibre + TiendaNube · ${LINES.length?('actualizado '+nowLabel()):'datos de ejemplo'}`;
   }
 
   // ---- badge de fuente + barra de filtros
@@ -1491,6 +1613,7 @@ renderLede();renderKPIs();renderRank();renderDetail();renderCov();renderChart();
       elHasta.innerHTML=opt(FILTER.hasta||ms[ms.length-1]);
     }
     elFlt.hidden=!has;
+    document.querySelectorAll('#flt-personas button').forEach(b=>b.setAttribute('aria-pressed',String((b.dataset.p||null)===(FILTER.persona||null))));
     resetBtn.hidden=!(MANIFEST.length>1);
   }
 
@@ -1543,7 +1666,7 @@ renderLede();renderKPIs();renderRank();renderDetail();renderCov();renderChart();
       }
       if(!LINES.length)throw new Error('No se leyeron ventas de los archivos. Verificá que sean los exports correctos: los .xlsx de MercadoLibre y el .csv de TiendaNube tal cual los descarga cada plataforma.');
       await persist();
-      FILTER={desde:null,hasta:null};      // tras cargar, mostrar todo el histórico
+      FILTER.desde=null;FILTER.hasta=null; // tras cargar, mostrar todo el histórico (canal/comprador quedan)
       recompute();
       renderRecon({nuevas,dups});
       picked=[];renderList();
@@ -1555,7 +1678,7 @@ renderLede();renderKPIs();renderRank();renderDetail();renderCov();renderChart();
 
   async function clearHistory(){
     if(!confirm('¿Borrar los updates que cargaste y volver a los datos base?'))return;
-    LINES=[];SEEN=new Set();MANIFEST=[];MAESTRO_TEXT=null;FILTER={desde:null,hasta:null,canal:'Ambos'};
+    LINES=[];SEEN=new Set();MANIFEST=[];MAESTRO_TEXT=null;FILTER={desde:null,hasta:null,canal:'Ambos',persona:null};
     try{await idbClear();}catch(e){}
     reconEl.hidden=true;maestroStatusEl.textContent='';
     await seedFromServer();
@@ -1607,18 +1730,105 @@ renderLede();renderKPIs();renderRank();renderDetail();renderCov();renderChart();
   elHasta.addEventListener('change',()=>{FILTER.hasta=elHasta.value;if(FILTER.desde&&FILTER.hasta<FILTER.desde)FILTER.desde=FILTER.hasta;recompute();});
   document.querySelectorAll('.flt-presets button').forEach(b=>b.addEventListener('click',()=>{
     const ms=monthsOf(LINES);if(!ms.length)return;const p=b.dataset.preset;
-    if(p==='all')FILTER={desde:null,hasta:null};
-    else if(p==='ytd')FILTER={desde:ms[ms.length-1].slice(0,4)+'-01',hasta:ms[ms.length-1]};
-    else FILTER={desde:ms[Math.max(0,ms.length-(+p))],hasta:ms[ms.length-1]};
+    // solo el período: no pisar el canal ni el comprador elegidos
+    if(p==='all'){FILTER.desde=null;FILTER.hasta=null;}
+    else if(p==='ytd'){FILTER.desde=ms[ms.length-1].slice(0,4)+'-01';FILTER.hasta=ms[ms.length-1];}
+    else{FILTER.desde=ms[Math.max(0,ms.length-(+p))];FILTER.hasta=ms[ms.length-1];}
     document.querySelectorAll('.flt-presets button').forEach(x=>x.setAttribute('aria-pressed',x===b));
     recompute();
   }));
+  // filtro por comprador: pills "Todos | Juan | …" — recalcula KPIs, gráfico y detalle
+  (function buildPersonaPills(){
+    const wrap=document.getElementById('flt-personas');if(!wrap)return;
+    const pers=PERSONAS.filter(p=>p!=='Sin asignar');
+    wrap.innerHTML=`<button type="button" aria-pressed="true">Todos</button>`
+      +pers.map(p=>`<button type="button" data-p="${p}" style="--bc:${PC[p]}" aria-pressed="false"><i></i>${p}</button>`).join('');
+    wrap.querySelectorAll('button').forEach(b=>b.addEventListener('click',()=>{
+      const p=b.dataset.p||null;
+      if((FILTER.persona||null)===p)return;
+      FILTER.persona=p;
+      if(p)state.persona=p;
+      recompute();
+    }));
+  })();
   document.querySelectorAll('.seg button').forEach(b=>b.addEventListener('click',()=>{
     state.canal=b.dataset.canal; FILTER.canal=b.dataset.canal;
     document.querySelectorAll('.seg button').forEach(x=>x.setAttribute('aria-pressed',x===b));
     recompute();
   }));
   $('dl-template').addEventListener('click',downloadTemplate);
+
+  // ---- "Todas las ventas": detalle completo por comprador (modal)
+  const pvPanel=$('pv-panel'),pvCloseBtn=$('pv-close'),pvPers=$('pv-personas'),pvSum=$('pv-sum'),
+        pvBody=$('pv-body'),pvQ=$('pv-q'),pvSortEl=$('pv-sort'),pvCsvBtn=$('pv-csv');
+  const pv={persona:'Juan',sort:'facturacion',q:''};
+  let pvAggCache=null; // aggregate sin filtro de comprador; se invalida en cada recompute()
+  function escHtml(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;');}
+  window.__hasLines=()=>LINES.length>0;
+  window.__openVentas=(p)=>{
+    if(!lastBuild)return;
+    if(p&&PERSONAS.includes(p))pv.persona=p;
+    pv.q='';pvQ.value='';
+    pvPanel.hidden=false;renderPv();
+    pvBody.scrollTop=0;
+  };
+  function pvAgg(){
+    if(!FILTER.persona)return lastBuild.agg; // sin filtro de comprador, la vista actual ya sirve
+    if(!pvAggCache)pvAggCache=aggregate(filteredLines(false)||[]);
+    return pvAggCache;
+  }
+  function renderPv(){
+    if(!lastBuild){pvPanel.hidden=true;return;}
+    const p=pv.persona, agg=pvAgg();
+    const b=(agg.byPersona&&agg.byPersona[p])||{facturacion:0,unidades:0,ordenes:0,ticket:0};
+    // selector de comprador
+    pvPers.innerHTML=PERSONAS.filter(x=>x!=='Sin asignar').map(x=>
+      `<button type="button" data-p="${x}" style="--bc:${PC[x]}" aria-pressed="${x===p}"><i></i>${x}</button>`).join('');
+    pvPers.querySelectorAll('button').forEach(btn=>btn.addEventListener('click',()=>{
+      pv.persona=btn.dataset.p;
+      state.persona=btn.dataset.p; // el tablero acompaña
+      if(!(window.__onPersonaPick&&window.__onPersonaPick(btn.dataset.p))){renderRank();renderDetail();}
+      renderPv();
+    }));
+    // familias completas, con todos los productos (sin recortes)
+    const mval=x=>pv.sort==='unidades'?x.unidades:x.facturacion;
+    const q=pv.q.trim().toLowerCase();
+    const fams=(agg.topByPersona[p]||[])
+      .map(f=>({...f,productos:f.productos.filter(x=>!q||String(x.nombre).toLowerCase().includes(q)||String(x.sku).toLowerCase().includes(q))}))
+      .filter(f=>f.productos.length)
+      .sort((a,b)=>mval(b)-mval(a));
+    const nProd=fams.reduce((a,f)=>a+f.productos.length,0);
+    const canalLbl=state.canal==='Ambos'?'ambos canales':state.canal;
+    pvSum.innerHTML=`<b>${money(b.facturacion)}</b> · <b>${nf.format(b.unidades)}</b> unidades · <b>${nf.format(b.ordenes)}</b> órdenes · ticket prom. <b>${money(b.ticket)}</b><br>`
+      +`${DATA.meta.ventana} · ${canalLbl} · ${fams.length} familias · ${nProd} productos${q?' (con esa búsqueda)':''}`;
+    const hdr=`<div class="pv-row hdr"><div class="n">Producto</div><div class="v">Unid.</div><div class="v">Precio</div><div class="v">Factura</div><div class="v">%</div></div>`;
+    pvBody.innerHTML=fams.length?hdr+fams.map(f=>{
+      const prods=[...f.productos].sort((a,b)=>mval(b)-mval(a));
+      return `<div class="pv-fam"><span>${escHtml(f.familia)}</span><span class="pv-fm">${nf.format(f.unidades)} u · ${money(f.facturacion)} · ${String(f.sharePct).replace('.',',')}%</span></div>`
+        +prods.map(x=>`<div class="pv-row"><div class="n">${escHtml(x.nombre)}<span class="sku">${escHtml(x.sku)}</span></div>`
+          +`<div class="v ${pv.sort==='unidades'?'hi':''}">${nf.format(x.unidades)}</div>`
+          +`<div class="v">${money(x.precioProm)}</div>`
+          +`<div class="v ${pv.sort==='facturacion'?'hi':''}">${money(x.facturacion)}</div>`
+          +`<div class="v">${String(x.sharePct).replace('.',',')}%</div></div>`).join('');
+    }).join(''):'<div class="imp-empty" style="padding:14px">Sin resultados para esa búsqueda.</div>';
+    pvSortEl.style.setProperty('--pc',PC[p]); // el toggle toma el color del comprador activo
+    pvSortEl.querySelectorAll('button').forEach(btn=>btn.setAttribute('aria-pressed',String(btn.dataset.sort===pv.sort)));
+  }
+  // CSV: el detalle de la persona venta por venta (vista de período+canal actual)
+  function pvDownloadCsv(){
+    const ls=(filteredLines(false)||[]).filter(l=>l.buyer===pv.persona);
+    const esc=s=>{s=String(s==null?'':s);return /[;"\n]/.test(s)?'"'+s.replace(/"/g,'""')+'"':s;};
+    const rows=ls.map(l=>[l.mes,l.canal,l.order_id,l.sku_raw||l.sku,l.nombre,l.familia,l.unidades,Math.round(l.facturacion),l.provincia,l.billable===false?'No':'Sí'].map(esc).join(';'));
+    const csv='Mes;Canal;Orden;SKU;Producto;Familia;Unidades;Facturación;Provincia;Válida\n'+rows.join('\n');
+    download(`ventas-${pv.persona.toLowerCase()}.csv`,'﻿'+csv,'text/csv;charset=utf-8');
+  }
+  function pvClose(){pvPanel.hidden=true;}
+  pvCloseBtn.addEventListener('click',pvClose);
+  pvPanel.addEventListener('click',e=>{if(e.target===pvPanel)pvClose();});
+  document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!pvPanel.hidden)pvClose();});
+  pvQ.addEventListener('input',()=>{pv.q=pvQ.value;renderPv();});
+  pvSortEl.querySelectorAll('button').forEach(b=>b.addEventListener('click',()=>{pv.sort=b.dataset.sort;renderPv();}));
+  pvCsvBtn.addEventListener('click',pvDownloadCsv);
 
   // Baja el histórico base (líneas) la 1ª visita y lo siembra en IndexedDB.
   async function seedFromServer(){
