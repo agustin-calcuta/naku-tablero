@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Public+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&display=swap">
 
 <style>
 /* ============================================================
@@ -36,8 +36,11 @@
 
   --sombra:0 1px 2px rgba(14,21,38,.05), 0 8px 24px rgba(14,21,38,.05);
   --radio:12px;
+  /* mismas familias que el tablero de ventas */
   --sans:"Public Sans",system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
-  --mono:"IBM Plex Mono",ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+  --mono:ui-monospace,"SF Mono","Cascadia Mono",Menlo,Consolas,monospace;
+  /* qué ícono muestra el botón de tema */
+  --ico-luna:block; --ico-sol:none;
 }
 
 /* dark: se redefinen SOLO los tokens, dos veces (sistema y elección explícita) */
@@ -53,6 +56,7 @@
     --ojo:#D79238; --ojo-fondo:#2E2415;
     --mal:#EC6A63; --mal-fondo:#331A1B;
     --sombra:0 1px 2px rgba(0,0,0,.3), 0 10px 28px rgba(0,0,0,.28);
+    --ico-luna:none; --ico-sol:block;
   }
 }
 :root[data-theme="dark"]{
@@ -66,6 +70,7 @@
   --ojo:#D79238; --ojo-fondo:#2E2415;
   --mal:#EC6A63; --mal-fondo:#331A1B;
   --sombra:0 1px 2px rgba(0,0,0,.3), 0 10px 28px rgba(0,0,0,.28);
+  --ico-luna:none; --ico-sol:block;
 }
 
 *{box-sizing:border-box}
@@ -86,14 +91,25 @@ a{color:var(--azul)}
 .top{position:sticky;top:0;z-index:30;background:color-mix(in srgb,var(--papel) 92%,transparent);
   backdrop-filter:blur(10px);border-bottom:1px solid var(--linea)}
 .topin{max-width:1200px;margin:0 auto;padding:12px 24px;display:flex;align-items:center;gap:20px;flex-wrap:wrap}
-.marca{display:flex;align-items:center;gap:10px}
-.marca svg{width:28px;height:28px;display:block;flex:none}
-.marca b{font-weight:800;font-size:21px;letter-spacing:-.03em}
-.marca span{font-weight:600;font-size:14px;color:var(--media);padding-left:11px;border-left:1px solid var(--linea)}
+/* lockup: el isotipo real de Naku, redibujado para que el hueco de la
+   cápsula deje pasar el fondo en los dos temas */
+.marca{display:flex;align-items:center;gap:7px}
+/* el cuadrado del isotipo queda a la altura de las mayúsculas, como en el logo */
+.marca .iso{width:17px;height:22px;display:block;flex:none;position:relative;top:-2px}
+.marca b{font-weight:800;font-size:23px;letter-spacing:-.04em;line-height:1}
+.marca span{font-weight:700;font-size:15px;color:var(--media);padding-left:12px;
+  border-left:1px solid var(--linea);letter-spacing:0}
 .nav{display:flex;gap:2px;margin-left:auto;flex-wrap:wrap}
 .nav a{font-size:13px;font-weight:600;color:var(--media);text-decoration:none;padding:6px 11px;border-radius:7px}
 .nav a:hover{background:var(--panel2);color:var(--tinta)}
 .nav a[aria-current="true"]{background:var(--azul);color:#fff}
+.tema{margin-left:8px;display:inline-flex;align-items:center;justify-content:center;
+  width:34px;height:34px;border:1px solid var(--linea);background:var(--panel);
+  border-radius:9px;color:var(--media);cursor:pointer;padding:0}
+.tema:hover{border-color:var(--azul);color:var(--azul)}
+.tema svg{width:17px;height:17px}
+.tema .luna{display:var(--ico-luna)}
+.tema .sol{display:var(--ico-sol)}
 
 /* ---------- aviso de demo ---------- */
 .aviso{background:var(--lima);color:#111315;border-bottom:1px solid rgba(17,19,21,.12)}
@@ -301,13 +317,28 @@ html{scroll-behavior:smooth;scroll-padding-top:96px}
 </head>
 <body>
 
+<script>
+/* Antes de pintar nada: si ya eligieron un tema, se respeta */
+try {
+  const g = localStorage.getItem('naku-tema');
+  if (g === 'dark' || g === 'light') document.documentElement.dataset.theme = g;
+} catch (e) { /* navegador sin storage: sigue el tema del sistema */ }
+</script>
+
 <header class="top">
   <div class="topin">
     <div class="marca">
-      <svg viewBox="0 0 32 32" role="img" aria-label="Naku">
-        <rect width="32" height="32" rx="1" fill="#084AD6"/>
-        <rect x="10.6" y="7.4" width="10.8" height="17.2" rx="5.4" fill="none" stroke="#fff" stroke-width="3"/>
-        <line x1="16" y1="12.4" x2="16" y2="19.6" stroke="#fff" stroke-width="3" stroke-linecap="round"/>
+      <svg class="iso" viewBox="0 0 89 113" role="img" aria-label="Naku">
+        <defs>
+          <mask id="asa">
+            <rect width="89" height="113" fill="#fff"/>
+            <rect x="22" y="7" width="44" height="80" rx="22" fill="none" stroke="#000" stroke-width="14"/>
+          </mask>
+          <clipPath id="sobre"><rect width="89" height="28"/></clipPath>
+        </defs>
+        <rect x="22" y="7" width="44" height="80" rx="22" fill="none" stroke="#1452F0"
+          stroke-width="14" clip-path="url(#sobre)"/>
+        <rect y="28" width="89" height="85" fill="#1452F0" mask="url(#asa)"/>
       </svg>
       <b>NAKU</b><span>Tablero de dirección</span>
     </div>
@@ -318,6 +349,17 @@ html{scroll-behavior:smooth;scroll-padding-top:96px}
       <a href="#clientes">Clientes</a>
       <a href="#agenda">La semana</a>
     </nav>
+    <button class="tema" id="tema" type="button" aria-label="Cambiar a modo oscuro">
+      <svg class="luna" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+        stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M20.5 14.4A8.5 8.5 0 1 1 9.6 3.5a7 7 0 0 0 10.9 10.9Z"/>
+      </svg>
+      <svg class="sol" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+        stroke-linecap="round" aria-hidden="true">
+        <circle cx="12" cy="12" r="4.2"/>
+        <path d="M12 2.4v2.2M12 19.4v2.2M4.2 4.2l1.6 1.6M18.2 18.2l1.6 1.6M2.4 12h2.2M19.4 12h2.2M4.2 19.8l1.6-1.6M18.2 5.8l1.6-1.6"/>
+      </svg>
+    </button>
   </div>
 </header>
 
@@ -883,15 +925,9 @@ function graficoLinea(destino, campo, color, etiqueta, formato){
     <line class="base" x1="${mIzq}" y1="${mSup+alto}" x2="${W-mDer}" y2="${mSup+alto}"/>
   </svg>`;
 }
-const tono = v => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
-function pintarLineas(){
-  graficoLinea('gMargen', 'mb', tono('--c1'), 'Margen bruto mensual en porcentaje', v => pct(v,1));
-  graficoLinea('gEbitda', 'eb', tono('--c4'), 'EBITDA mensual en porcentaje', v => pct(v,1));
-}
-pintarLineas();
-if (window.matchMedia) {
-  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', pintarLineas);
-}
+/* Los colores van como var(): así los gráficos siguen al tema sin redibujarse */
+graficoLinea('gMargen', 'mb', 'var(--c1)', 'Margen bruto mensual en porcentaje', v => pct(v,1));
+graficoLinea('gEbitda', 'eb', 'var(--c4)', 'EBITDA mensual en porcentaje', v => pct(v,1));
 
 /* ---------------- postventa ---------------- */
 const URGENCIAS = [
@@ -923,7 +959,7 @@ document.getElementById('postventaKpis').innerHTML = [
 
 document.getElementById('tendenciaCasos').innerHTML = `
   <span class="et">Casos abiertos al cierre de cada mes</span>
-  ${chispa(COLA, tono('--c4'), {w:320, h:52, clase:'tendenciaSvg'})}
+  ${chispa(COLA, 'var(--c4)', {w:320, h:52, clase:'tendenciaSvg'})}
   <div class="pieT"><span>ago 25 · 52 casos</span><span>jul 26 · 34 casos</span></div>`;
 
 let filtro = null;
@@ -982,6 +1018,23 @@ document.getElementById('notas').innerHTML = NOTAS.map(n => `
     <span class="marca-sev" aria-hidden="true"></span>
     <div><h4>${n.h}</h4><p>${n.p}</p><span class="quien">${n.q}</span></div>
   </article>`).join('');
+
+/* ---------------- claro / oscuro ---------------- */
+const raiz = document.documentElement;
+const botonTema = document.getElementById('tema');
+const sistemaOscuro = () => window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches;
+const temaVigente = () => raiz.dataset.theme || (sistemaOscuro() ? 'dark' : 'light');
+
+function aplicarTema(t, recordar){
+  raiz.dataset.theme = t;
+  botonTema.setAttribute('aria-label', t === 'dark' ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro');
+  botonTema.title = botonTema.getAttribute('aria-label');
+  if (recordar) { try { localStorage.setItem('naku-tema', t); } catch (e) { /* sin storage, no pasa nada */ } }
+}
+/* Sin elección propia el tablero sigue al sistema: sólo se marca el botón */
+botonTema.setAttribute('aria-label', temaVigente() === 'dark' ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro');
+botonTema.title = botonTema.getAttribute('aria-label');
+botonTema.addEventListener('click', () => aplicarTema(temaVigente() === 'dark' ? 'light' : 'dark', true));
 
 /* ---------------- navegación ---------------- */
 const secciones = [...document.querySelectorAll('main section')];
