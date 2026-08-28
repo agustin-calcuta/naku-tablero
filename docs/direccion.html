@@ -1,0 +1,1000 @@
+<!doctype html>
+<html lang="es-AR">
+<head>
+<meta charset="utf-8">
+<meta name="robots" content="noindex, nofollow">
+<title>Naku · Tablero de dirección</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+
+<style>
+/* ============================================================
+   NAKU · Tablero de dirección — prototipo con datos de demostración
+   Paleta y tipografía alineadas al tablero de ventas y a la
+   central de atención que ya usa Naku.
+   ============================================================ */
+
+:root{
+  /* superficies y tinta (neutros con sesgo azul, el azul de la marca) */
+  --papel:#F2F5FC; --panel:#FFFFFF; --panel2:#EEF3FD; --panel3:#E6EDFA;
+  --tinta:#0E1526; --media:#586277; --tenue:#8E98AD;
+  --linea:#D8E0F0; --linea2:#E9EEF9;
+
+  /* marca */
+  --azul:#084AD6; --azul-hover:#0B3CC4; --azul-suave:#E4ECFC; --lima:#E7F67F;
+
+  /* series categóricas — validadas para daltonismo sobre papel claro */
+  --c1:#084AD6; --c2:#A8447F; --c3:#B5771A; --c4:#0E8C74;
+  --c1-suave:#DDE7FB; --c2-suave:#F6E6F0;
+
+  /* estado (reservado: nunca se usa como serie) */
+  --bien:#1B8A50; --bien-fondo:#E2F1E9;
+  --ojo:#B5670F; --ojo-fondo:#FBEEDC;
+  --mal:#C42F2F; --mal-fondo:#FAE4E2;
+
+  --sombra:0 1px 2px rgba(14,21,38,.05), 0 8px 24px rgba(14,21,38,.05);
+  --radio:12px;
+  --sans:"Public Sans",system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+}
+
+/* dark: se redefinen SOLO los tokens, dos veces (sistema y elección explícita) */
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --papel:#0C1220; --panel:#141C2C; --panel2:#1A2435; --panel3:#212C40;
+    --tinta:#E9EEF8; --media:#9BA6BC; --tenue:#6B768D;
+    --linea:#28334A; --linea2:#1E283C;
+    --azul:#3E77E8; --azul-hover:#5A8BF0; --azul-suave:#1B2A4A; --lima:#E7F67F;
+    --c1:#3E77E8; --c2:#BE5B95; --c3:#C0862A; --c4:#17A07F;
+    --c1-suave:#1D2C4C; --c2-suave:#33223A;
+    --bien:#3FB878; --bien-fondo:#122A20;
+    --ojo:#D79238; --ojo-fondo:#2E2415;
+    --mal:#EC6A63; --mal-fondo:#331A1B;
+    --sombra:0 1px 2px rgba(0,0,0,.3), 0 10px 28px rgba(0,0,0,.28);
+  }
+}
+:root[data-theme="dark"]{
+  --papel:#0C1220; --panel:#141C2C; --panel2:#1A2435; --panel3:#212C40;
+  --tinta:#E9EEF8; --media:#9BA6BC; --tenue:#6B768D;
+  --linea:#28334A; --linea2:#1E283C;
+  --azul:#3E77E8; --azul-hover:#5A8BF0; --azul-suave:#1B2A4A; --lima:#E7F67F;
+  --c1:#3E77E8; --c2:#BE5B95; --c3:#C0862A; --c4:#17A07F;
+  --c1-suave:#1D2C4C; --c2-suave:#33223A;
+  --bien:#3FB878; --bien-fondo:#122A20;
+  --ojo:#D79238; --ojo-fondo:#2E2415;
+  --mal:#EC6A63; --mal-fondo:#331A1B;
+  --sombra:0 1px 2px rgba(0,0,0,.3), 0 10px 28px rgba(0,0,0,.28);
+}
+
+*{box-sizing:border-box}
+body{
+  margin:0; background:var(--papel); color:var(--tinta);
+  font-family:var(--sans); font-size:15px; line-height:1.5;
+  -webkit-font-smoothing:antialiased;
+  background-image:linear-gradient(var(--linea2) 1px,transparent 1px),linear-gradient(90deg,var(--linea2) 1px,transparent 1px);
+  background-size:28px 28px; background-position:-1px -1px;
+}
+h1,h2,h3{margin:0;font-weight:800;letter-spacing:-.02em;text-wrap:balance}
+.mono{font-family:var(--mono);font-variant-numeric:tabular-nums}
+.num{font-family:var(--mono);font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+a{color:var(--azul)}
+:focus-visible{outline:2px solid var(--azul);outline-offset:2px;border-radius:4px}
+
+/* ---------- barra superior ---------- */
+.top{position:sticky;top:0;z-index:30;background:color-mix(in srgb,var(--papel) 92%,transparent);
+  backdrop-filter:blur(10px);border-bottom:1px solid var(--linea)}
+.topin{max-width:1200px;margin:0 auto;padding:12px 24px;display:flex;align-items:center;gap:20px;flex-wrap:wrap}
+.marca{display:flex;align-items:center;gap:10px}
+.marca svg{width:28px;height:28px;display:block;flex:none}
+.marca b{font-weight:800;font-size:21px;letter-spacing:-.03em}
+.marca span{font-weight:600;font-size:14px;color:var(--media);padding-left:11px;border-left:1px solid var(--linea)}
+.nav{display:flex;gap:2px;margin-left:auto;flex-wrap:wrap}
+.nav a{font-size:13px;font-weight:600;color:var(--media);text-decoration:none;padding:6px 11px;border-radius:7px}
+.nav a:hover{background:var(--panel2);color:var(--tinta)}
+.nav a[aria-current="true"]{background:var(--azul);color:#fff}
+
+/* ---------- aviso de demo ---------- */
+.aviso{background:var(--lima);color:#111315;border-bottom:1px solid rgba(17,19,21,.12)}
+.avisoin{max-width:1200px;margin:0 auto;padding:9px 24px;display:flex;align-items:center;gap:14px;flex-wrap:wrap;font-size:13px}
+.avisoin b{font-family:var(--mono);font-size:10.5px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;
+  background:#111315;color:var(--lima);padding:3px 8px;border-radius:5px;white-space:nowrap}
+
+.hoja{max-width:1200px;margin:0 auto;padding:0 24px 80px}
+
+/* ---------- encabezado de página ---------- */
+.portada{display:flex;align-items:flex-end;justify-content:space-between;gap:24px;flex-wrap:wrap;padding:34px 0 6px}
+.portada h1{font-size:clamp(28px,4vw,40px);line-height:1.05}
+.portada p{margin:8px 0 0;color:var(--media);max-width:56ch;font-size:15px}
+.periodo{text-align:right}
+.periodo .et{font-family:var(--mono);font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--tenue)}
+.periodo b{display:block;font-size:19px;font-weight:700;letter-spacing:-.02em}
+.periodo small{display:block;color:var(--media);font-size:12.5px}
+
+/* ---------- separador de sección ---------- */
+.rotulo{display:flex;align-items:center;gap:14px;margin:44px 0 16px}
+.rotulo .lab{font-family:var(--mono);font-size:11px;letter-spacing:.18em;text-transform:uppercase;
+  color:var(--media);white-space:nowrap;font-weight:500}
+.rotulo .regla{flex:1;height:1px;background:var(--linea)}
+.rotulo .fuente{font-size:11.5px;color:var(--tenue);white-space:nowrap}
+
+/* ---------- tarjetas ---------- */
+.panel{background:var(--panel);border:1px solid var(--linea);border-radius:var(--radio);box-shadow:var(--sombra)}
+.panel > header{display:flex;align-items:baseline;justify-content:space-between;gap:12px;
+  padding:15px 18px 0;flex-wrap:wrap}
+.panel > header h3{font-size:15.5px;font-weight:700;letter-spacing:-.015em}
+.panel > header .sub{font-size:12px;color:var(--media)}
+.panel .cuerpo{padding:14px 18px 18px}
+
+.rejilla{display:grid;gap:14px}
+.r2{grid-template-columns:repeat(2,minmax(0,1fr))}
+.r3{grid-template-columns:repeat(3,minmax(0,1fr))}
+.r-53{grid-template-columns:minmax(0,5fr) minmax(0,3fr)}
+.r-35{grid-template-columns:minmax(0,3fr) minmax(0,5fr)}
+@media (max-width:900px){.r2,.r3,.r-53,.r-35{grid-template-columns:minmax(0,1fr)}}
+
+/* ---------- fichas de indicador ---------- */
+.fichas{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-top:18px}
+@media (max-width:900px){.fichas{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:560px){.fichas{grid-template-columns:minmax(0,1fr)}}
+.ficha{background:var(--panel);border:1px solid var(--linea);border-radius:var(--radio);
+  padding:15px 17px 13px;box-shadow:var(--sombra);display:flex;flex-direction:column;gap:6px}
+.ficha .et{font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--media)}
+.ficha .val{font-family:var(--mono);font-size:31px;font-weight:600;letter-spacing:-.035em;line-height:1.05}
+.ficha .val small{font-size:16px;font-weight:500;color:var(--media);letter-spacing:-.01em}
+.ficha .pie{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:auto;padding-top:4px}
+.ficha .glosa{font-size:12px;color:var(--media)}
+.ficha svg.chispa{width:96px;height:30px;flex:none}
+
+.delta{display:inline-flex;align-items:center;gap:4px;font-family:var(--mono);font-size:12px;font-weight:600;
+  padding:2px 7px;border-radius:20px;white-space:nowrap}
+.delta.sube{background:var(--bien-fondo);color:var(--bien)}
+.delta.baja{background:var(--mal-fondo);color:var(--mal)}
+.delta.plano{background:var(--panel2);color:var(--media)}
+
+/* ---------- estado de resultados ---------- */
+table.eerr{width:100%;border-collapse:collapse;font-size:13.5px;min-width:470px}
+table.eerr th{font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--media);font-weight:500;text-align:right;padding:0 0 9px;border-bottom:1px solid var(--linea)}
+table.eerr th:first-child{text-align:left}
+table.eerr td{padding:7px 0;border-bottom:1px solid var(--linea2);text-align:right;white-space:nowrap;
+  font-family:var(--mono);font-variant-numeric:tabular-nums}
+table.eerr td:first-child{text-align:left;white-space:normal;font-family:var(--sans);color:var(--media)}
+table.eerr td.barra{width:88px;padding-left:14px}
+table.eerr tr.total td{font-weight:700;color:var(--tinta);border-bottom:1px solid var(--linea);
+  border-top:1px solid var(--linea);padding:10px 0}
+table.eerr tr.total td:first-child{font-weight:700;color:var(--tinta);font-family:var(--sans)}
+table.eerr tr.destacado td{background:var(--azul-suave)}
+table.eerr tr.destacado td:first-child{padding-left:8px;border-radius:6px 0 0 6px}
+table.eerr tr.destacado td:last-child{padding-right:8px;border-radius:0 6px 6px 0}
+table.eerr .neg{color:var(--media)}
+.mini{display:block;height:7px;border-radius:2px;background:var(--linea2);overflow:hidden}
+.mini i{display:block;height:100%;border-radius:2px;background:var(--c1)}
+.mini.gasto i{background:var(--c3)}
+
+/* ---------- barras horizontales ---------- */
+.lista{display:flex;flex-direction:column;gap:11px}
+.item{display:grid;grid-template-columns:1fr auto;gap:3px 12px;align-items:baseline}
+.item .nom{font-size:13.5px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.item .nom em{font-style:normal;font-family:var(--mono);font-size:11px;color:var(--tenue);margin-right:7px}
+.item .cif{font-family:var(--mono);font-size:13px;font-variant-numeric:tabular-nums;white-space:nowrap}
+.item .cif span{color:var(--media);font-size:11.5px;margin-left:7px}
+.item .riel{grid-column:1 / -1;height:8px;border-radius:2px;background:var(--linea2);overflow:hidden}
+.item .riel i{display:block;height:100%;border-radius:2px;background:var(--c1);
+  transition:width .5s cubic-bezier(.2,.7,.3,1)}
+.item.c2 .riel i{background:var(--c2)} .item.c3 .riel i{background:var(--c3)} .item.c4 .riel i{background:var(--c4)}
+@media (max-width:620px){
+  .item .cif{white-space:normal;text-align:right}
+  .item .cif span{display:block;margin-left:0}
+}
+
+/* ---------- gráficos ---------- */
+.grafico{position:relative}
+.grafico svg{width:100%;height:auto;display:block;overflow:visible}
+.eje{font-family:var(--mono);font-size:10px;fill:var(--tenue)}
+.malla{stroke:var(--linea2);stroke-width:1}
+.base{stroke:var(--linea);stroke-width:1}
+.s1{fill:var(--c1)} .s2{fill:var(--c2)}
+.l1{stroke:var(--c1);fill:none;stroke-width:2;stroke-linejoin:round;stroke-linecap:round}
+.l4{stroke:var(--c4);fill:none;stroke-width:2;stroke-linejoin:round;stroke-linecap:round}
+.a1{fill:var(--c1);opacity:.10} .a4{fill:var(--c4);opacity:.10}
+.pico{fill:var(--panel);stroke-width:2}
+.zona:hover{cursor:crosshair}
+.zona rect{fill:transparent}
+
+.panel.estira{display:flex;flex-direction:column}
+.panel.estira .cuerpo{flex:1;display:flex;flex-direction:column}
+.panel.estira #postventaKpis{margin-top:16px}
+.tendencia{margin-top:auto;padding-top:16px;border-top:1px solid var(--linea)}
+.tendencia .et{display:block;font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--media);margin-bottom:6px}
+.tendencia svg{width:100%;height:auto;display:block}
+.tendencia .pieT{display:flex;justify-content:space-between;font-size:11.5px;color:var(--tenue);margin-top:2px}
+
+/* pares dato/valor, para cifras que no comparten escala */
+.dato{display:flex;align-items:baseline;justify-content:space-between;gap:12px;
+  padding:7px 0;border-bottom:1px solid var(--linea2);font-size:13.5px}
+.dato:last-child{border-bottom:0;padding-bottom:0}
+.dato span{color:var(--media)}
+.dato b{font-size:15px;font-weight:600;letter-spacing:-.02em}
+.globo{position:absolute;pointer-events:none;opacity:0;transform:translate(-50%,-118%);
+  background:var(--tinta);color:var(--papel);border-radius:8px;padding:8px 11px;font-size:12px;
+  line-height:1.45;white-space:nowrap;box-shadow:0 8px 24px rgba(0,0,0,.22);transition:opacity .12s;z-index:5}
+.globo b{font-family:var(--mono);font-variant-numeric:tabular-nums}
+.globo .fila{display:flex;align-items:center;gap:7px}
+.globo i{width:8px;height:8px;border-radius:2px;flex:none}
+.leyenda{display:flex;gap:16px;flex-wrap:wrap;font-size:12.5px;color:var(--media);margin-top:12px}
+.leyenda span{display:inline-flex;align-items:center;gap:7px}
+.leyenda i{width:10px;height:10px;border-radius:3px;flex:none}
+
+/* ---------- semáforo de casos ---------- */
+.luces{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.luz{border:1px solid var(--linea);border-radius:10px;padding:11px 13px;background:var(--panel);
+  cursor:pointer;text-align:left;font-family:inherit;color:inherit;display:flex;flex-direction:column;gap:2px}
+.luz .n{font-family:var(--mono);font-size:26px;font-weight:600;line-height:1.05;letter-spacing:-.03em}
+.luz .t{font-size:12.5px;font-weight:600;display:flex;align-items:center;gap:6px}
+.luz .t svg{width:13px;height:13px;flex:none}
+.luz .d{font-size:11.5px;color:var(--media)}
+.luz.alta{background:var(--mal-fondo);border-color:color-mix(in srgb,var(--mal) 30%,transparent);color:var(--mal)}
+.luz.media{background:var(--ojo-fondo);border-color:color-mix(in srgb,var(--ojo) 30%,transparent);color:var(--ojo)}
+.luz.baja{background:var(--bien-fondo);border-color:color-mix(in srgb,var(--bien) 30%,transparent);color:var(--bien)}
+.luz .d{color:inherit;opacity:.78}
+.luz[aria-pressed="true"]{box-shadow:0 0 0 2px var(--tinta) inset}
+
+/* ---------- tabla de casos ---------- */
+.tablaEnv{overflow-x:auto;margin-top:14px}
+table.casos{width:100%;border-collapse:collapse;font-size:13px;min-width:620px}
+table.casos th{font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--media);font-weight:500;text-align:left;padding:0 10px 8px 0;border-bottom:1px solid var(--linea)}
+table.casos td{padding:9px 10px 9px 0;border-bottom:1px solid var(--linea2);vertical-align:middle}
+table.casos td.id{font-family:var(--mono);font-size:12px;color:var(--media)}
+table.casos td.dias{font-family:var(--mono);text-align:right;padding-right:0}
+table.casos tr.vencido td.dias{color:var(--mal);font-weight:600}
+.chip{display:inline-flex;align-items:center;gap:5px;font-size:11.5px;font-weight:600;
+  padding:2px 8px;border-radius:20px;white-space:nowrap}
+.chip.alta{background:var(--mal-fondo);color:var(--mal)}
+.chip.media{background:var(--ojo-fondo);color:var(--ojo)}
+.chip.baja{background:var(--bien-fondo);color:var(--bien)}
+.chip.neutro{background:var(--panel2);color:var(--media)}
+
+/* ---------- embudos ---------- */
+.pestanas{display:flex;gap:3px;background:var(--panel2);border:1px solid var(--linea);
+  border-radius:8px;padding:3px}
+.pestanas button{font-family:inherit;font-size:12.5px;font-weight:600;color:var(--media);
+  background:none;border:0;padding:5px 12px;border-radius:6px;cursor:pointer}
+.pestanas button[aria-selected="true"]{background:var(--azul);color:#fff}
+.etapas{display:flex;flex-direction:column;gap:9px}
+.etapa{display:grid;grid-template-columns:1fr auto;gap:2px 12px;align-items:baseline}
+.etapa .e{font-size:13px;font-weight:600}
+.etapa .v{font-family:var(--mono);font-size:13px}
+.etapa .v span{color:var(--media);font-size:11.5px;margin-left:8px}
+.etapa .riel{grid-column:1 / -1;height:22px;border-radius:4px;background:var(--linea2);overflow:hidden}
+.etapa .riel i{display:block;height:100%;border-radius:4px;background:var(--c1);opacity:.92;
+  transition:width .5s cubic-bezier(.2,.7,.3,1)}
+.etapa.gana .riel i{background:var(--c4)}
+.etapa.pierde .riel i{background:var(--linea)}
+
+/* ---------- agenda de la semana ---------- */
+.agenda{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+@media (max-width:900px){.agenda{grid-template-columns:minmax(0,1fr)}}
+.nota{background:var(--panel);border:1px solid var(--linea);border-radius:var(--radio);
+  padding:15px 17px;box-shadow:var(--sombra);display:flex;gap:13px;align-items:flex-start}
+.nota .marca-sev{width:4px;align-self:stretch;border-radius:3px;flex:none}
+.nota.mal .marca-sev{background:var(--mal)} .nota.ojo .marca-sev{background:var(--ojo)}
+.nota.bien .marca-sev{background:var(--bien)} .nota.info .marca-sev{background:var(--azul)}
+.nota h4{margin:0 0 4px;font-size:14.5px;font-weight:700;letter-spacing:-.01em}
+.nota p{margin:0;font-size:13px;color:var(--media);line-height:1.5}
+.nota .quien{display:inline-block;margin-top:8px;font-family:var(--mono);font-size:11px;
+  color:var(--media);background:var(--panel2);border-radius:20px;padding:2px 9px}
+
+/* ---------- pie ---------- */
+.pie-doc{margin-top:52px;padding-top:20px;border-top:1px solid var(--linea);
+  display:flex;justify-content:space-between;gap:18px;flex-wrap:wrap;font-size:12.5px;color:var(--media)}
+.pie-doc b{color:var(--tinta)}
+
+@media (prefers-reduced-motion:reduce){
+  *{animation:none !important;transition:none !important;scroll-behavior:auto !important}
+}
+html{scroll-behavior:smooth;scroll-padding-top:96px}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="topin">
+    <div class="marca">
+      <svg viewBox="0 0 32 32" role="img" aria-label="Naku">
+        <rect width="32" height="32" rx="1" fill="#084AD6"/>
+        <rect x="10.6" y="7.4" width="10.8" height="17.2" rx="5.4" fill="none" stroke="#fff" stroke-width="3"/>
+        <line x1="16" y1="12.4" x2="16" y2="19.6" stroke="#fff" stroke-width="3" stroke-linecap="round"/>
+      </svg>
+      <b>NAKU</b><span>Tablero de dirección</span>
+    </div>
+    <nav class="nav" aria-label="Secciones">
+      <a href="#pulso">Pulso</a>
+      <a href="#finanzas">Finanzas</a>
+      <a href="#ventas">Ventas</a>
+      <a href="#clientes">Clientes</a>
+      <a href="#agenda">La semana</a>
+    </nav>
+  </div>
+</header>
+
+<div class="aviso">
+  <div class="avisoin">
+    <b>Datos de demostración</b>
+    <span>Los números son inventados y sirven para mostrar el diseño. Cuando conectemos Odoo por API, el tablero se llena solo: nadie va a tener que cargar nada a mano.</span>
+  </div>
+</div>
+
+<main class="hoja">
+
+  <!-- ══════════ PULSO ══════════ -->
+  <section id="pulso">
+    <div class="portada">
+      <div>
+        <h1>Cómo viene la empresa</h1>
+        <p>Una sola vista con las tres fuentes que hoy están separadas: las ventas de Mercado&nbsp;Libre y Tienda&nbsp;Nube, el resultado del mes y la central de atención al cliente.</p>
+      </div>
+      <div class="periodo">
+        <span class="et">Mes cerrado</span>
+        <b>Julio 2026</b>
+        <small>Comparado contra junio 2026</small>
+      </div>
+    </div>
+
+    <div class="fichas" id="fichas"></div>
+  </section>
+
+  <!-- ══════════ FINANZAS ══════════ -->
+  <section id="finanzas">
+    <div class="rotulo">
+      <span class="lab">Finanzas</span><span class="regla"></span>
+      <span class="fuente">Fuente futura · Odoo Contabilidad</span>
+    </div>
+
+    <div class="rejilla r-53">
+      <div class="panel">
+        <header>
+          <h3>Estado de resultados</h3>
+          <span class="sub">Julio 2026 · en pesos</span>
+        </header>
+        <div class="cuerpo">
+          <div class="tablaEnv">
+            <table class="eerr" id="tablaEerr">
+              <thead>
+                <tr><th>Concepto</th><th>Julio 2026</th><th>% s/ventas</th><th>vs junio</th><th></th></tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:14px">
+        <div class="panel">
+          <header><h3>Posición al 31/07</h3></header>
+          <div class="cuerpo">
+            <div class="lista" id="posicion"></div>
+          </div>
+        </div>
+        <div class="panel">
+          <header><h3>A dónde se va cada peso</h3><span class="sub">Sobre ventas netas</span></header>
+          <div class="cuerpo">
+            <div class="lista" id="gastos"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="rejilla r2" style="margin-top:14px">
+      <div class="panel">
+        <header><h3>Margen bruto</h3><span class="sub">% sobre ventas netas · 12 meses</span></header>
+        <div class="cuerpo"><div class="grafico" id="gMargen"></div></div>
+      </div>
+      <div class="panel">
+        <header><h3>Resultado operativo (EBITDA)</h3><span class="sub">% sobre ventas netas · 12 meses</span></header>
+        <div class="cuerpo"><div class="grafico" id="gEbitda"></div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════ VENTAS ══════════ -->
+  <section id="ventas">
+    <div class="rotulo">
+      <span class="lab">Ventas</span><span class="regla"></span>
+      <span class="fuente">Hoy · exports de Mercado Libre y Tienda Nube</span>
+    </div>
+
+    <div class="panel">
+      <header>
+        <h3>Facturación por mes y canal</h3>
+        <span class="sub">Agosto 2025 – julio 2026</span>
+      </header>
+      <div class="cuerpo">
+        <div class="grafico" id="gMeses"></div>
+        <div class="leyenda">
+          <span><i style="background:var(--c1)"></i> Mercado Libre</span>
+          <span><i style="background:var(--c2)"></i> Tienda Nube</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="rejilla r-53" style="margin-top:14px">
+      <div class="panel">
+        <header><h3>Los que traccionan</h3><span class="sub">Julio 2026 · top 8 por facturación</span></header>
+        <div class="cuerpo"><div class="lista" id="productos"></div></div>
+      </div>
+      <div class="panel">
+        <header><h3>Mix por familia</h3><span class="sub">% de la facturación del mes</span></header>
+        <div class="cuerpo"><div class="lista" id="familias"></div></div>
+      </div>
+    </div>
+
+    <div class="rejilla r2" style="margin-top:14px">
+      <div class="panel">
+        <header><h3>De dónde compran</h3><span class="sub">Facturación por provincia</span></header>
+        <div class="cuerpo"><div class="lista" id="provincias"></div></div>
+      </div>
+      <div class="panel">
+        <header><h3>Cómo llega el paquete</h3><span class="sub">Órdenes por tipo de envío</span></header>
+        <div class="cuerpo"><div class="lista" id="envios"></div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════ CLIENTES ══════════ -->
+  <section id="clientes">
+    <div class="rotulo">
+      <span class="lab">Atención al cliente</span><span class="regla"></span>
+      <span class="fuente">Hoy · central de atención interna</span>
+    </div>
+
+    <div class="rejilla r-35">
+      <div class="panel estira">
+        <header><h3>Postventa abierta</h3><span class="sub">Al 31/07</span></header>
+        <div class="cuerpo">
+          <div class="luces" id="luces"></div>
+          <div id="postventaKpis"></div>
+          <div class="tendencia" id="tendenciaCasos"></div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <header>
+          <h3>Casos abiertos</h3>
+          <span class="sub" id="filtroTexto">Los 12 casos que siguen sin cerrar</span>
+        </header>
+        <div class="cuerpo">
+          <div class="tablaEnv">
+            <table class="casos">
+              <thead>
+                <tr><th>Caso</th><th>Urgencia</th><th>Motivo</th><th>Producto</th><th>Responsable</th><th style="text-align:right">Días</th></tr>
+              </thead>
+              <tbody id="tablaCasos"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="rejilla r2" style="margin-top:14px">
+      <div class="panel">
+        <header>
+          <h3>Preventa: consultas que se vuelven ventas</h3>
+          <div class="pestanas" role="tablist" aria-label="Tipo de preventa">
+            <button role="tab" id="tab-minorista" aria-selected="true" aria-controls="embudo">Minorista</button>
+            <button role="tab" id="tab-volumen" aria-selected="false" aria-controls="embudo">Por volumen</button>
+          </div>
+        </header>
+        <div class="cuerpo">
+          <div class="etapas" id="embudo" role="tabpanel" aria-labelledby="tab-minorista"></div>
+          <p class="sub" id="embudoNota" style="margin:14px 0 0;font-size:12.5px;color:var(--media)"></p>
+        </div>
+      </div>
+      <div class="panel">
+        <header><h3>Por qué escriben</h3><span class="sub">Reclamos de postventa ingresados en julio</span></header>
+        <div class="cuerpo"><div class="lista" id="reclamos"></div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════ AGENDA ══════════ -->
+  <section id="agenda">
+    <div class="rotulo">
+      <span class="lab">Para la reunión de la semana</span><span class="regla"></span>
+      <span class="fuente">Lo que el tablero marcó solo</span>
+    </div>
+    <div class="agenda" id="notas"></div>
+  </section>
+
+  <footer class="pie-doc">
+    <span>Prototipo de tablero de dirección · <b>Naku</b> · agosto 2026</span>
+    <span>Ventas, finanzas y postventa en una sola pantalla. Números de demostración.</span>
+  </footer>
+</main>
+
+<script>
+/* ============================================================
+   Datos de demostración.
+   Los SKU, las familias y las magnitudes salen del maestro real
+   de Naku para que el prototipo se lea como su negocio; los
+   importes del mes y todo lo financiero son inventados.
+   ============================================================ */
+
+const MESES = [
+  {m:'ago 25', ml:177775208, tn:4627257,  ord:4612,  mb:45.1, eb:6.2},
+  {m:'sep 25', ml:249038041, tn:3106929,  ord:6208,  mb:45.8, eb:6.9},
+  {m:'oct 25', ml:279653986, tn:14620088, ord:7166,  mb:46.2, eb:7.4},
+  {m:'nov 25', ml:343480761, tn:46258469, ord:9318,  mb:47.4, eb:8.8},
+  {m:'dic 25', ml:306412355, tn:30256606, ord:8010,  mb:46.6, eb:8.1},
+  {m:'ene 26', ml:335283626, tn:15581811, ord:8494,  mb:45.9, eb:7.2},
+  {m:'feb 26', ml:268372526, tn:7038842,  ord:6688,  mb:44.8, eb:5.9},
+  {m:'mar 26', ml:354909347, tn:10330930, ord:8755,  mb:46.1, eb:7.0},
+  {m:'abr 26', ml:357510087, tn:28580963, ord:9154,  mb:46.8, eb:7.6},
+  {m:'may 26', ml:417268505, tn:53558888, ord:11078, mb:47.5, eb:8.4},
+  {m:'jun 26', ml:395870000, tn:46440000, ord:10536, mb:46.9, eb:7.8},
+  {m:'jul 26', ml:448930000, tn:59710000, ord:11842, mb:48.6, eb:9.6}
+];
+MESES.forEach(x => x.fact = x.ml + x.tn);
+
+const EERR = [
+  {c:'Ventas brutas',                v:508640000,  pct:102.5, var:15.0, tipo:'normal'},
+  {c:'Devoluciones y bonificaciones',v:-12460000,  pct:-2.5,  var:6.2,  tipo:'normal'},
+  {c:'Ventas netas',                 v:496180000,  pct:100,   var:15.0, tipo:'total'},
+  {c:'Costo de la mercadería',       v:-255020000, pct:-51.4, var:12.0, tipo:'gasto'},
+  {c:'Margen bruto',                 v:241160000,  pct:48.6,  var:19.2, tipo:'destacado'},
+  {c:'Comisiones de plataforma',     v:-70460000,  pct:-14.2, var:14.1, tipo:'gasto'},
+  {c:'Envíos y logística',           v:-35230000,  pct:-7.1,  var:11.8, tipo:'gasto'},
+  {c:'Marketing y publicidad',       v:-21340000,  pct:-4.3,  var:22.4, tipo:'gasto'},
+  {c:'Estructura y sueldos',         v:-51600000,  pct:-10.4, var:4.6,  tipo:'gasto'},
+  {c:'Impuestos y gastos bancarios', v:-14880000,  pct:-3.0,  var:15.3, tipo:'gasto'},
+  {c:'EBITDA',                       v:47650000,   pct:9.6,   var:41.6, tipo:'destacado'},
+  {c:'Amortizaciones',               v:-3900000,   pct:-0.8,  var:0,    tipo:'gasto'},
+  {c:'Resultados financieros',       v:-8450000,   pct:-1.7,  var:-1.7, tipo:'gasto'},
+  {c:'Resultado neto',               v:35300000,   pct:7.1,   var:66.8, tipo:'total'}
+];
+
+const POSICION = [
+  {n:'Caja y bancos',            v:128400000, d:'+$21,3 M vs junio'},
+  {n:'A cobrar de ML y TN',      v:214700000, d:'Liquidaciones en tránsito'},
+  {n:'Stock valorizado',         v:486200000, d:'57 días de venta'},
+  {n:'Deuda con proveedores',    v:173900000, d:'Vence 62% en agosto'}
+];
+
+const GASTOS = [
+  {n:'Costo de la mercadería',    v:51.4},
+  {n:'Comisiones de plataforma',  v:14.2},
+  {n:'Estructura y sueldos',      v:10.4},
+  {n:'Envíos y logística',        v:7.1},
+  {n:'Marketing y publicidad',    v:4.3},
+  {n:'Impuestos y bancarios',     v:3.0}
+];
+
+const PRODUCTOS = [
+  {sku:'SS-1032M', n:'Soporte hidráulico de mesa para monitor 13"–32"', v:38420000, u:1104},
+  {sku:'MC-002',   n:'Máquina de coser mini 12 puntadas con pedal',      v:31180000, u:812},
+  {sku:'SP-446',   n:'Soporte articulado de pared TV 32"–75"',           v:26940000, u:668},
+  {sku:'SS-C024D', n:'Soporte doble hidráulico para monitor 13"–32"',    v:24360000, u:402},
+  {sku:'SH-446',   n:'Soporte articulado de pared TV 32"–75"',           v:22870000, u:574},
+  {sku:'22D-BEL',  n:'Escritorio eléctrico sit-stand 135x60',            v:19480000, u:74},
+  {sku:'ESC-001',  n:'Escalera de aluminio 12 escalones',                v:17220000, u:191},
+  {sku:'SE-446',   n:'Soporte articulado de pared TV 20"–75"',           v:15640000, u:498}
+];
+
+const FAMILIAS = [
+  {n:'Móviles con brazo',           v:20.4},
+  {n:'Monitor',                     v:17.1},
+  {n:'Escritorios ergonómicos',     v:10.6},
+  {n:'Exterior y aire libre',       v:8.2},
+  {n:'Herramientas y equipamiento', v:7.1},
+  {n:'Máquinas de coser',           v:6.7},
+  {n:'Comercio',                    v:5.9},
+  {n:'Organizadores multiuso',      v:5.2},
+  {n:'Las otras 17 familias',       v:18.8}
+];
+
+const PROVINCIAS = [
+  {n:'Buenos Aires',    v:47.9},
+  {n:'Capital Federal', v:20.3},
+  {n:'Córdoba',         v:7.1},
+  {n:'Santa Fe',        v:5.6},
+  {n:'Mendoza',         v:2.7},
+  {n:'Resto del país',  v:16.4}
+];
+
+const ENVIOS = [
+  {n:'Flex',                v:5983},
+  {n:'Colecta',             v:3684},
+  {n:'Full',                v:1421},
+  {n:'Envío a domicilio',   v:452},
+  {n:'Correo / Andreani',   v:186},
+  {n:'Retiro o acuerdo',    v:116}
+];
+
+const CASOS = [
+  {id:'PV-0412', u:'Alta',  t:'Producto defectuoso', p:'SS-C024D', r:'Celeste', d:6},
+  {id:'PV-0418', u:'Alta',  t:'Estado del envío',    p:'SP-446',   r:'Luis',    d:5},
+  {id:'PV-0421', u:'Alta',  t:'Producto erróneo',    p:'MC-002',   r:'Celeste', d:4},
+  {id:'PV-0426', u:'Alta',  t:'Instalación',         p:'22D-BEL',  r:'Ivi',     d:3},
+  {id:'PV-0429', u:'Alta',  t:'Producto defectuoso', p:'ESC-001',  r:'Luis',    d:3},
+  {id:'PV-0433', u:'Alta',  t:'Facturación',         p:'NO-APLICA',r:'Ivi',     d:2},
+  {id:'PV-0435', u:'Media', t:'Estado del envío',    p:'SE-446',   r:'Luis',    d:4},
+  {id:'PV-0437', u:'Media', t:'Soporte de uso',      p:'SS-1032M', r:'Celeste', d:3},
+  {id:'PV-0440', u:'Media', t:'Coordinar envío',     p:'SH-446',   r:'Luis',    d:2},
+  {id:'PV-0442', u:'Media', t:'Instalación',         p:'SM-C012',  r:'Ivi',     d:2},
+  {id:'PV-0445', u:'Baja',  t:'Soporte de uso',      p:'EARTH-2S', r:'Celeste', d:1},
+  {id:'PV-0447', u:'Baja',  t:'Facturación',         p:'CR-001',   r:'Luis',    d:1}
+];
+
+const RECLAMOS = [
+  {n:'Estado del envío',    v:68},
+  {n:'Producto defectuoso', v:41},
+  {n:'Instalación',         v:33},
+  {n:'Soporte de uso',      v:27},
+  {n:'Producto erróneo',    v:19},
+  {n:'Facturación',         v:12},
+  {n:'Coordinar envío',     v:8},
+  {n:'Otro',                v:4}
+];
+
+const EMBUDOS = {
+  minorista: {
+    ref:'de las consultas',
+    nota:'De cada 100 personas que preguntan por Mercado Libre o Instagram, 28 terminan comprando. Las 65 consultas que quedaron sin responder se dan por perdidas a las 48 h.',
+    etapas:[
+      {e:'Consultas recibidas',       v:486, clase:''},
+      {e:'Respondidas',               v:421, clase:''},
+      {e:'→ Ganadas',                 v:137, clase:'gana'},
+      {e:'→ Todavía en seguimiento',  v:96,  clase:''},
+      {e:'→ Perdidas',                v:188, clase:'pierde'}
+    ]
+  },
+  volumen: {
+    ref:'de los leads',
+    nota:'Se cotizaron $84,6 M y se cerraron $28,4 M. Los nueve cierres del mes son distribuidores del interior que ya habían comprado antes.',
+    etapas:[
+      {e:'Leads recibidos',     v:38, clase:''},
+      {e:'Respondidos',         v:34, clase:''},
+      {e:'Cotizados',           v:24, clase:''},
+      {e:'En negociación',      v:11, clase:''},
+      {e:'Ganados',             v:9,  clase:'gana'}
+    ]
+  }
+};
+
+/* Casos de postventa que quedaron abiertos al cierre de cada mes */
+const COLA = [52,49,46,44,41,45,43,40,42,38,40,34];
+
+const NOTAS = [
+  {sev:'mal',  h:'Seis reclamos urgentes llevan más de 48 h abiertos',
+   p:'Cuatro son de producto defectuoso y tres cayeron el mismo día. Es el número que más se movió del mes.',
+   q:'Postventa · Celeste'},
+  {sev:'ojo',  h:'Tienda Nube creció 28,6% y sigue siendo el 11,7% de la facturación',
+   p:'Todo el crecimiento del canal viene de escritorios ergonómicos. Mercado Libre sigue explicando 8 de cada 10 pesos.',
+   q:'Comercial · Ari'},
+  {sev:'bien', h:'Julio fue el mejor mes del año móvil: $508,6 M',
+   p:'8% arriba de mayo, que era el récord anterior. El margen bruto subió 1,7 puntos porque bajó el costo de los soportes importados.',
+   q:'Dirección'},
+  {sev:'info', h:'El stock equivale a 57 días de venta',
+   p:'Con la venta de julio, casi dos meses de mercadería inmovilizada. Vale mirarlo antes de la próxima orden de compra.',
+   q:'Compras · Fran'}
+];
+
+/* ---------------- formato ---------------- */
+const nf = new Intl.NumberFormat('es-AR');
+const coma = s => String(s).replace('.', ',');
+const money = n => '$' + nf.format(Math.round(n));
+const moneyM = n => '$' + coma((n/1e6).toFixed(1)) + ' M';
+const pct = (n,d=1) => coma(n.toFixed(d)) + '%';
+const signo = n => (n > 0 ? '+' : '') + coma(n.toFixed(1));
+
+function delta(valor, {bueno = 'sube', sufijo = '%', texto = null} = {}){
+  const clase = valor === 0 ? 'plano' : ((valor > 0) === (bueno === 'sube') ? 'sube' : 'baja');
+  const flecha = valor === 0 ? '→' : (valor > 0 ? '↑' : '↓');
+  return `<span class="delta ${clase}">${flecha} ${texto ?? (signo(valor) + sufijo)}</span>`;
+}
+
+/* ---------------- fichas del pulso ---------------- */
+const ultimo = MESES[MESES.length - 1], previo = MESES[MESES.length - 2];
+const ticket = m => m.fact / m.ord;
+
+const FICHAS = [
+  {et:'Facturación', val:moneyM(ultimo.fact), d:15.0, glosa:'Mejor mes del año móvil',
+   chispa:MESES.map(m => m.fact)},
+  {et:'Margen bruto', val:pct(ultimo.mb), d:1.7, sufijo:' pts', glosa:'Sobre ventas netas',
+   chispa:MESES.map(m => m.mb)},
+  {et:'Resultado operativo', val:moneyM(47650000), sub:'9,6%', d:41.6, glosa:'EBITDA del mes',
+   chispa:MESES.map(m => m.eb)},
+  {et:'Órdenes', val:nf.format(ultimo.ord), d:12.4, glosa:'Mercado Libre + Tienda Nube',
+   chispa:MESES.map(m => m.ord)},
+  {et:'Ticket promedio', val:money(ticket(ultimo)), d:2.3, glosa:'Por orden, sin envío',
+   chispa:MESES.map(ticket)},
+  {et:'Casos abiertos', val:'34', d:-15.0, bueno:'baja', glosa:'Postventa sin cerrar', casos:true,
+   chispa:COLA}
+];
+
+document.getElementById('fichas').innerHTML = FICHAS.map(f => `
+  <article class="ficha">
+    <span class="et">${f.et}</span>
+    <span class="val">${f.val}${f.sub ? ` <small>· ${f.sub}</small>` : ''}</span>
+    <div class="pie">
+      <div style="display:flex;flex-direction:column;gap:4px">
+        ${delta(f.d, {bueno:f.bueno || 'sube', sufijo:f.sufijo || '%'})}
+        <span class="glosa">${f.glosa}</span>
+      </div>
+      ${chispa(f.chispa, f.casos ? 'var(--c4)' : 'var(--c1)')}
+    </div>
+  </article>`).join('');
+
+function chispa(vals, color, {w = 96, h = 30, clase = 'chispa'} = {}){
+  const p = 3;
+  const min = Math.min(...vals), max = Math.max(...vals), rango = max - min || 1;
+  const x = i => p + i * (w - 2*p) / (vals.length - 1);
+  const y = v => h - p - (v - min) / rango * (h - 2*p);
+  const linea = vals.map((v,i) => `${i ? 'L' : 'M'}${x(i).toFixed(1)},${y(v).toFixed(1)}`).join(' ');
+  const area = `${linea} L${x(vals.length-1).toFixed(1)},${h} L${x(0).toFixed(1)},${h} Z`;
+  return `<svg class="${clase}" viewBox="0 0 ${w} ${h}" aria-hidden="true">
+    <path d="${area}" fill="${color}" opacity=".10"/>
+    <path d="${linea}" fill="none" stroke="${color}" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round"/>
+    <circle cx="${x(vals.length-1).toFixed(1)}" cy="${y(vals[vals.length-1]).toFixed(1)}" r="2.6"
+      fill="${color}" stroke="var(--panel)" stroke-width="1.6"/>
+  </svg>`;
+}
+
+/* ---------------- estado de resultados ---------------- */
+const maxAbs = Math.max(...EERR.map(f => Math.abs(f.v)));
+document.querySelector('#tablaEerr tbody').innerHTML = EERR.map(f => {
+  const clase = f.tipo === 'total' ? 'total' : (f.tipo === 'destacado' ? 'destacado total' : '');
+  const negativo = f.v < 0;
+  const varCell = f.var === 0 ? '<span style="color:var(--tenue)">—</span>'
+    : delta(f.var, {bueno: negativo ? 'baja' : 'sube'});
+  return `<tr class="${clase}">
+    <td>${f.c}</td>
+    <td class="${negativo ? 'neg' : ''}">${negativo ? '−' : ''}${money(Math.abs(f.v))}</td>
+    <td class="${negativo ? 'neg' : ''}">${pct(f.pct)}</td>
+    <td>${varCell}</td>
+    <td class="barra"><span class="mini ${negativo ? 'gasto' : ''}">
+      <i style="width:${(Math.abs(f.v)/maxAbs*100).toFixed(1)}%"></i></span></td>
+  </tr>`;
+}).join('');
+
+/* ---------------- listas de barras ---------------- */
+function barras(destino, datos, opts = {}){
+  const {formato = v => nf.format(v), extra = () => '', clase = '', max = null} = opts;
+  const tope = max ?? Math.max(...datos.map(d => d.v));
+  document.getElementById(destino).innerHTML = datos.map(d => `
+    <div class="item ${clase}">
+      <span class="nom" title="${d.n}">${d.sku ? `<em>${d.sku}</em>` : ''}${d.n}</span>
+      <span class="cif">${formato(d.v)}${extra(d)}</span>
+      <span class="riel"><i style="width:${(d.v/tope*100).toFixed(1)}%"></i></span>
+    </div>`).join('');
+}
+
+barras('posicion', POSICION, {formato: moneyM, extra: d => `<span>${d.d}</span>`});
+barras('gastos', GASTOS, {formato: v => pct(v), clase:'c3'});
+barras('productos', PRODUCTOS, {formato: moneyM, extra: d => `<span>${nf.format(d.u)} u</span>`});
+barras('familias', FAMILIAS, {formato: v => pct(v)});
+barras('provincias', PROVINCIAS, {formato: v => pct(v)});
+barras('envios', ENVIOS, {formato: v => nf.format(v) + ' órd.', clase:'c4'});
+barras('reclamos', RECLAMOS, {formato: v => nf.format(v) + ' casos', clase:'c2'});
+
+/* ---------------- gráfico de barras apiladas por mes ---------------- */
+function graficoMeses(){
+  const cont = document.getElementById('gMeses');
+  const W = 900, H = 300, mIzq = 54, mDer = 8, mSup = 12, mInf = 30;
+  const ancho = W - mIzq - mDer, alto = H - mSup - mInf;
+  const tope = 600e6;
+  const paso = ancho / MESES.length;
+  const barra = Math.min(38, paso * 0.62);
+  const y = v => mSup + alto - (v / tope) * alto;
+
+  let ejes = '';
+  for (let t = 0; t <= 600e6; t += 150e6){
+    ejes += `<line class="malla" x1="${mIzq}" y1="${y(t).toFixed(1)}" x2="${W-mDer}" y2="${y(t).toFixed(1)}"/>
+      <text class="eje" x="${mIzq-9}" y="${(y(t)+3.5).toFixed(1)}" text-anchor="end">${t ? '$'+(t/1e6)+' M' : '0'}</text>`;
+  }
+
+  const barras = MESES.map((m,i) => {
+    const cx = mIzq + paso*i + paso/2;
+    const x = cx - barra/2;
+    const yMl = y(m.ml), hMl = mSup + alto - yMl;
+    const yTot = y(m.fact), hTn = yMl - yTot - 2;
+    const ultima = i === MESES.length - 1;
+    return `<g>
+      <rect class="s1" x="${x.toFixed(1)}" y="${yMl.toFixed(1)}" width="${barra.toFixed(1)}"
+        height="${Math.max(hMl,0).toFixed(1)}" rx="0"/>
+      <rect class="s2" x="${x.toFixed(1)}" y="${yTot.toFixed(1)}" width="${barra.toFixed(1)}"
+        height="${Math.max(hTn,0).toFixed(1)}" rx="3"/>
+      ${ultima ? `<text class="eje" x="${cx}" y="${(yTot-9).toFixed(1)}" text-anchor="middle"
+        style="fill:var(--tinta);font-weight:600">${moneyM(m.fact)}</text>` : ''}
+      <text class="eje" x="${cx}" y="${H-10}" text-anchor="middle">${m.m}</text>
+    </g>`;
+  }).join('');
+
+  const zonas = MESES.map((m,i) => {
+    const cx = mIzq + paso*i + paso/2;
+    return `<rect x="${(mIzq+paso*i).toFixed(1)}" y="${mSup}" width="${paso.toFixed(1)}" height="${alto}"
+      fill="transparent" data-i="${i}" data-cx="${cx.toFixed(1)}" data-cy="${y(m.fact).toFixed(1)}"/>`;
+  }).join('');
+
+  cont.innerHTML = `<svg viewBox="0 0 ${W} ${H}" role="img"
+      aria-label="Facturación mensual por canal, agosto 2025 a julio 2026">
+      ${ejes}${barras}
+      <line class="base" x1="${mIzq}" y1="${mSup+alto}" x2="${W-mDer}" y2="${mSup+alto}"/>
+      <g class="zona">${zonas}</g>
+    </svg><div class="globo" id="globoMeses"></div>`;
+
+  const globo = document.getElementById('globoMeses');
+  const svg = cont.querySelector('svg');
+  cont.querySelectorAll('.zona rect').forEach(r => {
+    r.addEventListener('mouseenter', () => {
+      const m = MESES[+r.dataset.i];
+      globo.innerHTML = `<b>${m.m}</b> · ${moneyM(m.fact)}<br>
+        <span class="fila"><i style="background:var(--c1)"></i>Mercado Libre ${moneyM(m.ml)}</span>
+        <span class="fila"><i style="background:var(--c2)"></i>Tienda Nube ${moneyM(m.tn)}</span>
+        <span class="fila" style="color:var(--tenue)">${nf.format(m.ord)} órdenes · ticket ${money(m.fact/m.ord)}</span>`;
+      const caja = svg.getBoundingClientRect();
+      globo.style.left = (+r.dataset.cx / W * caja.width) + 'px';
+      globo.style.top  = (+r.dataset.cy / H * caja.height) + 'px';
+      globo.style.opacity = 1;
+    });
+    r.addEventListener('mouseleave', () => { globo.style.opacity = 0; });
+  });
+}
+graficoMeses();
+
+/* ---------------- gráficos de línea (margen y EBITDA) ---------------- */
+function graficoLinea(destino, campo, color, etiqueta, formato){
+  const cont = document.getElementById(destino);
+  const vals = MESES.map(m => m[campo]);
+  const W = 460, H = 190, mIzq = 40, mDer = 46, mSup = 14, mInf = 26;
+  const ancho = W - mIzq - mDer, alto = H - mSup - mInf;
+  const min = Math.floor(Math.min(...vals) - 1), max = Math.ceil(Math.max(...vals) + 1);
+  const x = i => mIzq + i * ancho / (vals.length - 1);
+  const y = v => mSup + alto - (v - min) / (max - min) * alto;
+
+  let malla = '';
+  [min, (min+max)/2, max].forEach(t => {
+    malla += `<line class="malla" x1="${mIzq}" y1="${y(t).toFixed(1)}" x2="${W-mDer}" y2="${y(t).toFixed(1)}"/>
+      <text class="eje" x="${mIzq-8}" y="${(y(t)+3.5).toFixed(1)}" text-anchor="end">${formato(t)}</text>`;
+  });
+
+  const d = vals.map((v,i) => `${i ? 'L' : 'M'}${x(i).toFixed(1)},${y(v).toFixed(1)}`).join(' ');
+  const area = `${d} L${x(vals.length-1).toFixed(1)},${mSup+alto} L${mIzq},${mSup+alto} Z`;
+  const fin = vals.length - 1;
+
+  const marcas = vals.map((v,i) =>
+    `<circle cx="${x(i).toFixed(1)}" cy="${y(v).toFixed(1)}" r="${i === fin ? 4.5 : 3}"
+      class="pico" stroke="${color}" style="fill:${i === fin ? color : 'var(--panel)'}"/>`).join('');
+
+  const etiquetasX = [0, 5, 11].map(i =>
+    `<text class="eje" x="${x(i).toFixed(1)}" y="${H-8}" text-anchor="middle">${MESES[i].m}</text>`).join('');
+
+  cont.innerHTML = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${etiqueta}">
+    ${malla}
+    <path d="${area}" fill="${color}" opacity=".09"/>
+    <path d="${d}" fill="none" stroke="${color}" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+    ${marcas}
+    <text x="${(x(fin)+9).toFixed(1)}" y="${(y(vals[fin])+4).toFixed(1)}" class="eje"
+      style="fill:var(--tinta);font-weight:600;font-size:12px">${formato(vals[fin])}</text>
+    ${etiquetasX}
+    <line class="base" x1="${mIzq}" y1="${mSup+alto}" x2="${W-mDer}" y2="${mSup+alto}"/>
+  </svg>`;
+}
+const tono = v => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+function pintarLineas(){
+  graficoLinea('gMargen', 'mb', tono('--c1'), 'Margen bruto mensual en porcentaje', v => pct(v,1));
+  graficoLinea('gEbitda', 'eb', tono('--c4'), 'EBITDA mensual en porcentaje', v => pct(v,1));
+}
+pintarLineas();
+if (window.matchMedia) {
+  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', pintarLineas);
+}
+
+/* ---------------- postventa ---------------- */
+const URGENCIAS = [
+  {u:'Alta',  n:6,  d:'4 hace más de 48 h', clase:'alta'},
+  {u:'Media', n:15, d:'Ninguno vencido',    clase:'media'},
+  {u:'Baja',  n:13, d:'Consultas de uso',   clase:'baja'}
+];
+const ICONO = {
+  alta:'<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 1.6 15 14H1L8 1.6Z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M8 6v3.4M8 11.4v.1" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>',
+  media:'<svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="6.4" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M8 4.6V8l2.4 1.6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" fill="none"/></svg>',
+  baja:'<svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="6.4" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="m5.2 8.2 2 2 3.6-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>'
+};
+
+document.getElementById('luces').innerHTML = URGENCIAS.map(x => `
+  <button class="luz ${x.clase}" data-u="${x.u}" aria-pressed="false">
+    <span class="n">${x.n}</span>
+    <span class="t">${ICONO[x.clase]} ${x.u}</span>
+    <span class="d">${x.d}</span>
+  </button>`).join('');
+
+/* Cuatro cifras de contexto: escalas distintas, así que van como datos, no como barras */
+document.getElementById('postventaKpis').innerHTML = [
+  {n:'Ingresados en julio',          v:'212'},
+  {n:'Resueltos en julio',           v:'198'},
+  {n:'Resueltos satisfactoriamente', v:'78%'},
+  {n:'Tiempo de 1ª respuesta',       v:'4,2 h'},
+  {n:'Reclamos cada 100 órdenes',    v:'1,8'}
+].map(d => `<div class="dato"><span>${d.n}</span><b class="num">${d.v}</b></div>`).join('');
+
+document.getElementById('tendenciaCasos').innerHTML = `
+  <span class="et">Casos abiertos al cierre de cada mes</span>
+  ${chispa(COLA, tono('--c4'), {w:320, h:52, clase:'tendenciaSvg'})}
+  <div class="pieT"><span>ago 25 · 52 casos</span><span>jul 26 · 34 casos</span></div>`;
+
+let filtro = null;
+function pintarCasos(){
+  const lista = filtro ? CASOS.filter(c => c.u === filtro) : CASOS;
+  document.getElementById('tablaCasos').innerHTML = lista.map(c => `
+    <tr class="${c.d >= 3 && c.u === 'Alta' ? 'vencido' : ''}">
+      <td class="id">${c.id}</td>
+      <td><span class="chip ${c.u.toLowerCase()}">${c.u}</span></td>
+      <td>${c.t}</td>
+      <td><span class="chip neutro">${c.p}</span></td>
+      <td>${c.r}</td>
+      <td class="dias">${c.d}</td>
+    </tr>`).join('');
+  document.getElementById('filtroTexto').textContent = filtro
+    ? `${lista.length} caso${lista.length === 1 ? '' : 's'} de urgencia ${filtro.toLowerCase()} · tocá de nuevo para ver todos`
+    : 'Los 12 casos que siguen sin cerrar';
+}
+pintarCasos();
+
+document.querySelectorAll('.luz').forEach(b => {
+  b.addEventListener('click', () => {
+    const u = b.dataset.u;
+    filtro = filtro === u ? null : u;
+    document.querySelectorAll('.luz').forEach(o =>
+      o.setAttribute('aria-pressed', String(o.dataset.u === filtro)));
+    pintarCasos();
+  });
+});
+
+/* ---------------- embudos de preventa ---------------- */
+function pintarEmbudo(cual){
+  const datos = EMBUDOS[cual];
+  const tope = Math.max(...datos.etapas.map(e => e.v));
+  document.getElementById('embudo').innerHTML = datos.etapas.map(e => `
+    <div class="etapa ${e.clase}">
+      <span class="e">${e.e}</span>
+      <span class="v">${nf.format(e.v)}<span>${pct(e.v/tope*100,0)} ${datos.ref}</span></span>
+      <span class="riel"><i style="width:${(e.v/tope*100).toFixed(1)}%"></i></span>
+    </div>`).join('');
+  document.getElementById('embudoNota').textContent = datos.nota;
+}
+pintarEmbudo('minorista');
+
+document.querySelectorAll('[role="tab"]').forEach(t => {
+  t.addEventListener('click', () => {
+    document.querySelectorAll('[role="tab"]').forEach(o => o.setAttribute('aria-selected', String(o === t)));
+    document.getElementById('embudo').setAttribute('aria-labelledby', t.id);
+    pintarEmbudo(t.id.replace('tab-', ''));
+  });
+});
+
+/* ---------------- notas de la semana ---------------- */
+document.getElementById('notas').innerHTML = NOTAS.map(n => `
+  <article class="nota ${n.sev}">
+    <span class="marca-sev" aria-hidden="true"></span>
+    <div><h4>${n.h}</h4><p>${n.p}</p><span class="quien">${n.q}</span></div>
+  </article>`).join('');
+
+/* ---------------- navegación ---------------- */
+const secciones = [...document.querySelectorAll('main section')];
+const enlaces = new Map([...document.querySelectorAll('.nav a')].map(a => [a.getAttribute('href').slice(1), a]));
+const observador = new IntersectionObserver(entradas => {
+  entradas.forEach(e => {
+    if (e.isIntersecting){
+      enlaces.forEach(a => a.removeAttribute('aria-current'));
+      enlaces.get(e.target.id)?.setAttribute('aria-current', 'true');
+    }
+  });
+}, {rootMargin:'-96px 0px -60% 0px', threshold:0});
+secciones.forEach(s => observador.observe(s));
+</script>
+</body>
+</html>
