@@ -11,14 +11,14 @@
  "fuentes": {
   "origen": {
    "costos": {
-    "origen": "local-viejo",
-    "motivo": "Google devolvió una página en vez del archivo. Casi siempre es que no está compartido: abrilo → Compartir → Acceso general → \"Cualquiera con el enlace\" (Lector)",
-    "dias": 0
+    "origen": "local",
+    "motivo": null,
+    "dias": null
    },
    "postventa": {
-    "origen": "local-viejo",
-    "motivo": "Google devolvió 401",
-    "dias": 0
+    "origen": "local",
+    "motivo": null,
+    "dias": null
    },
    "maestro": {
     "origen": "local",
@@ -4939,25 +4939,65 @@
    "id": "mes",
    "n": "Todo julio",
    "desde": 1,
-   "hasta": 31
+   "hasta": 31,
+   "dentroDelMes": true,
+   "disponible": true,
+   "faltan": 0
   },
   {
    "id": "q1",
    "n": "1ª quincena",
    "desde": 1,
-   "hasta": 15
+   "hasta": 15,
+   "dentroDelMes": true,
+   "disponible": true,
+   "faltan": 0
   },
   {
    "id": "q2",
    "n": "2ª quincena",
    "desde": 16,
-   "hasta": 31
+   "hasta": 31,
+   "dentroDelMes": true,
+   "disponible": true,
+   "faltan": 0
   },
   {
    "id": "u7",
    "n": "Últimos 7 días",
    "desde": 25,
-   "hasta": 31
+   "hasta": 31,
+   "dentroDelMes": true,
+   "disponible": true,
+   "faltan": 0
+  },
+  {
+   "id": "m3",
+   "n": "Últimos 3 meses",
+   "meses": 3,
+   "disponible": false,
+   "faltan": 2
+  },
+  {
+   "id": "m6",
+   "n": "Últimos 6 meses",
+   "meses": 6,
+   "disponible": false,
+   "faltan": 5
+  },
+  {
+   "id": "anio",
+   "n": "Este año",
+   "meses": 12,
+   "disponible": false,
+   "faltan": 11
+  },
+  {
+   "id": "todo",
+   "n": "Todo el histórico",
+   "meses": 999,
+   "disponible": false,
+   "faltan": 11
   }
  ],
  "canales": [
