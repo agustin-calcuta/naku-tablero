@@ -361,6 +361,49 @@ export function verificarMeli(acc) {
   return { suma, neto: acc.netoLiquidado, delta, rel, ok: rel < 0.01 };
 }
 
+/**
+ * Colapsa varios meses de un mismo mapa en un acumulador único.
+ * Los días se reindexan corridos (mes 1 día 1 → 1, mes 2 día 1 → 32…) para que
+ * `agregar` los recorra en orden; el mapa `origen` dice de qué mes salió cada uno.
+ */
+export function unirMeses(porMes, meses) {
+  const t = vacio();
+  const origen = new Map();
+  let base = 0;
+  for (const mes of meses) {
+    const a = porMes.get(mes);
+    const dias = new Date(Date.UTC(+mes.slice(0, 4), +mes.slice(5, 7), 0)).getUTCDate();
+    if (a) {
+      t.ultimoDia = Math.max(t.ultimoDia, a.ultimoDia);
+      for (const [dia, x] of a.porDia) {
+        const d = diaDe(t, base + dia);
+        for (const k of MONTOS) d[k] += x[k];
+        for (const o of x.ordenes) d.ordenes.add(o);
+        for (const [k, v] of x.skusSinCosto) {
+          const p = d.skusSinCosto.get(k) || { facturacion: 0, lineas: 0 };
+          p.facturacion += v.facturacion; p.lineas += v.lineas;
+          d.skusSinCosto.set(k, p);
+        }
+        for (const [k, p] of x.productos) {
+          const q = d.productos.get(k) || { sku: p.sku, n: p.n, v: 0, u: 0 };
+          q.v += p.v; q.u += p.u;
+          d.productos.set(k, q);
+        }
+        for (const campo of ['familias', 'provincias']) {
+          for (const [k, v] of x[campo]) d[campo].set(k, (d[campo].get(k) || 0) + v);
+        }
+        for (const [k, set] of x.envios) {
+          if (!d.envios.has(k)) d.envios.set(k, new Set());
+          for (const o of set) d.envios.get(k).add(o);
+        }
+      }
+    }
+    for (let d = 1; d <= dias; d++) origen.set(base + d, { mes, dia: d });
+    base += dias;
+  }
+  return { acc: t, origen, totalDias: base };
+}
+
 /** Une los acumuladores de los dos canales en uno por mes. */
 export function unirCanales(...mapas) {
   const out = new Map();

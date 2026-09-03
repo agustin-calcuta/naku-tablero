@@ -53,7 +53,9 @@ npm run actualizar
 ```
 
 Eso hace todo: trae las planillas, procesa los exports que haya, regenera el
-tablero, lo commitea y lo publica. GitHub Pages lo sirve un minuto después.
+tablero, **lo sube a la base** (donde lo ve todo el mundo) y commitea la copia de
+respaldo. Necesita `NAKU_CLAVE` en el entorno para el paso de la base; sin ella
+avisa y sigue con el commit.
 
 | Fuente | Cómo llega |
 |---|---|
@@ -80,13 +82,76 @@ Sin puente, el build usa los archivos que estén en el directorio de datos y avi
 
 ```bash
 npm run tablero          # sólo regenera el JSON, no toca git
-npm test                 # 65 controles sobre el JSON generado
+npm test                 # 74 controles sobre el JSON generado
 npm run actualizar -- --sin-publicar
 ```
 
 `npm test` verifica que el estado de resultados cierre, que las quincenas sumen
 el mes, que los canales sumen el total, que las listas no tengan huecos y que las
 cifras sean plausibles. Conviene correrlo antes de publicar algo raro.
+
+## Publicar: cómo llega un dato al tablero de todos
+
+El tablero **no lee el archivo del repositorio**: lee la base. Eso es lo que hace
+que cuando alguien carga los exports, se actualice para todos y no sólo en su
+pantalla.
+
+```
+exports (.xlsx/.csv)
+        │
+        ├── navegador: botón «Actualizar datos» ──┐
+        │   (procesa acá, no sube los archivos)   │
+        │                                          ├──▶  base (Neon)  ──▶  el tablero
+        └── consola: npm run actualizar ───────────┘         │
+                    │                                        │
+                    └── commitea docs/data/direccion.json ────┘
+                        (respaldo: se usa sólo si la base no contesta)
+```
+
+**Las dos vías escriben lo mismo**, porque usan el mismo motor (`src/tablero.mjs`);
+el navegador lo corre a través de `docs/importar.js`, que genera
+`tools/build-importer.mjs` desde esos mismos módulos.
+
+| | Dónde vive | Quién puede |
+|---|---|---|
+| **Leer** el tablero | público, sin clave | cualquiera con el link |
+| **Publicar** | pide la clave | quien la tenga |
+
+La clave la escribe cada uno una vez en el panel y queda en **su** navegador
+(`localStorage`). No está en la página: por eso el tablero se puede compartir sin
+que nadie de afuera lo pueda cambiar.
+
+### La pieza de atrás
+
+Proyecto Neon **`naku-tablero`** (`flat-fire-69274162`, región Ohio — Neon
+Functions todavía no corre en São Paulo).
+
+- **`neon/api/esquema.sql`** — las tablas y las funciones `publicar()`,
+  `volver()` y `versiones()`. **Toda la lógica está acá**, del lado de la base:
+  la clave se compara contra un sha256 y el JSON se valida antes de guardarlo,
+  así una publicación mal armada no deja la pantalla en blanco para todos.
+- **`neon/api/index.mjs`** — el puente HTTP, para poder llamar a esas funciones
+  desde el navegador sin exponer la conexión a Postgres. No tiene lógica.
+
+```bash
+npm run api                 # empaqueta neon/api/ (deja .backup/api.zip)
+npm run api -- --deploy     # además lo publica (pide NEON_API_KEY)
+```
+
+**Cambiar la clave** (desde el editor SQL de Neon):
+
+```sql
+insert into naku_clave (id, hash) values (1, encode(sha256('la-nueva'::bytea), 'hex'))
+  on conflict (id) do update set hash = excluded.hash, cambiada = now();
+```
+
+**Volver atrás** si alguien publicó algo mal: se guardan las últimas 30
+versiones.
+
+```bash
+curl "$NAKU_API/versiones" -H "x-naku-clave: $NAKU_CLAVE"      # ver cuáles hay
+curl -X PUT "$NAKU_API/volver?n=12" -H "x-naku-clave: $NAKU_CLAVE"
+```
 
 ## Tablero de dirección (`docs/direccion.html`)
 

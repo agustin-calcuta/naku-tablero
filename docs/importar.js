@@ -1058,6 +1058,49 @@ function verificarMeli(acc) {
   return { suma, neto: acc.netoLiquidado, delta, rel, ok: rel < 0.01 };
 }
 
+/**
+ * Colapsa varios meses de un mismo mapa en un acumulador único.
+ * Los días se reindexan corridos (mes 1 día 1 → 1, mes 2 día 1 → 32…) para que
+ * `agregar` los recorra en orden; el mapa `origen` dice de qué mes salió cada uno.
+ */
+function unirMeses(porMes, meses) {
+  const t = vacio();
+  const origen = new Map();
+  let base = 0;
+  for (const mes of meses) {
+    const a = porMes.get(mes);
+    const dias = new Date(Date.UTC(+mes.slice(0, 4), +mes.slice(5, 7), 0)).getUTCDate();
+    if (a) {
+      t.ultimoDia = Math.max(t.ultimoDia, a.ultimoDia);
+      for (const [dia, x] of a.porDia) {
+        const d = diaDe(t, base + dia);
+        for (const k of MONTOS) d[k] += x[k];
+        for (const o of x.ordenes) d.ordenes.add(o);
+        for (const [k, v] of x.skusSinCosto) {
+          const p = d.skusSinCosto.get(k) || { facturacion: 0, lineas: 0 };
+          p.facturacion += v.facturacion; p.lineas += v.lineas;
+          d.skusSinCosto.set(k, p);
+        }
+        for (const [k, p] of x.productos) {
+          const q = d.productos.get(k) || { sku: p.sku, n: p.n, v: 0, u: 0 };
+          q.v += p.v; q.u += p.u;
+          d.productos.set(k, q);
+        }
+        for (const campo of ['familias', 'provincias']) {
+          for (const [k, v] of x[campo]) d[campo].set(k, (d[campo].get(k) || 0) + v);
+        }
+        for (const [k, set] of x.envios) {
+          if (!d.envios.has(k)) d.envios.set(k, new Set());
+          for (const o of set) d.envios.get(k).add(o);
+        }
+      }
+    }
+    for (let d = 1; d <= dias; d++) origen.set(base + d, { mes, dia: d });
+    base += dias;
+  }
+  return { acc: t, origen, totalDias: base };
+}
+
 /** Une los acumuladores de los dos canales en uno por mes. */
 function unirCanales(...mapas) {
   const out = new Map();
@@ -1146,7 +1189,7 @@ function eerr(acc) {
   };
 }
 
-  return { sinIva, num, mesML, mesTN, agregar, ingestFinanzasMeli, ingestFinanzasTn, verificarMeli, unirCanales, eerr };
+  return { sinIva, num, mesML, mesTN, agregar, ingestFinanzasMeli, ingestFinanzasTn, verificarMeli, unirMeses, unirCanales, eerr };
 })();
 
 /* ── postventa.mjs ── */
@@ -1467,7 +1510,7 @@ const __tablero = (function () {
 // no coincidiera con el publicado, el tablero dejaría de servir para decidir.
 
 const { IVA } = __costos;
-const { eerr, agregar, unirCanales, sinIva } = __finanzas;
+const { eerr, agregar, unirCanales, unirMeses, sinIva } = __finanzas;
 
 const MES_ES = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'];
 const MES_LARGO = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio',
@@ -1499,10 +1542,16 @@ function share(map, n, resto) {
   return out;
 }
 
-/** Todo lo que el tablero necesita de un mes, para un canal y un rango de días. */
-function bloque(acc, mes, desde = 1, hasta = 31) {
-  if (!acc) return null;
-  const a = agregar(acc, desde, hasta);
+/**
+ * Todo lo que el tablero necesita de un rango de meses, para un canal.
+ *
+ * El gráfico cambia de grano según lo que se pida: con un mes, una barra por día;
+ * con varios, una por mes. Treinta barras se leen; noventa, no.
+ */
+function bloque(porMes, meses) {
+  if (!porMes || !meses || !meses.length) return null;
+  const { acc, origen, totalDias } = unirMeses(porMes, meses);
+  const a = agregar(acc, 1, totalDias);
   if (!a.ordenes.size) return null;
   const e = eerr(a);
   const pctDe = (v) => (e.ventasNetas ? +(100 * v / e.ventasNetas).toFixed(1) : 0);
@@ -1553,9 +1602,26 @@ function bloque(acc, mes, desde = 1, hasta = 31) {
     familias: share(familias, FILAS, RESTO_FAMILIAS),
     provincias: share(a.provincias, FILAS - 4, 'Resto del país'),
     envios: [...a.envios.entries()].map(([n, set]) => ({ n, v: set.size })).sort((x, y) => y.v - x.v),
-    dias: a.dias,
+    puntos: puntosDe(a.dias, origen, meses),
+    granularidad: meses.length === 1 ? 'dia' : 'mes',
+    meses: meses.slice(),
     neto: Math.round(e.netoLiquidado),
   };
+}
+
+/** Los puntos del gráfico: por día si es un mes solo, por mes si son varios. */
+function puntosDe(dias, origen, meses) {
+  if (meses.length === 1) {
+    return dias.map((d) => ({ ...d, etiqueta: String(origen.get(d.d).dia) }));
+  }
+  const porMes = new Map(meses.map((m) => [m, { ml: 0, tn: 0, v: 0, ordenes: 0 }]));
+  for (const d of dias) {
+    const o = origen.get(d.d);
+    if (!o) continue;
+    const p = porMes.get(o.mes);
+    p.ml += d.ml; p.tn += d.tn; p.v += d.v; p.ordenes += d.ordenes;
+  }
+  return meses.map((m) => ({ ...porMes.get(m), d: m, etiqueta: etiqueta(m) }));
 }
 
 /**
@@ -1619,37 +1685,38 @@ function armarTablero({ mapasMl = [], mapasTn = [], post = null, meta = {} } = {
   const est = eerr(totalMes.get(mesCerrado));
   const previo = completos.length > 1 ? completos[completos.length - 2] : null;
 
-  /* Los períodos del filtro. Los que caen dentro del mes cerrado se calculan; los
-     que necesitan más meses se declaran igual, marcados como sin datos, para que
-     el filtro esté completo desde el principio y se vea qué falta cargar. Cuando
-     lleguen más exports dejan de estar vacíos solos. */
-  const nDias = diasDelMes(mesCerrado);
-  const mesesCargados = completos.length;
+  /* Los períodos del filtro, todos como rangos de meses. Se resuelven contra los
+     meses que hay cargados: si el rango pide más de los que hay, se muestra lo
+     que hay y se dice cuántos faltan, en vez de un tablero en cero. */
+  const cargados = completos.map((s) => s.mes);           // ordenados, sin parciales
+  const anioActual = mesCerrado.slice(0, 4);
+  const ultimos = (n) => cargados.slice(-n);
+
   const periodos = [
-    { id: 'mes', n: `Todo ${largo(mesCerrado).split(' ')[0]}`, desde: 1, hasta: nDias, dentroDelMes: true },
-    { id: 'q1', n: '1ª quincena', desde: 1, hasta: 15, dentroDelMes: true },
-    { id: 'q2', n: '2ª quincena', desde: 16, hasta: nDias, dentroDelMes: true },
-    { id: 'u7', n: 'Últimos 7 días', desde: Math.max(1, nDias - 6), hasta: nDias, dentroDelMes: true },
-    { id: 'm3', n: 'Últimos 3 meses', meses: 3 },
-    { id: 'm6', n: 'Últimos 6 meses', meses: 6 },
-    { id: 'anio', n: 'Este año', meses: 12 },
-    { id: 'todo', n: 'Todo el histórico', meses: 999 },
+    { id: 'm3', n: 'Últimos 3 meses', pide: 3, meses: ultimos(3) },
+    { id: 'm6', n: 'Últimos 6 meses', pide: 6, meses: ultimos(6) },
+    { id: 'anio', n: 'Este año', pide: +mesCerrado.slice(5, 7), meses: cargados.filter((m) => m.startsWith(anioActual)) },
+    { id: 'rango', n: 'Rango', pide: 0, meses: cargados.slice(), libre: true },
   ].map((p) => ({
     ...p,
-    // Un rango de varios meses necesita tantos exports como meses abarca.
-    disponible: p.dentroDelMes ? true : mesesCargados >= Math.min(p.meses, 2),
-    faltan: p.dentroDelMes ? 0 : Math.max(0, Math.min(p.meses, 12) - mesesCargados),
+    disponible: p.meses.length > 0,
+    // Cuántos exports faltarían para que el rango esté completo de verdad.
+    faltan: Math.max(0, p.pide - p.meses.length),
   }));
 
-  const fuentesCanal = { todos: acc, ml: porMesMl.get(mesCerrado), tn: porMesTn.get(mesCerrado) };
+  const fuentesCanal = { todos: porMes, ml: porMesMl, tn: porMesTn };
   const vistas = {};
   for (const [canal, fuente] of Object.entries(fuentesCanal)) {
-    if (!fuente) continue;
+    if (!fuente || !fuente.size) continue;
     vistas[canal] = {};
     for (const p of periodos) {
-      if (!p.dentroDelMes) continue;      // los multi-mes esperan más exports
-      const b = bloque(fuente, mesCerrado, p.desde, p.hasta);
+      const b = bloque(fuente, p.meses);
       if (b) vistas[canal][p.id] = b;
+    }
+    // Además, cada mes suelto: el selector de rango arma cualquier tramo con ellos.
+    for (const mes of cargados) {
+      const b = bloque(fuente, [mes]);
+      if (b) vistas[canal][`mes:${mes}`] = b;
     }
     if (!Object.keys(vistas[canal]).length) delete vistas[canal];
   }
@@ -1667,16 +1734,19 @@ function armarTablero({ mapasMl = [], mapasTn = [], post = null, meta = {} } = {
       generado: meta.generado || new Date().toISOString().slice(0, 10),
       iva: IVA,
       mesCerrado: {
-        mes: mesCerrado, largo: largo(mesCerrado), dias: nDias,
+        mes: mesCerrado, largo: largo(mesCerrado), dias: diasDelMes(mesCerrado),
         previo: previo ? previo.largo : null, previoMes: previo ? previo.mes : null,
       },
+      // Los meses con datos, para que el selector de rango ofrezca sólo esos.
+      mesesCargados: cargados.map((m) => ({ mes: m, largo: largo(m), corto: etiqueta(m) })),
       fuentes: meta.fuentes || {},
       serie,
       // vistas[canal][periodo]: el tablero cambia de corte sin volver a pedir nada.
       vistas,
-      // Se declaran todos: los que no tienen datos van marcados y el tablero lo dice.
       periodos: periodos.map((p) => ({
-        ...p, disponible: p.disponible && !!(vistas.todos && vistas.todos[p.id]),
+        id: p.id, n: p.n, faltan: p.faltan, libre: !!p.libre,
+        meses: p.meses, pide: p.pide,
+        disponible: p.disponible && !!(vistas.todos && vistas.todos[p.id]),
       })),
       canales: [
         { id: 'todos', n: 'Los dos canales' },
