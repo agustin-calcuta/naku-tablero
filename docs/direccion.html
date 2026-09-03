@@ -245,7 +245,7 @@ table.eerr .neg{color:var(--media)}
 .leyenda i{width:10px;height:10px;border-radius:3px;flex:none}
 
 /* ---------- semáforo de casos ---------- */
-.luces{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.luces{display:grid;grid-template-columns:repeat(auto-fit,minmax(78px,1fr));gap:9px}
 .luz{border:1px solid var(--linea);border-radius:10px;padding:11px 13px;background:var(--panel);
   cursor:pointer;text-align:left;font-family:inherit;color:inherit;display:flex;flex-direction:column;gap:2px}
 .luz .n{font-family:var(--mono);font-size:26px;font-weight:600;line-height:1.05;letter-spacing:-.03em}
@@ -256,6 +256,7 @@ table.eerr .neg{color:var(--media)}
 .luz.media{background:var(--ojo-fondo);border-color:color-mix(in srgb,var(--ojo) 30%,transparent);color:var(--ojo)}
 .luz.baja{background:var(--bien-fondo);border-color:color-mix(in srgb,var(--bien) 30%,transparent);color:var(--bien)}
 .luz .d{color:inherit;opacity:.78}
+.luz.nula{background:var(--panel2);color:var(--media)}
 .luz[aria-pressed="true"]{box-shadow:0 0 0 2px var(--tinta) inset}
 
 /* ---------- tabla de casos ---------- */
@@ -272,7 +273,7 @@ table.casos tr.vencido td.dias{color:var(--mal);font-weight:600}
 .chip.alta{background:var(--mal-fondo);color:var(--mal)}
 .chip.media{background:var(--ojo-fondo);color:var(--ojo)}
 .chip.baja{background:var(--bien-fondo);color:var(--bien)}
-.chip.neutro{background:var(--panel2);color:var(--media)}
+.chip.neutro,.chip.nula{background:var(--panel2);color:var(--media)}
 
 /* ---------- embudos ---------- */
 .pestanas{display:flex;gap:3px;background:var(--panel2);border:1px solid var(--linea);
@@ -308,6 +309,35 @@ table.casos tr.vencido td.dias{color:var(--mal);font-weight:600}
 .pie-doc{margin-top:52px;padding-top:20px;border-top:1px solid var(--linea);
   display:flex;justify-content:space-between;gap:18px;flex-wrap:wrap;font-size:12.5px;color:var(--media)}
 .pie-doc b{color:var(--tinta)}
+
+/* ---------- lo que todavía no tiene fuente ---------- */
+.pendientes{display:flex;flex-direction:column;gap:9px}
+.pendientes .p{display:flex;align-items:baseline;gap:9px;font-size:13px;color:var(--media)}
+.pendientes .p::before{content:'';width:6px;height:6px;border-radius:50%;flex:none;
+  border:1.5px solid var(--linea);transform:translateY(-2px)}
+.pendientes .pie-p{margin:4px 0 0;font-size:12px;color:var(--tenue);line-height:1.5}
+
+/* ---------- avisos dentro de un panel ---------- */
+.nodato{font-size:13px;color:var(--media);line-height:1.55;background:var(--panel2);
+  border:1px solid var(--linea);border-radius:8px;padding:11px 13px;margin:12px 0 0}
+.nodato b{color:var(--tinta);font-weight:600}
+
+/* ---------- estado de la conexión de datos ---------- */
+.fuente-t{background:var(--panel);border:1px solid var(--linea);border-radius:var(--radio);
+  padding:14px 16px;box-shadow:var(--sombra)}
+.fuente-t .et{display:flex;align-items:center;gap:7px;font-family:var(--mono);font-size:10.5px;
+  letter-spacing:.14em;text-transform:uppercase;color:var(--media)}
+.fuente-t .et i{width:7px;height:7px;border-radius:50%;flex:none;background:var(--bien)}
+.fuente-t.parcial .et i{background:var(--ojo)}
+.fuente-t.falta .et i{background:var(--linea)}
+.fuente-t h4{margin:7px 0 3px;font-size:14px;font-weight:700;letter-spacing:-.01em}
+.fuente-t p{margin:0;font-size:12.5px;color:var(--media);line-height:1.5}
+.fuente-t .dato{font-family:var(--mono);font-size:11.5px;color:var(--tenue);margin-top:7px;display:block}
+
+.leyenda:empty{display:none}
+
+/* Las clases de layout traen display propio: sin esto, [hidden] no oculta nada. */
+[hidden]{display:none !important}
 
 @media (prefers-reduced-motion:reduce){
   *{animation:none !important;transition:none !important;scroll-behavior:auto !important}
@@ -363,10 +393,10 @@ try {
   </div>
 </header>
 
-<div class="aviso">
+<div class="aviso" id="aviso" hidden>
   <div class="avisoin">
-    <b>Datos de demostración</b>
-    <span>Los números son inventados y sirven para mostrar el diseño. Cuando conectemos Odoo por API, el tablero se llena solo: nadie va a tener que cargar nada a mano.</span>
+    <b id="avisoTitulo">Datos reales</b>
+    <span id="avisoTexto"></span>
   </div>
 </div>
 
@@ -377,12 +407,12 @@ try {
     <div class="portada">
       <div>
         <h1>Cómo viene la empresa</h1>
-        <p>Una sola vista con las tres fuentes que hoy están separadas: las ventas de Mercado&nbsp;Libre y Tienda&nbsp;Nube, el resultado del mes y la central de atención al cliente.</p>
+        <p id="bajada">Una sola vista con las tres fuentes que hoy están separadas: las ventas de Mercado&nbsp;Libre y Tienda&nbsp;Nube, el resultado del mes y la central de atención al cliente.</p>
       </div>
       <div class="periodo">
         <span class="et">Mes cerrado</span>
-        <b>Julio 2026</b>
-        <small>Comparado contra junio 2026</small>
+        <b id="mesCerrado">—</b>
+        <small id="mesPrevio"></small>
       </div>
     </div>
 
@@ -393,20 +423,20 @@ try {
   <section id="finanzas">
     <div class="rotulo">
       <span class="lab">Finanzas</span><span class="regla"></span>
-      <span class="fuente">Fuente futura · Odoo Contabilidad</span>
+      <span class="fuente" id="fuenteFinanzas"></span>
     </div>
 
     <div class="rejilla r-53">
       <div class="panel">
         <header>
           <h3>Estado de resultados</h3>
-          <span class="sub">Julio 2026 · en pesos</span>
+          <span class="sub" id="subEerr">en pesos, sin IVA</span>
         </header>
         <div class="cuerpo">
           <div class="tablaEnv">
             <table class="eerr" id="tablaEerr">
               <thead>
-                <tr><th>Concepto</th><th>Julio 2026</th><th>% s/ventas</th><th>vs junio</th><th></th></tr>
+                <tr><th>Concepto</th><th id="thMes">Mes</th><th>% s/ventas netas</th><th></th></tr>
               </thead>
               <tbody></tbody>
             </table>
@@ -416,28 +446,22 @@ try {
 
       <div style="display:flex;flex-direction:column;gap:14px">
         <div class="panel">
-          <header><h3>Posición al 31/07</h3></header>
-          <div class="cuerpo">
-            <div class="lista" id="posicion"></div>
-          </div>
-        </div>
-        <div class="panel">
           <header><h3>A dónde se va cada peso</h3><span class="sub">Sobre ventas netas</span></header>
           <div class="cuerpo">
             <div class="lista" id="gastos"></div>
           </div>
         </div>
+        <div class="panel" id="panelFaltan">
+          <header><h3>Para llegar al resultado neto</h3><span class="sub">Todavía sin fuente</span></header>
+          <div class="cuerpo"><div class="pendientes" id="faltan"></div></div>
+        </div>
       </div>
     </div>
 
-    <div class="rejilla r2" style="margin-top:14px">
+    <div class="rejilla r2" style="margin-top:14px" id="filaMargen" hidden>
       <div class="panel">
-        <header><h3>Margen bruto</h3><span class="sub">% sobre ventas netas · 12 meses</span></header>
+        <header><h3>Margen bruto</h3><span class="sub" id="subMargen">% sobre ventas netas</span></header>
         <div class="cuerpo"><div class="grafico" id="gMargen"></div></div>
-      </div>
-      <div class="panel">
-        <header><h3>Resultado operativo (EBITDA)</h3><span class="sub">% sobre ventas netas · 12 meses</span></header>
-        <div class="cuerpo"><div class="grafico" id="gEbitda"></div></div>
       </div>
     </div>
   </section>
@@ -446,41 +470,38 @@ try {
   <section id="ventas">
     <div class="rotulo">
       <span class="lab">Ventas</span><span class="regla"></span>
-      <span class="fuente">Hoy · exports de Mercado Libre y Tienda Nube</span>
+      <span class="fuente" id="fuenteVentas"></span>
     </div>
 
     <div class="panel">
       <header>
-        <h3>Facturación por mes y canal</h3>
-        <span class="sub">Agosto 2025 – julio 2026</span>
+        <h3 id="tituloMeses">Cómo se cobró el mes, día por día</h3>
+        <span class="sub" id="subMeses"></span>
       </header>
       <div class="cuerpo">
-        <div class="grafico" id="gMeses"></div>
-        <div class="leyenda">
-          <span><i style="background:var(--c1)"></i> Mercado Libre</span>
-          <span><i style="background:var(--c2)"></i> Tienda Nube</span>
-        </div>
+        <div class="grafico" id="gDias"></div>
+        <div class="leyenda" id="leyendaMeses"></div>
       </div>
     </div>
 
     <div class="rejilla r-53" style="margin-top:14px">
       <div class="panel">
-        <header><h3>Los que traccionan</h3><span class="sub">Julio 2026 · top 8 por facturación</span></header>
+        <header><h3>Los que traccionan</h3><span class="sub" id="subProductos">top 8 por facturación</span></header>
         <div class="cuerpo"><div class="lista" id="productos"></div></div>
       </div>
       <div class="panel">
-        <header><h3>Mix por familia</h3><span class="sub">% de la facturación del mes</span></header>
+        <header><h3>Mix por familia</h3><span class="sub" id="subFamilias">% de la facturación del mes</span></header>
         <div class="cuerpo"><div class="lista" id="familias"></div></div>
       </div>
     </div>
 
     <div class="rejilla r2" style="margin-top:14px">
       <div class="panel">
-        <header><h3>De dónde compran</h3><span class="sub">Facturación por provincia</span></header>
+        <header><h3>De dónde compran</h3><span class="sub" id="subProvincias"></span></header>
         <div class="cuerpo"><div class="lista" id="provincias"></div></div>
       </div>
       <div class="panel">
-        <header><h3>Cómo llega el paquete</h3><span class="sub">Órdenes por tipo de envío</span></header>
+        <header><h3>Cómo llega el paquete</h3><span class="sub" id="subEnvios"></span></header>
         <div class="cuerpo"><div class="lista" id="envios"></div></div>
       </div>
     </div>
@@ -490,12 +511,12 @@ try {
   <section id="clientes">
     <div class="rotulo">
       <span class="lab">Atención al cliente</span><span class="regla"></span>
-      <span class="fuente">Hoy · central de atención interna</span>
+      <span class="fuente" id="fuenteClientes"></span>
     </div>
 
     <div class="rejilla r-35">
       <div class="panel estira">
-        <header><h3>Postventa abierta</h3><span class="sub">Al 31/07</span></header>
+        <header><h3>Postventa abierta</h3><span class="sub" id="subPostventa"></span></header>
         <div class="cuerpo">
           <div class="luces" id="luces"></div>
           <div id="postventaKpis"></div>
@@ -506,7 +527,7 @@ try {
       <div class="panel">
         <header>
           <h3>Casos abiertos</h3>
-          <span class="sub" id="filtroTexto">Los 12 casos que siguen sin cerrar</span>
+          <span class="sub" id="filtroTexto"></span>
         </header>
         <div class="cuerpo">
           <div class="tablaEnv">
@@ -524,11 +545,8 @@ try {
     <div class="rejilla r2" style="margin-top:14px">
       <div class="panel">
         <header>
-          <h3>Preventa: consultas que se vuelven ventas</h3>
-          <div class="pestanas" role="tablist" aria-label="Tipo de preventa">
-            <button role="tab" id="tab-minorista" aria-selected="true" aria-controls="embudo">Minorista</button>
-            <button role="tab" id="tab-volumen" aria-selected="false" aria-controls="embudo">Por volumen</button>
-          </div>
+          <h3>Preventa: consultas que entran</h3>
+          <span class="sub" id="subEmbudo"></span>
         </header>
         <div class="cuerpo">
           <div class="etapas" id="embudo" role="tabpanel" aria-labelledby="tab-minorista"></div>
@@ -536,7 +554,7 @@ try {
         </div>
       </div>
       <div class="panel">
-        <header><h3>Por qué escriben</h3><span class="sub">Reclamos de postventa ingresados en julio</span></header>
+        <header><h3>Por qué escriben</h3><span class="sub" id="subReclamos">reclamos por motivo</span></header>
         <div class="cuerpo"><div class="lista" id="reclamos"></div></div>
       </div>
     </div>
@@ -549,505 +567,609 @@ try {
       <span class="fuente">Lo que el tablero marcó solo</span>
     </div>
     <div class="agenda" id="notas"></div>
+
+    <div class="rotulo">
+      <span class="lab">Conexión de datos</span><span class="regla"></span>
+      <span class="fuente" id="fuenteGenerado"></span>
+    </div>
+    <div class="rejilla r3" id="conexion"></div>
   </section>
 
   <footer class="pie-doc">
-    <span>Prototipo de tablero de dirección · <b>Naku</b> · agosto 2026</span>
-    <span>Ventas, finanzas y postventa en una sola pantalla. Números de demostración.</span>
+    <span>Tablero de dirección · <b>Naku</b></span>
+    <span id="pieFuentes"></span>
   </footer>
 </main>
 
 <script>
 /* ============================================================
-   Datos de demostración.
-   Los SKU, las familias y las magnitudes salen del maestro real
-   de Naku para que el prototipo se lea como su negocio; los
-   importes del mes y todo lo financiero son inventados.
+   Todo lo que se ve sale de data/direccion.json, que arma
+   tools/build-direccion.mjs con tres fuentes reales:
+
+     · exports de MercadoLibre / Mercado Shops y de TiendaNube
+     · planilla madre de compras (costo por SKU, sin IVA)
+     · Sheet de la central de atención (postventa y preventa)
+
+   Nada está escrito a mano acá. Lo que no tiene fuente no se
+   dibuja: el tablero lo dice en su lugar.
    ============================================================ */
-
-const MESES = [
-  {m:'ago 25', ml:177775208, tn:4627257,  ord:4612,  mb:45.1, eb:6.2},
-  {m:'sep 25', ml:249038041, tn:3106929,  ord:6208,  mb:45.8, eb:6.9},
-  {m:'oct 25', ml:279653986, tn:14620088, ord:7166,  mb:46.2, eb:7.4},
-  {m:'nov 25', ml:343480761, tn:46258469, ord:9318,  mb:47.4, eb:8.8},
-  {m:'dic 25', ml:306412355, tn:30256606, ord:8010,  mb:46.6, eb:8.1},
-  {m:'ene 26', ml:335283626, tn:15581811, ord:8494,  mb:45.9, eb:7.2},
-  {m:'feb 26', ml:268372526, tn:7038842,  ord:6688,  mb:44.8, eb:5.9},
-  {m:'mar 26', ml:354909347, tn:10330930, ord:8755,  mb:46.1, eb:7.0},
-  {m:'abr 26', ml:357510087, tn:28580963, ord:9154,  mb:46.8, eb:7.6},
-  {m:'may 26', ml:417268505, tn:53558888, ord:11078, mb:47.5, eb:8.4},
-  {m:'jun 26', ml:395870000, tn:46440000, ord:10536, mb:46.9, eb:7.8},
-  {m:'jul 26', ml:448930000, tn:59710000, ord:11842, mb:48.6, eb:9.6}
-];
-MESES.forEach(x => x.fact = x.ml + x.tn);
-
-const EERR = [
-  {c:'Ventas brutas',                v:508640000,  pct:102.5, var:15.0, tipo:'normal'},
-  {c:'Devoluciones y bonificaciones',v:-12460000,  pct:-2.5,  var:6.2,  tipo:'normal'},
-  {c:'Ventas netas',                 v:496180000,  pct:100,   var:15.0, tipo:'total'},
-  {c:'Costo de la mercadería',       v:-255020000, pct:-51.4, var:12.0, tipo:'gasto'},
-  {c:'Margen bruto',                 v:241160000,  pct:48.6,  var:19.2, tipo:'destacado'},
-  {c:'Comisiones de plataforma',     v:-70460000,  pct:-14.2, var:14.1, tipo:'gasto'},
-  {c:'Envíos y logística',           v:-35230000,  pct:-7.1,  var:11.8, tipo:'gasto'},
-  {c:'Marketing y publicidad',       v:-21340000,  pct:-4.3,  var:22.4, tipo:'gasto'},
-  {c:'Estructura y sueldos',         v:-51600000,  pct:-10.4, var:4.6,  tipo:'gasto'},
-  {c:'Impuestos y gastos bancarios', v:-14880000,  pct:-3.0,  var:15.3, tipo:'gasto'},
-  {c:'EBITDA',                       v:47650000,   pct:9.6,   var:41.6, tipo:'destacado'},
-  {c:'Amortizaciones',               v:-3900000,   pct:-0.8,  var:0,    tipo:'gasto'},
-  {c:'Resultados financieros',       v:-8450000,   pct:-1.7,  var:-1.7, tipo:'gasto'},
-  {c:'Resultado neto',               v:35300000,   pct:7.1,   var:66.8, tipo:'total'}
-];
-
-const POSICION = [
-  {n:'Caja y bancos',            v:128400000, d:'+$21,3 M vs junio'},
-  {n:'A cobrar de ML y TN',      v:214700000, d:'Liquidaciones en tránsito'},
-  {n:'Stock valorizado',         v:486200000, d:'57 días de venta'},
-  {n:'Deuda con proveedores',    v:173900000, d:'Vence 62% en agosto'}
-];
-
-const GASTOS = [
-  {n:'Costo de la mercadería',    v:51.4},
-  {n:'Comisiones de plataforma',  v:14.2},
-  {n:'Estructura y sueldos',      v:10.4},
-  {n:'Envíos y logística',        v:7.1},
-  {n:'Marketing y publicidad',    v:4.3},
-  {n:'Impuestos y bancarios',     v:3.0}
-];
-
-const PRODUCTOS = [
-  {sku:'SS-1032M', n:'Soporte hidráulico de mesa para monitor 13"–32"', v:38420000, u:1104},
-  {sku:'MC-002',   n:'Máquina de coser mini 12 puntadas con pedal',      v:31180000, u:812},
-  {sku:'SP-446',   n:'Soporte articulado de pared TV 32"–75"',           v:26940000, u:668},
-  {sku:'SS-C024D', n:'Soporte doble hidráulico para monitor 13"–32"',    v:24360000, u:402},
-  {sku:'SH-446',   n:'Soporte articulado de pared TV 32"–75"',           v:22870000, u:574},
-  {sku:'22D-BEL',  n:'Escritorio eléctrico sit-stand 135x60',            v:19480000, u:74},
-  {sku:'ESC-001',  n:'Escalera de aluminio 12 escalones',                v:17220000, u:191},
-  {sku:'SE-446',   n:'Soporte articulado de pared TV 20"–75"',           v:15640000, u:498}
-];
-
-const FAMILIAS = [
-  {n:'Móviles con brazo',           v:20.4},
-  {n:'Monitor',                     v:17.1},
-  {n:'Escritorios ergonómicos',     v:10.6},
-  {n:'Exterior y aire libre',       v:8.2},
-  {n:'Herramientas y equipamiento', v:7.1},
-  {n:'Máquinas de coser',           v:6.7},
-  {n:'Comercio',                    v:5.9},
-  {n:'Organizadores multiuso',      v:5.2},
-  {n:'Las otras 17 familias',       v:18.8}
-];
-
-const PROVINCIAS = [
-  {n:'Buenos Aires',    v:47.9},
-  {n:'Capital Federal', v:20.3},
-  {n:'Córdoba',         v:7.1},
-  {n:'Santa Fe',        v:5.6},
-  {n:'Mendoza',         v:2.7},
-  {n:'Resto del país',  v:16.4}
-];
-
-const ENVIOS = [
-  {n:'Flex',                v:5983},
-  {n:'Colecta',             v:3684},
-  {n:'Full',                v:1421},
-  {n:'Envío a domicilio',   v:452},
-  {n:'Correo / Andreani',   v:186},
-  {n:'Retiro o acuerdo',    v:116}
-];
-
-const CASOS = [
-  {id:'PV-0412', u:'Alta',  t:'Producto defectuoso', p:'SS-C024D', r:'Celeste', d:6},
-  {id:'PV-0418', u:'Alta',  t:'Estado del envío',    p:'SP-446',   r:'Luis',    d:5},
-  {id:'PV-0421', u:'Alta',  t:'Producto erróneo',    p:'MC-002',   r:'Celeste', d:4},
-  {id:'PV-0426', u:'Alta',  t:'Instalación',         p:'22D-BEL',  r:'Ivi',     d:3},
-  {id:'PV-0429', u:'Alta',  t:'Producto defectuoso', p:'ESC-001',  r:'Luis',    d:3},
-  {id:'PV-0433', u:'Alta',  t:'Facturación',         p:'NO-APLICA',r:'Ivi',     d:2},
-  {id:'PV-0435', u:'Media', t:'Estado del envío',    p:'SE-446',   r:'Luis',    d:4},
-  {id:'PV-0437', u:'Media', t:'Soporte de uso',      p:'SS-1032M', r:'Celeste', d:3},
-  {id:'PV-0440', u:'Media', t:'Coordinar envío',     p:'SH-446',   r:'Luis',    d:2},
-  {id:'PV-0442', u:'Media', t:'Instalación',         p:'SM-C012',  r:'Ivi',     d:2},
-  {id:'PV-0445', u:'Baja',  t:'Soporte de uso',      p:'EARTH-2S', r:'Celeste', d:1},
-  {id:'PV-0447', u:'Baja',  t:'Facturación',         p:'CR-001',   r:'Luis',    d:1}
-];
-
-const RECLAMOS = [
-  {n:'Estado del envío',    v:68},
-  {n:'Producto defectuoso', v:41},
-  {n:'Instalación',         v:33},
-  {n:'Soporte de uso',      v:27},
-  {n:'Producto erróneo',    v:19},
-  {n:'Facturación',         v:12},
-  {n:'Coordinar envío',     v:8},
-  {n:'Otro',                v:4}
-];
-
-const EMBUDOS = {
-  minorista: {
-    ref:'de las consultas',
-    nota:'De cada 100 personas que preguntan por Mercado Libre o Instagram, 28 terminan comprando. Las 65 consultas que quedaron sin responder se dan por perdidas a las 48 h.',
-    etapas:[
-      {e:'Consultas recibidas',       v:486, clase:''},
-      {e:'Respondidas',               v:421, clase:''},
-      {e:'→ Ganadas',                 v:137, clase:'gana'},
-      {e:'→ Todavía en seguimiento',  v:96,  clase:''},
-      {e:'→ Perdidas',                v:188, clase:'pierde'}
-    ]
-  },
-  volumen: {
-    ref:'de los leads',
-    nota:'Se cotizaron $84,6 M y se cerraron $28,4 M. Los nueve cierres del mes son distribuidores del interior que ya habían comprado antes.',
-    etapas:[
-      {e:'Leads recibidos',     v:38, clase:''},
-      {e:'Respondidos',         v:34, clase:''},
-      {e:'Cotizados',           v:24, clase:''},
-      {e:'En negociación',      v:11, clase:''},
-      {e:'Ganados',             v:9,  clase:'gana'}
-    ]
-  }
-};
-
-/* Casos de postventa que quedaron abiertos al cierre de cada mes */
-const COLA = [52,49,46,44,41,45,43,40,42,38,40,34];
-
-const NOTAS = [
-  {sev:'mal',  h:'Seis reclamos urgentes llevan más de 48 h abiertos',
-   p:'Cuatro son de producto defectuoso y tres cayeron el mismo día. Es el número que más se movió del mes.',
-   q:'Postventa · Celeste'},
-  {sev:'ojo',  h:'Tienda Nube creció 28,6% y sigue siendo el 11,7% de la facturación',
-   p:'Todo el crecimiento del canal viene de escritorios ergonómicos. Mercado Libre sigue explicando 8 de cada 10 pesos.',
-   q:'Comercial · Ari'},
-  {sev:'bien', h:'Julio fue el mejor mes del año móvil: $508,6 M',
-   p:'8% arriba de mayo, que era el récord anterior. El margen bruto subió 1,7 puntos porque bajó el costo de los soportes importados.',
-   q:'Dirección'},
-  {sev:'info', h:'El stock equivale a 57 días de venta',
-   p:'Con la venta de julio, casi dos meses de mercadería inmovilizada. Vale mirarlo antes de la próxima orden de compra.',
-   q:'Compras · Fran'}
-];
 
 /* ---------------- formato ---------------- */
 const nf = new Intl.NumberFormat('es-AR');
-const coma = s => String(s).replace('.', ',');
-const money = n => '$' + nf.format(Math.round(n));
-const moneyM = n => '$' + coma((n/1e6).toFixed(1)) + ' M';
-const pct = (n,d=1) => coma(n.toFixed(d)) + '%';
-const signo = n => (n > 0 ? '+' : '') + coma(n.toFixed(1));
+const coma = (s) => String(s).replace('.', ',');
+const money = (n) => '$' + nf.format(Math.round(n));
+const moneyM = (n) => (Math.abs(n) >= 1e6
+  ? '$' + coma((n / 1e6).toFixed(1)) + ' M'
+  : '$' + nf.format(Math.round(n)));
+const pct = (n, d = 1) => coma(Number(n).toFixed(d)) + '%';
+const signo = (n) => (n > 0 ? '+' : '') + coma(Number(n).toFixed(1));
+const $ = (id) => document.getElementById(id);
 
-function delta(valor, {bueno = 'sube', sufijo = '%', texto = null} = {}){
+function delta(valor, { bueno = 'sube', sufijo = '%', texto = null } = {}) {
+  if (valor == null) return '';
   const clase = valor === 0 ? 'plano' : ((valor > 0) === (bueno === 'sube') ? 'sube' : 'baja');
   const flecha = valor === 0 ? '→' : (valor > 0 ? '↑' : '↓');
   return `<span class="delta ${clase}">${flecha} ${texto ?? (signo(valor) + sufijo)}</span>`;
 }
+const variacion = (hoy, antes) => (antes ? 100 * (hoy - antes) / Math.abs(antes) : null);
 
-/* ---------------- fichas del pulso ---------------- */
-const ultimo = MESES[MESES.length - 1], previo = MESES[MESES.length - 2];
-const ticket = m => m.fact / m.ord;
-
-const FICHAS = [
-  {et:'Facturación', val:moneyM(ultimo.fact), d:15.0, glosa:'Mejor mes del año móvil',
-   chispa:MESES.map(m => m.fact)},
-  {et:'Margen bruto', val:pct(ultimo.mb), d:1.7, sufijo:' pts', glosa:'Sobre ventas netas',
-   chispa:MESES.map(m => m.mb)},
-  {et:'Resultado operativo', val:moneyM(47650000), sub:'9,6%', d:41.6, glosa:'EBITDA del mes',
-   chispa:MESES.map(m => m.eb)},
-  {et:'Órdenes', val:nf.format(ultimo.ord), d:12.4, glosa:'Mercado Libre + Tienda Nube',
-   chispa:MESES.map(m => m.ord)},
-  {et:'Ticket promedio', val:money(ticket(ultimo)), d:2.3, glosa:'Por orden, sin envío',
-   chispa:MESES.map(ticket)},
-  {et:'Casos abiertos', val:'34', d:-15.0, bueno:'baja', glosa:'Postventa sin cerrar', casos:true,
-   chispa:COLA}
-];
-
-document.getElementById('fichas').innerHTML = FICHAS.map(f => `
-  <article class="ficha">
-    <span class="et">${f.et}</span>
-    <span class="val">${f.val}${f.sub ? ` <small>· ${f.sub}</small>` : ''}</span>
-    <div class="pie">
-      <div style="display:flex;flex-direction:column;gap:4px">
-        ${delta(f.d, {bueno:f.bueno || 'sube', sufijo:f.sufijo || '%'})}
-        <span class="glosa">${f.glosa}</span>
-      </div>
-      ${chispa(f.chispa, f.casos ? 'var(--c4)' : 'var(--c1)')}
-    </div>
-  </article>`).join('');
-
-function chispa(vals, color, {w = 96, h = 30, clase = 'chispa'} = {}){
+/** Línea de tendencia chiquita. Con menos de 3 puntos no dice nada: no se dibuja. */
+function chispa(vals, color, { w = 96, h = 30, clase = 'chispa' } = {}) {
+  const v = (vals || []).filter((x) => Number.isFinite(x));
+  if (v.length < 3) return '';
   const p = 3;
-  const min = Math.min(...vals), max = Math.max(...vals), rango = max - min || 1;
-  const x = i => p + i * (w - 2*p) / (vals.length - 1);
-  const y = v => h - p - (v - min) / rango * (h - 2*p);
-  const linea = vals.map((v,i) => `${i ? 'L' : 'M'}${x(i).toFixed(1)},${y(v).toFixed(1)}`).join(' ');
-  const area = `${linea} L${x(vals.length-1).toFixed(1)},${h} L${x(0).toFixed(1)},${h} Z`;
+  const min = Math.min(...v), max = Math.max(...v), rango = max - min || 1;
+  const x = (i) => p + i * (w - 2 * p) / (v.length - 1);
+  const y = (val) => h - p - (val - min) / rango * (h - 2 * p);
+  const linea = v.map((val, i) => `${i ? 'L' : 'M'}${x(i).toFixed(1)},${y(val).toFixed(1)}`).join(' ');
+  const area = `${linea} L${x(v.length - 1).toFixed(1)},${h} L${x(0).toFixed(1)},${h} Z`;
   return `<svg class="${clase}" viewBox="0 0 ${w} ${h}" aria-hidden="true">
-    <path d="${area}" fill="${color}" opacity=".10"/>
-    <path d="${linea}" fill="none" stroke="${color}" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round"/>
-    <circle cx="${x(vals.length-1).toFixed(1)}" cy="${y(vals[vals.length-1]).toFixed(1)}" r="2.6"
-      fill="${color}" stroke="var(--panel)" stroke-width="1.6"/>
+    <path d="${area}" fill="${color}" opacity=".13"/>
+    <path d="${linea}" fill="none" stroke="${color}" stroke-width="1.7"
+      stroke-linejoin="round" stroke-linecap="round"/>
+    <circle cx="${x(v.length - 1).toFixed(1)}" cy="${y(v[v.length - 1]).toFixed(1)}" r="2.3" fill="${color}"/>
   </svg>`;
 }
 
-/* ---------------- estado de resultados ---------------- */
-const maxAbs = Math.max(...EERR.map(f => Math.abs(f.v)));
-document.querySelector('#tablaEerr tbody').innerHTML = EERR.map(f => {
-  const clase = f.tipo === 'total' ? 'total' : (f.tipo === 'destacado' ? 'destacado total' : '');
-  const negativo = f.v < 0;
-  const varCell = f.var === 0 ? '<span style="color:var(--tenue)">—</span>'
-    : delta(f.var, {bueno: negativo ? 'baja' : 'sube'});
-  return `<tr class="${clase}">
-    <td>${f.c}</td>
-    <td class="${negativo ? 'neg' : ''}">${negativo ? '−' : ''}${money(Math.abs(f.v))}</td>
-    <td class="${negativo ? 'neg' : ''}">${pct(f.pct)}</td>
-    <td>${varCell}</td>
-    <td class="barra"><span class="mini ${negativo ? 'gasto' : ''}">
-      <i style="width:${(Math.abs(f.v)/maxAbs*100).toFixed(1)}%"></i></span></td>
-  </tr>`;
-}).join('');
-
-/* ---------------- listas de barras ---------------- */
-function barras(destino, datos, opts = {}){
-  const {formato = v => nf.format(v), extra = () => '', clase = '', max = null} = opts;
-  const tope = max ?? Math.max(...datos.map(d => d.v));
-  document.getElementById(destino).innerHTML = datos.map(d => `
+/** Barras horizontales. `datos` = [{n, v}], `formato` decide cómo se lee el valor. */
+function barras(destino, datos, opts = {}) {
+  const { formato = (v) => nf.format(v), extra = () => '', clase = '', max = null } = opts;
+  const el = $(destino);
+  if (!el) return;
+  if (!datos || !datos.length) { el.innerHTML = '<p class="nodato">Sin datos para este período.</p>'; return; }
+  const tope = max ?? Math.max(...datos.map((d) => d.v));
+  el.innerHTML = datos.map((d) => `
     <div class="item ${clase}">
-      <span class="nom" title="${d.n}">${d.sku ? `<em>${d.sku}</em>` : ''}${d.n}</span>
+      <span class="nom">${d.sku ? `<em>${d.sku}</em>` : ''}${d.n}</span>
       <span class="cif">${formato(d.v)}${extra(d)}</span>
-      <span class="riel"><i style="width:${(d.v/tope*100).toFixed(1)}%"></i></span>
+      <span class="riel"><i style="width:${tope ? (100 * d.v / tope).toFixed(1) : 0}%"></i></span>
     </div>`).join('');
 }
 
-barras('posicion', POSICION, {formato: moneyM, extra: d => `<span>${d.d}</span>`});
-barras('gastos', GASTOS, {formato: v => pct(v), clase:'c3'});
-barras('productos', PRODUCTOS, {formato: moneyM, extra: d => `<span>${nf.format(d.u)} u</span>`});
-barras('familias', FAMILIAS, {formato: v => pct(v)});
-barras('provincias', PROVINCIAS, {formato: v => pct(v)});
-barras('envios', ENVIOS, {formato: v => nf.format(v) + ' órd.', clase:'c4'});
-barras('reclamos', RECLAMOS, {formato: v => nf.format(v) + ' casos', clase:'c2'});
+/* ---------------- arranque ---------------- */
+fetch('data/direccion.json', { cache: 'no-cache' })
+  .then((r) => { if (!r.ok) throw new Error(r.status); return r.json(); })
+  .then(pintar)
+  .catch((e) => {
+    $('aviso').hidden = false;
+    $('avisoTitulo').textContent = 'Sin datos';
+    $('avisoTexto').textContent =
+      'No pude leer data/direccion.json. Corré «node tools/build-direccion.mjs» y volvé a publicar. (' + e.message + ')';
+  });
 
-/* ---------------- gráfico de barras apiladas por mes ---------------- */
-function graficoMeses(){
-  const cont = document.getElementById('gMeses');
-  const W = 900, H = 300, mIzq = 54, mDer = 8, mSup = 12, mInf = 30;
-  const ancho = W - mIzq - mDer, alto = H - mSup - mInf;
-  const tope = 600e6;
-  const paso = ancho / MESES.length;
-  const barra = Math.min(38, paso * 0.62);
-  const y = v => mSup + alto - (v / tope) * alto;
+function pintar(D) {
+  const serie = D.serie || [];
+  const ult = serie.find((s) => s.mes === D.mesCerrado.mes) || serie[serie.length - 1] || {};
+  /* Sólo se compara contra un mes entero: un mes cortado a mitad daría una
+     variación falsa. Con un único export todavía no hay contra qué comparar. */
+  const prev = serie.find((s) => s.mes === D.mesCerrado.previoMes) || {};
+  const glosaPrev = prev.m ? `contra ${prev.m}` : '';
+  const dias = D.dias || [];
+  const E = D.eerr;
+  const linea = (nombre) => (E.lineas || []).find((l) => l.c === nombre) || { v: 0, pct: 0 };
+  const ventasNetas = linea('Ventas netas');
+  const margen = linea('Margen bruto');
+  const contrib = linea('Resultado de contribución');
 
-  let ejes = '';
-  for (let t = 0; t <= 600e6; t += 150e6){
-    ejes += `<line class="malla" x1="${mIzq}" y1="${y(t).toFixed(1)}" x2="${W-mDer}" y2="${y(t).toFixed(1)}"/>
-      <text class="eje" x="${mIzq-9}" y="${(y(t)+3.5).toFixed(1)}" text-anchor="end">${t ? '$'+(t/1e6)+' M' : '0'}</text>`;
+  /* ---------------- encabezado ---------------- */
+  $('mesCerrado').textContent = D.mesCerrado.largo.replace(/^./, (c) => c.toUpperCase());
+  $('mesPrevio').textContent = D.mesCerrado.previo
+    ? `Comparado contra ${D.mesCerrado.previo}`
+    : `${nf.format(E.ordenes)} órdenes · ${nf.format(E.unidades)} unidades`;
+
+  const F = D.fuentes;
+  $('aviso').hidden = false;
+  $('avisoTitulo').textContent = 'Datos reales';
+  $('avisoTexto').textContent =
+    `Ventas y finanzas de ${D.mesCerrado.largo}, del export de los canales`
+    + `${F.postventa ? `; atención al cliente al ${F.postventa.corte}` : ''}. `
+    + 'El estado de resultados llega hasta el resultado de contribución: marketing, estructura y sueldos '
+    + 'todavía no tienen fuente, así que no se muestran.'
+    + (D.mesCerrado.previo ? '' : ' Con un solo mes cargado todavía no hay comparación contra el mes anterior.');
+
+  $('fuenteFinanzas').textContent = `Exports de los canales + planilla de costos (${F.costos.hoja.toLowerCase()})`;
+  $('fuenteVentas').textContent = 'Exports de Mercado Libre y Tienda Nube';
+  $('fuenteClientes').textContent = F.postventa ? `Central de atención · corte ${F.postventa.corte}` : 'sin conectar';
+  $('fuenteGenerado').textContent = `Generado el ${D.generado}`;
+  $('pieFuentes').textContent =
+    `Importes sin IVA (${pct(D.iva * 100, 0)}). Costos de la planilla de compras, hoja ${F.costos.hoja}.`;
+
+  /* ---------------- fichas del pulso ---------------- */
+  const fichas = [
+    {
+      et: 'Cobrado de los canales', val: moneyM(ult.neto),
+      d: variacion(ult.neto, prev.neto),
+      glosa: `Neto liquidado por los dos canales${glosaPrev ? ' ' + glosaPrev : ''}`,
+      chispa: dias.map((x) => x.v),
+    },
+    {
+      et: 'Ventas netas', val: moneyM(ventasNetas.v), sub: 'sin IVA',
+      glosa: 'Antes de comisiones y envíos',
+    },
+    {
+      et: 'Margen bruto', val: pct(margen.pct), sub: moneyM(margen.v),
+      glosa: 'Ventas netas menos costo de la mercadería',
+    },
+    {
+      et: 'Contribución', val: pct(contrib.pct), sub: moneyM(contrib.v),
+      glosa: 'Después de comisiones, envíos e impuestos del canal',
+    },
+    {
+      et: 'Órdenes', val: nf.format(ult.ordenes),
+      d: variacion(ult.ordenes, prev.ordenes),
+      glosa: `Mercado Libre + Tienda Nube${glosaPrev ? ' ' + glosaPrev : ''}`,
+      chispa: dias.map((x) => x.ordenes),
+    },
+    {
+      et: 'Ticket promedio', val: money(ult.neto / ult.ordenes),
+      d: variacion(ult.neto / ult.ordenes, prev.neto / prev.ordenes),
+      glosa: `Cobrado por orden${glosaPrev ? ' ' + glosaPrev : ''}`,
+      chispa: dias.filter((x) => x.ordenes).map((x) => x.v / x.ordenes),
+    },
+  ];
+
+  $('fichas').innerHTML = fichas.map((f) => `
+    <article class="ficha">
+      <span class="et">${f.et}</span>
+      <span class="val">${f.val}${f.sub ? ` <small>· ${f.sub}</small>` : ''}</span>
+      <div class="pie">
+        <div style="display:flex;flex-direction:column;gap:4px">
+          ${delta(f.d, { bueno: f.bueno || 'sube', sufijo: f.sufijo || '%' })}
+          <span class="glosa">${f.glosa}</span>
+        </div>
+        ${chispa(f.chispa, 'var(--c1)')}
+      </div>
+    </article>`).join('');
+
+  /* ---------------- estado de resultados ---------------- */
+  $('thMes').textContent = D.mesCerrado.largo.replace(/^./, (c) => c.toUpperCase());
+  $('subEerr').textContent = `${nf.format(E.ordenes)} órdenes · en pesos, sin IVA`;
+
+  const maxAbs = Math.max(...E.lineas.map((l) => Math.abs(l.v)));
+  $('tablaEerr').querySelector('tbody').innerHTML = E.lineas.map((f) => {
+    const clase = f.tipo === 'total' ? 'total' : (f.tipo === 'destacado' ? 'destacado total' : '');
+    const neg = f.v < 0;
+    return `<tr class="${clase}">
+      <td>${f.c}</td>
+      <td class="${neg ? 'neg' : ''}">${neg ? '(' + moneyM(-f.v) + ')' : moneyM(f.v)}</td>
+      <td class="${neg ? 'neg' : ''}">${neg ? '(' + pct(Math.abs(f.pct)) + ')' : pct(f.pct)}</td>
+      <td class="barra"><span class="mini ${neg ? 'gasto' : ''}">
+        <i style="width:${(100 * Math.abs(f.v) / maxAbs).toFixed(1)}%"></i></span></td>
+    </tr>`;
+  }).join('');
+
+  barras('gastos', D.gastos, { formato: (v) => pct(v), clase: 'c3' });
+
+  /* Lo que falta para bajar del resultado de contribución al neto. */
+  $('faltan').innerHTML = (E.faltan || []).map((x) => `<span class="p">${x}</span>`).join('')
+    + `<p class="pie-p">Son datos que hoy no salen de ningún export. Con una planilla de gastos
+       mensuales — seis o siete filas por mes — el tablero cierra hasta el resultado neto.</p>`;
+
+  /* El margen mes a mes necesita el export crudo de cada mes; hoy sólo hay uno. */
+  const conMargen = serie.filter((s) => s.mb != null && !s.parcial);
+  if (conMargen.length >= 3) {
+    $('filaMargen').hidden = false;
+    $('subMargen').textContent = `% sobre ventas netas · ${conMargen.length} meses`;
+    graficoLinea('gMargen', conMargen, 'mb', 'var(--c1)', 'Margen bruto mensual', (v) => pct(v));
   }
 
-  const barras = MESES.map((m,i) => {
-    const cx = mIzq + paso*i + paso/2;
-    const x = cx - barra/2;
-    const yMl = y(m.ml), hMl = mSup + alto - yMl;
-    const yTot = y(m.fact), hTn = yMl - yTot - 2;
-    const ultima = i === MESES.length - 1;
-    return `<g>
-      <rect class="s1" x="${x.toFixed(1)}" y="${yMl.toFixed(1)}" width="${barra.toFixed(1)}"
-        height="${Math.max(hMl,0).toFixed(1)}" rx="0"/>
-      <rect class="s2" x="${x.toFixed(1)}" y="${yTot.toFixed(1)}" width="${barra.toFixed(1)}"
-        height="${Math.max(hTn,0).toFixed(1)}" rx="3"/>
-      ${ultima ? `<text class="eje" x="${cx}" y="${(yTot-9).toFixed(1)}" text-anchor="middle"
-        style="fill:var(--tinta);font-weight:600">${moneyM(m.fact)}</text>` : ''}
-      <text class="eje" x="${cx}" y="${H-10}" text-anchor="middle">${m.m}</text>
-    </g>`;
+  /* ---------------- ventas ---------------- */
+  const pico = dias.reduce((a, x) => (x.v > a.v ? x : a), dias[0] || { v: 0, d: 0 });
+  $('subMeses').textContent = `${D.mesCerrado.largo} · neto liquidado por cada canal`
+    + (pico.v ? ` · el día más fuerte fue el ${pico.d} con ${moneyM(pico.v)}` : '');
+  $('leyendaMeses').innerHTML =
+    '<span><i style="background:var(--c1)"></i> Mercado Libre</span>'
+    + '<span><i style="background:var(--c2)"></i> Tienda Nube</span>';
+  graficoDias(dias, D.mesCerrado);
+
+  const mesCortes = D.mesCerrado.largo;
+  $('subProductos').textContent = `${mesCortes} · top 8 por facturación`;
+  $('subFamilias').textContent = `% de la facturación de ${mesCortes}`;
+  $('subProvincias').textContent = `facturación de ${mesCortes} por provincia`;
+  $('subEnvios').textContent = `órdenes de ${mesCortes} por tipo de envío`;
+
+  barras('productos', D.productos.map((p) => ({ n: p.n, sku: p.sku, v: p.v, u: p.u })), {
+    formato: (v) => moneyM(v),
+    extra: (d) => `<span>${nf.format(d.u)} u</span>`,
+  });
+  barras('familias', D.familias, { formato: (v) => pct(v), clase: 'c2' });
+  barras('provincias', D.provincias, { formato: (v) => pct(v) });
+  barras('envios', D.envios, { formato: (v) => nf.format(v) + ' órdenes', clase: 'c4' });
+
+  /* ---------------- atención al cliente ---------------- */
+  if (D.clientes) pintarClientes(D.clientes, D);
+  else document.getElementById('clientes').hidden = true;
+
+  /* ---------------- notas y conexión ---------------- */
+  pintarNotas(D);
+  pintarConexion(D);
+}
+
+/* ---------------- cobrado por día del mes, apilado por canal ---------------- */
+function graficoDias(dias, mesInfo) {
+  const cont = $('gDias');
+  if (!cont || !dias.length) return;
+  const W = 900, H = 290, mIzq = 54, mDer = 8, mSup = 12, mInf = 30;
+  const ancho = W - mIzq - mDer, alto = H - mSup - mInf;
+
+  // Grilla en números redondos: se elige el paso más chico de la escala 1/2/5
+  // que deje cuatro o cinco líneas.
+  const maxV = Math.max(...dias.map((x) => x.v), 1);
+  const bruto = maxV / 4;
+  const magnitud = 10 ** Math.floor(Math.log10(bruto));
+  const paso = [1, 2, 2.5, 5, 10].map((k) => k * magnitud).find((k) => k >= bruto) || magnitud * 10;
+  const tope = Math.ceil(maxV / paso) * paso;
+  const pasoX = ancho / dias.length;
+  const barra = Math.max(4, Math.min(20, pasoX * 0.66));
+  const y = (v) => mSup + alto - (v / tope) * alto;
+
+  let ejes = '';
+  for (let t = 0; t <= tope + 1; t += paso) {
+    ejes += `<line class="malla" x1="${mIzq}" y1="${y(t)}" x2="${W - mDer}" y2="${y(t)}"/>
+      <text class="eje" x="${mIzq - 9}" y="${y(t) + 3.5}" text-anchor="end">${t ? moneyM(t) : '0'}</text>`;
+  }
+
+  const cx = (i) => mIzq + pasoX * i + pasoX / 2;
+  const barrasSvg = dias.map((x, i) => {
+    const px = cx(i) - barra / 2;
+    const yMl = y(x.ml), hMl = mSup + alto - yMl;
+    const yTot = y(x.v), hTn = Math.max(0, yMl - yTot - (x.tn ? 1 : 0));
+    return `<rect class="s1" x="${px}" y="${yMl}" width="${barra}" height="${Math.max(0, hMl)}" rx="1.5"/>
+      ${x.tn ? `<rect class="s2" x="${px}" y="${yTot}" width="${barra}" height="${hTn}" rx="1.5"/>` : ''}`;
   }).join('');
 
-  const zonas = MESES.map((m,i) => {
-    const cx = mIzq + paso*i + paso/2;
-    return `<rect x="${(mIzq+paso*i).toFixed(1)}" y="${mSup}" width="${paso.toFixed(1)}" height="${alto}"
-      fill="transparent" data-i="${i}" data-cx="${cx.toFixed(1)}" data-cy="${y(m.fact).toFixed(1)}"/>`;
-  }).join('');
+  // Etiquetas cada cinco días: 31 números seguidos no se leen.
+  const etiquetas = dias
+    .filter((x) => x.d === 1 || x.d % 5 === 0)
+    .map((x) => `<text class="eje" x="${cx(x.d - 1)}" y="${H - 10}" text-anchor="middle">${x.d}</text>`)
+    .join('');
+
+  const zonas = dias.map((x, i) => `<rect class="zona" data-i="${i}" x="${cx(i) - pasoX / 2}"
+      y="${mSup}" width="${pasoX}" height="${alto}" fill="transparent"/>`).join('');
 
   cont.innerHTML = `<svg viewBox="0 0 ${W} ${H}" role="img"
-      aria-label="Facturación mensual por canal, agosto 2025 a julio 2026">
-      ${ejes}${barras}
-      <line class="base" x1="${mIzq}" y1="${mSup+alto}" x2="${W-mDer}" y2="${mSup+alto}"/>
-      <g class="zona">${zonas}</g>
-    </svg><div class="globo" id="globoMeses"></div>`;
+      aria-label="Neto liquidado por día de ${mesInfo.largo}, separado por canal">
+      ${ejes}${barrasSvg}${etiquetas}
+      <line class="base" x1="${mIzq}" y1="${mSup + alto}" x2="${W - mDer}" y2="${mSup + alto}"/>
+      ${zonas}
+    </svg><div class="globo" id="globoDias"></div>`;
 
-  const globo = document.getElementById('globoMeses');
+  const globo = $('globoDias');
   const svg = cont.querySelector('svg');
-  cont.querySelectorAll('.zona rect').forEach(r => {
-    r.addEventListener('mouseenter', () => {
-      const m = MESES[+r.dataset.i];
-      globo.innerHTML = `<b>${m.m}</b> · ${moneyM(m.fact)}<br>
-        <span class="fila"><i style="background:var(--c1)"></i>Mercado Libre ${moneyM(m.ml)}</span>
-        <span class="fila"><i style="background:var(--c2)"></i>Tienda Nube ${moneyM(m.tn)}</span>
-        <span class="fila" style="color:var(--tenue)">${nf.format(m.ord)} órdenes · ticket ${money(m.fact/m.ord)}</span>`;
+  svg.querySelectorAll('.zona').forEach((r) => {
+    const mostrar = () => {
+      const x = dias[+r.dataset.i];
+      globo.innerHTML = `<b>${x.d} de ${mesInfo.largo.split(' ')[0]}</b>
+        <span>Total ${moneyM(x.v)}</span>
+        <span>Mercado Libre ${moneyM(x.ml)}</span>
+        ${x.tn ? `<span>Tienda Nube ${moneyM(x.tn)}</span>` : ''}
+        <span>${nf.format(x.ordenes)} órdenes${x.ordenes ? ` · ticket ${money(x.v / x.ordenes)}` : ''}</span>`;
       const caja = svg.getBoundingClientRect();
-      globo.style.left = (+r.dataset.cx / W * caja.width) + 'px';
-      globo.style.top  = (+r.dataset.cy / H * caja.height) + 'px';
-      globo.style.opacity = 1;
-    });
-    r.addEventListener('mouseleave', () => { globo.style.opacity = 0; });
+      const px = cx(+r.dataset.i) / W * caja.width;
+      globo.style.left = Math.min(Math.max(px, 92), caja.width - 92) + 'px';
+      globo.style.top = '18px';
+      globo.classList.add('visible');
+    };
+    r.addEventListener('mouseenter', mostrar);
+    r.addEventListener('focus', mostrar);
+    r.addEventListener('mouseleave', () => globo.classList.remove('visible'));
   });
 }
-graficoMeses();
 
-/* ---------------- gráficos de línea (margen y EBITDA) ---------------- */
-function graficoLinea(destino, campo, color, etiqueta, formato){
-  const cont = document.getElementById(destino);
-  const vals = MESES.map(m => m[campo]);
+/* ---------------- gráfico de línea ---------------- */
+function graficoLinea(destino, datos, campo, color, etiqueta, formato) {
+  const cont = $(destino);
+  if (!cont) return;
+  const vals = datos.map((m) => m[campo]);
   const W = 460, H = 190, mIzq = 40, mDer = 46, mSup = 14, mInf = 26;
   const ancho = W - mIzq - mDer, alto = H - mSup - mInf;
   const min = Math.floor(Math.min(...vals) - 1), max = Math.ceil(Math.max(...vals) + 1);
-  const x = i => mIzq + i * ancho / (vals.length - 1);
-  const y = v => mSup + alto - (v - min) / (max - min) * alto;
+  const x = (i) => mIzq + i * ancho / Math.max(1, vals.length - 1);
+  const y = (v) => mSup + alto - (v - min) / (max - min || 1) * alto;
 
   let malla = '';
-  [min, (min+max)/2, max].forEach(t => {
-    malla += `<line class="malla" x1="${mIzq}" y1="${y(t).toFixed(1)}" x2="${W-mDer}" y2="${y(t).toFixed(1)}"/>
-      <text class="eje" x="${mIzq-8}" y="${(y(t)+3.5).toFixed(1)}" text-anchor="end">${formato(t)}</text>`;
-  });
-
-  const d = vals.map((v,i) => `${i ? 'L' : 'M'}${x(i).toFixed(1)},${y(v).toFixed(1)}`).join(' ');
-  const area = `${d} L${x(vals.length-1).toFixed(1)},${mSup+alto} L${mIzq},${mSup+alto} Z`;
+  for (let k = 0; k <= 4; k++) {
+    const v = min + (max - min) * k / 4;
+    malla += `<line class="malla" x1="${mIzq}" y1="${y(v)}" x2="${W - mDer}" y2="${y(v)}"/>
+      <text class="eje" x="${mIzq - 8}" y="${y(v) + 3.5}" text-anchor="end">${Math.round(v)}</text>`;
+  }
+  const d = vals.map((v, i) => `${i ? 'L' : 'M'}${x(i).toFixed(1)},${y(v).toFixed(1)}`).join(' ');
+  const area = `${d} L${x(vals.length - 1).toFixed(1)},${mSup + alto} L${mIzq},${mSup + alto} Z`;
   const fin = vals.length - 1;
-
-  const marcas = vals.map((v,i) =>
-    `<circle cx="${x(i).toFixed(1)}" cy="${y(v).toFixed(1)}" r="${i === fin ? 4.5 : 3}"
-      class="pico" stroke="${color}" style="fill:${i === fin ? color : 'var(--panel)'}"/>`).join('');
-
-  const etiquetasX = [0, 5, 11].map(i =>
-    `<text class="eje" x="${x(i).toFixed(1)}" y="${H-8}" text-anchor="middle">${MESES[i].m}</text>`).join('');
+  const marcas = vals.map((v, i) => `<circle cx="${x(i).toFixed(1)}" cy="${y(v).toFixed(1)}" r="2.4"
+    fill="${color}" opacity="${i === fin ? 1 : 0.5}"/>`).join('');
+  const etiquetasX = [0, Math.floor(fin / 2), fin].filter((v, i, a) => a.indexOf(v) === i).map((i) =>
+    `<text class="eje" x="${x(i).toFixed(1)}" y="${H - 8}" text-anchor="middle">${datos[i].m}</text>`).join('');
 
   cont.innerHTML = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${etiqueta}">
     ${malla}
-    <path d="${area}" fill="${color}" opacity=".09"/>
-    <path d="${d}" fill="none" stroke="${color}" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
-    ${marcas}
-    <text x="${(x(fin)+9).toFixed(1)}" y="${(y(vals[fin])+4).toFixed(1)}" class="eje"
-      style="fill:var(--tinta);font-weight:600;font-size:12px">${formato(vals[fin])}</text>
-    ${etiquetasX}
-    <line class="base" x1="${mIzq}" y1="${mSup+alto}" x2="${W-mDer}" y2="${mSup+alto}"/>
+    <path d="${area}" fill="${color}" opacity=".1"/>
+    <path d="${d}" fill="none" stroke="${color}" stroke-width="2"
+      stroke-linejoin="round" stroke-linecap="round"/>
+    ${marcas}${etiquetasX}
+    <text class="pico" x="${x(fin) + 7}" y="${y(vals[fin]) + 4}">${formato(vals[fin])}</text>
+    <line class="base" x1="${mIzq}" y1="${mSup + alto}" x2="${W - mDer}" y2="${mSup + alto}"/>
   </svg>`;
 }
-/* Los colores van como var(): así los gráficos siguen al tema sin redibujarse */
-graficoLinea('gMargen', 'mb', 'var(--c1)', 'Margen bruto mensual en porcentaje', v => pct(v,1));
-graficoLinea('gEbitda', 'eb', 'var(--c4)', 'EBITDA mensual en porcentaje', v => pct(v,1));
 
-/* ---------------- postventa ---------------- */
-const URGENCIAS = [
-  {u:'Alta',  n:6,  d:'4 hace más de 48 h', clase:'alta'},
-  {u:'Media', n:15, d:'Ninguno vencido',    clase:'media'},
-  {u:'Baja',  n:13, d:'Consultas de uso',   clase:'baja'}
-];
+/* ---------------- atención al cliente ---------------- */
+const CLASE_URG = { Alta: 'alta', Media: 'media', Baja: 'baja', 'Sin clasificar': 'nula' };
+const ORDEN_URG = ['Alta', 'Media', 'Baja', 'Sin clasificar'];
 const ICONO = {
-  alta:'<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 1.6 15 14H1L8 1.6Z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M8 6v3.4M8 11.4v.1" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>',
-  media:'<svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="6.4" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M8 4.6V8l2.4 1.6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" fill="none"/></svg>',
-  baja:'<svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="6.4" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="m5.2 8.2 2 2 3.6-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>'
+  nula: '<svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="6.4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-dasharray="2.4 2.2"/></svg>',
+  alta: '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 1.6 15 14H1L8 1.6Z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M8 6v3.4M8 11.4v.1" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>',
+  media: '<svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="6.4" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M8 4.6V8l2.4 1.6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" fill="none"/></svg>',
+  baja: '<svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="6.4" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="m5.2 8.2 2 2 3.6-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>',
 };
 
-document.getElementById('luces').innerHTML = URGENCIAS.map(x => `
-  <button class="luz ${x.clase}" data-u="${x.u}" aria-pressed="false">
-    <span class="n">${x.n}</span>
-    <span class="t">${ICONO[x.clase]} ${x.u}</span>
-    <span class="d">${x.d}</span>
-  </button>`).join('');
+function pintarClientes(C, D) {
+  const P = C.postventa;
+  $('subPostventa').textContent = `${P.abiertos} sin cerrar al ${C.corte}`;
 
-/* Cuatro cifras de contexto: escalas distintas, así que van como datos, no como barras */
-document.getElementById('postventaKpis').innerHTML = [
-  {n:'Ingresados en julio',          v:'212'},
-  {n:'Resueltos en julio',           v:'198'},
-  {n:'Resueltos satisfactoriamente', v:'78%'},
-  {n:'Tiempo de 1ª respuesta',       v:'4,2 h'},
-  {n:'Reclamos cada 100 órdenes',    v:'1,8'}
-].map(d => `<div class="dato"><span>${d.n}</span><b class="num">${d.v}</b></div>`).join('');
+  $('luces').innerHTML = P.urgencias.map((x) => `
+    <button class="luz ${x.clase}" data-u="${x.u}" aria-pressed="false">
+      <span class="n">${x.n}</span>
+      <span class="t">${ICONO[x.clase]} ${x.u}</span>
+      <span class="d">${x.d}</span>
+    </button>`).join('');
 
-document.getElementById('tendenciaCasos').innerHTML = `
-  <span class="et">Casos abiertos al cierre de cada mes</span>
-  ${chispa(COLA, 'var(--c4)', {w:320, h:52, clase:'tendenciaSvg'})}
-  <div class="pieT"><span>ago 25 · 52 casos</span><span>jul 26 · 34 casos</span></div>`;
+  $('postventaKpis').innerHTML = P.kpis
+    .map((d) => `<div class="dato"><span>${d.n}</span><b class="num">${d.v}</b></div>`).join('');
 
-let filtro = null;
-function pintarCasos(){
-  const lista = filtro ? CASOS.filter(c => c.u === filtro) : CASOS;
-  document.getElementById('tablaCasos').innerHTML = lista.map(c => `
-    <tr class="${c.d >= 3 && c.u === 'Alta' ? 'vencido' : ''}">
-      <td class="id">${c.id}</td>
-      <td><span class="chip ${c.u.toLowerCase()}">${c.u}</span></td>
-      <td>${c.t}</td>
-      <td><span class="chip neutro">${c.p}</span></td>
-      <td>${c.r}</td>
-      <td class="dias">${c.d}</td>
-    </tr>`).join('');
-  document.getElementById('filtroTexto').textContent = filtro
-    ? `${lista.length} caso${lista.length === 1 ? '' : 's'} de urgencia ${filtro.toLowerCase()} · tocá de nuevo para ver todos`
-    : 'Los 12 casos que siguen sin cerrar';
-}
-pintarCasos();
+  /* La evolución de la cola sale sólo si se carga la fecha de cierre. */
+  const t = $('tendenciaCasos');
+  if (P.cola && P.cola.length >= 3) {
+    t.innerHTML = `<span class="et">Casos abiertos al cierre de cada mes</span>
+      ${chispa(P.cola.map((c) => c.v), 'var(--c4)', { w: 320, h: 52, clase: 'tendenciaSvg' })}
+      <div class="pieT"><span>${P.cola[0].mes}</span><span>${P.cola[P.cola.length - 1].mes}</span></div>`;
+  } else if (C.calidad.faltantes.length) {
+    t.innerHTML = `<p class="nodato">${C.calidad.faltantes.map((f) => `<b>·</b> ${f}`).join('<br>')}</p>`;
+  }
 
-document.querySelectorAll('.luz').forEach(b => {
-  b.addEventListener('click', () => {
-    const u = b.dataset.u;
-    filtro = filtro === u ? null : u;
-    document.querySelectorAll('.luz').forEach(o =>
-      o.setAttribute('aria-pressed', String(o.dataset.u === filtro)));
-    pintarCasos();
+  /* Tabla de casos abiertos, filtrable por urgencia. */
+  let filtro = null;
+  const pintarCasos = () => {
+    const lista = (filtro ? P.casos.filter((c) => c.u === filtro) : P.casos).slice(0, 12);
+    $('tablaCasos').innerHTML = lista.map((c) => `
+      <tr class="${c.d >= 2 && c.u === 'Alta' ? 'vencido' : ''}">
+        <td class="id">${c.id}</td>
+        <td><span class="chip ${CLASE_URG[c.u] || 'nula'}">${c.u}</span></td>
+        <td>${c.t}</td>
+        <td><span class="chip neutro">${c.p}</span></td>
+        <td>${c.r}</td>
+        <td class="dias">${c.d}</td>
+      </tr>`).join('');
+    $('filtroTexto').textContent = filtro
+      ? `${lista.length} caso${lista.length === 1 ? '' : 's'} de urgencia ${filtro.toLowerCase()} · tocá de nuevo para ver todos`
+      : `Los ${Math.min(12, P.casos.length)} más urgentes de los ${P.abiertos} abiertos · días desde que entró el mensaje`;
+  };
+  pintarCasos();
+
+  document.querySelectorAll('.luz').forEach((b) => {
+    b.addEventListener('click', () => {
+      filtro = filtro === b.dataset.u ? null : b.dataset.u;
+      document.querySelectorAll('.luz').forEach((o) =>
+        o.setAttribute('aria-pressed', String(o.dataset.u === filtro)));
+      pintarCasos();
+    });
   });
-});
 
-/* ---------------- embudos de preventa ---------------- */
-function pintarEmbudo(cual){
-  const datos = EMBUDOS[cual];
-  const tope = Math.max(...datos.etapas.map(e => e.v));
-  document.getElementById('embudo').innerHTML = datos.etapas.map(e => `
+  /* Embudo de preventa: sólo las etapas que el equipo carga de verdad. */
+  const M = C.preventa.minorista;
+  $('subEmbudo').textContent = `Minorista · ${C.mesRefLargo || C.mesRef}`;
+  const tope = Math.max(...M.etapas.map((e) => e.v)) || 1;
+  $('embudo').innerHTML = M.etapas.map((e) => `
     <div class="etapa ${e.clase}">
       <span class="e">${e.e}</span>
-      <span class="v">${nf.format(e.v)}<span>${pct(e.v/tope*100,0)} ${datos.ref}</span></span>
-      <span class="riel"><i style="width:${(e.v/tope*100).toFixed(1)}%"></i></span>
+      <span class="v">${nf.format(e.v)}<span>${pct(100 * e.v / tope, 0)} de las consultas</span></span>
+      <span class="riel"><i style="width:${(100 * e.v / tope).toFixed(1)}%"></i></span>
     </div>`).join('');
-  document.getElementById('embudoNota').textContent = datos.nota;
+
+  $('embudoNota').innerHTML = M.resultadoConfiable
+    ? `${M.ganados} ganadas y ${M.perdidos} perdidas sobre ${M.total} consultas.`
+    : `<b>No hay conversión todavía:</b> ${M.sinResolver} de las ${M.total} consultas siguen en el estado
+       inicial, así que no se sabe cuántas terminaron en venta. Con el estatus cargado
+       (ganado / perdido) el embudo se completa solo.`;
+
+  $('subReclamos').textContent = `Motivos de los ${P.kpis[0].v} casos de ${C.mesRefLargo || C.mesRef}`;
+  barras('reclamos', P.reclamos, { formato: (v) => nf.format(v), clase: 'c3' });
+
+  if (C.preventa.volumen.casos === 0) {
+    $('embudoNota').innerHTML += '<br>Preventa por volumen: todavía sin casos cargados.';
+  }
 }
-pintarEmbudo('minorista');
 
-document.querySelectorAll('[role="tab"]').forEach(t => {
-  t.addEventListener('click', () => {
-    document.querySelectorAll('[role="tab"]').forEach(o => o.setAttribute('aria-selected', String(o === t)));
-    document.getElementById('embudo').setAttribute('aria-labelledby', t.id);
-    pintarEmbudo(t.id.replace('tab-', ''));
-  });
-});
+/* ---------------- lo que el tablero marca solo ---------------- */
+function pintarNotas(D) {
+  const notas = [];
+  const serie = D.serie || [];
+  const ult = serie.find((s) => s.mes === D.mesCerrado.mes) || serie[serie.length - 1] || {};
+  const prev = serie.find((s) => s.mes === D.mesCerrado.previoMes) || {};
+  const dias = D.dias || [];
+  const E = D.eerr;
+  const C = D.clientes;
+  const mes = D.mesCerrado.largo;
+  const Mes = mes.replace(/^./, (c) => c.toUpperCase());
 
-/* ---------------- notas de la semana ---------------- */
-document.getElementById('notas').innerHTML = NOTAS.map(n => `
-  <article class="nota ${n.sev}">
-    <span class="marca-sev" aria-hidden="true"></span>
-    <div><h4>${n.h}</h4><p>${n.p}</p><span class="quien">${n.q}</span></div>
-  </article>`).join('');
+  const v = variacion(ult.neto, prev.neto);
+  if (v != null) {
+    notas.push({
+      sev: v >= 0 ? 'bien' : 'ojo',
+      h: `Los canales liquidaron ${moneyM(ult.neto)}, ${signo(v)}% contra ${prev.largo}`,
+      p: `${nf.format(ult.ordenes)} órdenes, ticket ${money(ult.neto / ult.ordenes)}.`,
+      q: 'Ventas',
+    });
+  } else if (dias.length) {
+    /* Con un solo mes no hay tendencia, pero sí se puede leer la forma del mes:
+       cuánto pesaron los diez mejores días sobre el total. */
+    const orden = [...dias].sort((a, b) => b.v - a.v);
+    const total = dias.reduce((a, x) => a + x.v, 0) || 1;
+    const top10 = orden.slice(0, 10).reduce((a, x) => a + x.v, 0);
+    notas.push({
+      sev: 'info',
+      h: `${Mes} cerró en ${moneyM(ult.neto)} con ${nf.format(ult.ordenes)} órdenes`,
+      p: `Los diez mejores días explican el ${pct(100 * top10 / total)} del mes; el más fuerte fue el `
+        + `${orden[0].d} con ${moneyM(orden[0].v)}. Ticket promedio ${money(ult.neto / ult.ordenes)}.`,
+      q: 'Ventas',
+    });
+  }
+
+  const tn = ult.tn ?? 0;
+  if (tn && ult.neto) {
+    notas.push({
+      sev: 'info',
+      h: `Tienda Nube es el ${pct(100 * tn / ult.neto)} de lo cobrado`,
+      p: prev.neto
+        ? `El mes anterior era el ${pct(100 * (prev.tn ?? 0) / prev.neto)}. Mercado Libre explica el resto.`
+        : `Mercado Libre puso los otros ${moneyM(ult.ml ?? (ult.neto - tn))}.`,
+      q: 'Comercial',
+    });
+  }
+
+  const contrib = (E.lineas || []).find((l) => l.c === 'Resultado de contribución');
+  const com = (E.lineas || []).find((l) => l.c === 'Comisiones de plataforma');
+  if (contrib && com) {
+    notas.push({
+      sev: 'info',
+      h: `Después del canal queda el ${pct(contrib.pct)} de la venta`,
+      p: `Las comisiones y cargos de plataforma se llevan ${pct(Math.abs(com.pct))} de las ventas netas. `
+        + 'De ahí todavía hay que restar marketing, sueldos y estructura.',
+      q: 'Dirección',
+    });
+  }
+
+  if (E.cobertura < 99) {
+    const top = (E.sinCosto || []).slice(0, 3).map((x) => x.sku).join(', ');
+    notas.push({
+      sev: E.cobertura < 95 ? 'mal' : 'ojo',
+      h: `El ${pct(100 - E.cobertura)} de la venta no tiene costo cargado`,
+      p: `El margen bruto se calcula sobre el ${pct(E.cobertura)} restante. Los SKU que faltan costear `
+        + `en la planilla de compras: ${top}.`,
+      q: 'Compras',
+    });
+  }
+
+  if (C) {
+    const alta = C.postventa.urgencias.find((u) => u.u === 'Alta') || { n: 0 };
+    if (C.postventa.vencidos > 0) {
+      notas.push({
+        sev: 'mal',
+        h: C.postventa.vencidos === 1
+          ? 'Un reclamo urgente lleva más de 48 h abierto'
+          : `${C.postventa.vencidos} reclamos urgentes llevan más de 48 h abiertos`,
+        p: `Hay ${alta.n} de urgencia alta entre los ${C.postventa.abiertos} casos abiertos al ${C.corte}.`,
+        q: 'Postventa',
+      });
+    }
+    if (C.calidad.faltantes.length) {
+      notas.push({
+        sev: 'ojo',
+        h: 'Faltan cargar dos campos de la central de atención',
+        p: C.calidad.faltantes.join(' '),
+        q: 'Postventa',
+      });
+    }
+  }
+
+  $('notas').innerHTML = notas.slice(0, 6).map((n) => `
+    <article class="nota ${n.sev}">
+      <span class="marca-sev" aria-hidden="true"></span>
+      <div><h4>${n.h}</h4><p>${n.p}</p><span class="quien">${n.q}</span></div>
+    </article>`).join('');
+}
+
+/* ---------------- de dónde sale cada número ---------------- */
+function pintarConexion(D) {
+  const F = D.fuentes;
+  const t = [
+    {
+      estado: '', et: 'Ventas', h: 'Exports de los canales',
+      p: 'Todo sale del export crudo: facturación, órdenes, productos, familias, provincias, envíos, '
+        + 'la evolución día por día y los cargos de plataforma línea por línea.',
+      dato: `${F.ventas.meli.length} export${F.ventas.meli.length === 1 ? '' : 's'} de Mercado Libre · `
+        + `${F.ventas.tiendanube.length} de Tienda Nube · `
+        + `${F.ventas.meses.length === 1 ? F.ventas.meses[0] : F.ventas.meses.join(', ')}`,
+    },
+    {
+      estado: D.eerr.cobertura >= 99 ? '' : 'parcial', et: 'Costos', h: 'Planilla madre de compras',
+      p: `Costo unitario sin IVA por SKU, columna «COSTO SIN IVA». Cubre el ${pct(D.eerr.cobertura)} `
+        + 'de la venta del mes; el resto son SKU nuevos o variantes sin costear.'
+        + (D.fuentes.maestro ? '' : ' Falta el maestro de nombres y familias.'),
+      dato: `hoja ${F.costos.hoja} · ${F.costos.skus} SKU con costo`,
+    },
+    {
+      estado: F.postventa ? (D.clientes && D.clientes.calidad.faltantes.length ? 'parcial' : '') : 'falta',
+      et: 'Atención al cliente', h: 'Sheet de la central',
+      p: F.postventa
+        ? 'Casos de postventa y consultas de preventa. Urgencia, motivo y estado se cargan; '
+          + 'la fecha de cierre y el resultado de preventa todavía no.'
+        : 'Sin conectar.',
+      dato: F.postventa ? `corte ${F.postventa.corte}` : '—',
+    },
+    {
+      estado: 'falta', et: 'Gastos operativos', h: 'Sin fuente',
+      p: 'Marketing, estructura y sueldos, impuestos propios, amortizaciones y resultados '
+        + 'financieros. Es lo único que falta para cerrar el resultado neto.',
+      dato: 'una planilla mensual de seis o siete filas alcanza',
+    },
+  ];
+  $('conexion').innerHTML = t.map((x) => `
+    <div class="fuente-t ${x.estado}">
+      <span class="et"><i></i>${x.et}</span>
+      <h4>${x.h}</h4>
+      <p>${x.p}</p>
+      <span class="dato">${x.dato}</span>
+    </div>`).join('');
+}
 
 /* ---------------- claro / oscuro ---------------- */
 const raiz = document.documentElement;
-const botonTema = document.getElementById('tema');
+const botonTema = $('tema');
 const sistemaOscuro = () => window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches;
 const temaVigente = () => raiz.dataset.theme || (sistemaOscuro() ? 'dark' : 'light');
 
-function aplicarTema(t, recordar){
+function aplicarTema(t, recordar) {
   raiz.dataset.theme = t;
   botonTema.setAttribute('aria-label', t === 'dark' ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro');
   botonTema.title = botonTema.getAttribute('aria-label');
   if (recordar) { try { localStorage.setItem('naku-tema', t); } catch (e) { /* sin storage, no pasa nada */ } }
 }
-/* Sin elección propia el tablero sigue al sistema: sólo se marca el botón */
 botonTema.setAttribute('aria-label', temaVigente() === 'dark' ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro');
 botonTema.title = botonTema.getAttribute('aria-label');
 botonTema.addEventListener('click', () => aplicarTema(temaVigente() === 'dark' ? 'light' : 'dark', true));
 
 /* ---------------- navegación ---------------- */
 const secciones = [...document.querySelectorAll('main section')];
-const enlaces = new Map([...document.querySelectorAll('.nav a')].map(a => [a.getAttribute('href').slice(1), a]));
-const observador = new IntersectionObserver(entradas => {
-  entradas.forEach(e => {
-    if (e.isIntersecting){
-      enlaces.forEach(a => a.removeAttribute('aria-current'));
+const enlaces = new Map([...document.querySelectorAll('.nav a')].map((a) => [a.getAttribute('href').slice(1), a]));
+const observador = new IntersectionObserver((entradas) => {
+  entradas.forEach((e) => {
+    if (e.isIntersecting) {
+      enlaces.forEach((a) => a.removeAttribute('aria-current'));
       enlaces.get(e.target.id)?.setAttribute('aria-current', 'true');
     }
   });
-}, {rootMargin:'-96px 0px -60% 0px', threshold:0});
-secciones.forEach(s => observador.observe(s));
+}, { rootMargin: '-96px 0px -60% 0px', threshold: 0 });
+secciones.forEach((s) => observador.observe(s));
 </script>
 </body>
 </html>

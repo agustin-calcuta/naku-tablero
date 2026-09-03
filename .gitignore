@@ -22,3 +22,4 @@ appsscript/.clasprc.json
 # temporales
 *.tmp
 scratchpad/
+.backup/
