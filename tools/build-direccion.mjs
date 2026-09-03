@@ -26,10 +26,11 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { buildCostos, makeCostMatcher, hojasPorMes, IVA } from '../src/costos.mjs';
+import { buildCostos, makeCostMatcher, hojasPorMes, normSkuCosto, IVA } from '../src/costos.mjs';
 import { buildMaestro, makeMatcher } from '../src/engine.mjs';
 import { ingestFinanzasMeli, ingestFinanzasTn, unirCanales, eerr, verificarMeli, sinIva, agregar } from '../src/finanzas.mjs';
 import { buildPostventa } from '../src/postventa.mjs';
+import { resolverFuente, leerConfig, traerDelPuente, probarPuente } from '../src/fuentes.mjs';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(HERE, '..');
@@ -71,17 +72,82 @@ function parseCSV(text, delim = ';') {
 
 console.log('· datos:', DATA);
 
+/* ---------------------------------------------------------------- fuentes de Google
+   Las planillas que alguien mantiene —costos y central de atención— se bajan
+   solas antes de cada build. Los exports de los canales no: hay que dejarlos en
+   el directorio de datos. Si Google no responde o la planilla dejó de estar
+   compartida, se sigue con la última copia y el build avisa. */
+const config = leerConfig(ROOT);
+const estadoFuentes = {};
+
+// El puente de Apps Script es el camino preferido: las planillas no se comparten
+// con nadie, el script las lee con el acceso de su dueño y devuelve sólo las
+// columnas que el tablero usa. Si no está configurado o no responde, se cae a los
+// archivos del directorio de datos.
+const puente = {
+  url: process.env.NAKU_FUENTES_URL || (config.fuentes || {}).url || '',
+  token: process.env.NAKU_FUENTES_TOKEN || (config.fuentes || {}).token || '',
+};
+let delPuente = null;
+if (puente.url && puente.token) {
+  const vivo = await probarPuente(puente.url, puente.token);
+  if (vivo.ok) {
+    try {
+      delPuente = await traerDelPuente(puente.url, puente.token);
+      console.log(`· puente: costos de "${delPuente.costos.hoja}" (${delPuente.costos.filas.length} SKU)`
+        + ` · central con ${delPuente.central.postventa.length - 1} casos`);
+      estadoFuentes.costos = { origen: 'puente' };
+      estadoFuentes.postventa = { origen: 'puente' };
+    } catch (e) {
+      console.warn(`⚠ el puente respondió pero falló al traer los datos: ${e.message}`);
+      console.warn('  sigo con los archivos locales');
+    }
+  } else {
+    console.warn(`⚠ puente de Apps Script no disponible: ${vivo.motivo}`);
+    console.warn('  sigo con los archivos locales');
+  }
+}
+
+// Lo que el puente no cubrió se busca en Google por link o en el disco.
+for (const clave of ['costos', 'postventa', 'maestro']) {
+  if (estadoFuentes[clave]) continue;
+  const f = config[clave];
+  if (!f || !f.archivo) continue;
+  const r = await resolverFuente(clave, f.id, path.join(DATA, f.archivo), {
+    tipo: f.tipo,
+    obligatoria: clave !== 'maestro',
+  });
+  estadoFuentes[clave] = { origen: r.origen, motivo: r.motivo || null, dias: r.dias ?? null };
+  if (!r.ok && clave !== 'maestro') {
+    fatal(`no pude conseguir la fuente "${clave}": ${r.motivo}`);
+  }
+}
+
 /* ---------------------------------------------------------------- costos */
-const fCostos = buscar(/PLANILLA.?MADRE.*\.xlsx$/i)[0] || buscar(/madre.*\.xlsx$/i)[0];
-if (!fCostos) fatal('falta la planilla madre de costos (PLANILLA_MADRE.xlsx)');
-const wbCostos = XLSX.read(fs.readFileSync(path.join(DATA, fCostos)), { type: 'buffer' });
-const candidatas = hojasPorMes(wbCostos.SheetNames);
-if (!candidatas.length) fatal(`la planilla "${fCostos}" no tiene hojas con nombre de mes`);
-const { hoja: hojaCostos, mes: mesCostos } = candidatas[0];
-const costos = buildCostos(
-  XLSX.utils.sheet_to_json(wbCostos.Sheets[hojaCostos], { header: 1, raw: true, defval: '' }),
-  hojaCostos, mesCostos,
-);
+let costos; let hojaCostos; let mesCostos; let fCostos = null;
+if (delPuente) {
+  // El puente devuelve pares [sku, costo]: no hay planilla que parsear.
+  hojaCostos = delPuente.costos.hoja;
+  mesCostos = delPuente.costos.mes;
+  const mapa = new Map();
+  for (const [sku, v] of delPuente.costos.filas) {
+    const k = normSkuCosto(sku);
+    const n = Number(v);
+    if (k && Number.isFinite(n) && n > 0 && !mapa.has(k)) mapa.set(k, n);
+  }
+  costos = { costo: mapa, hoja: hojaCostos, mes: mesCostos, filas: mapa.size };
+} else {
+  fCostos = buscar(/PLANILLA.?MADRE.*\.xlsx$/i)[0] || buscar(/madre.*\.xlsx$/i)[0];
+  if (!fCostos) fatal('falta la planilla madre de costos (PLANILLA_MADRE.xlsx)');
+  const wbCostos = XLSX.read(fs.readFileSync(path.join(DATA, fCostos)), { type: 'buffer' });
+  const candidatas = hojasPorMes(wbCostos.SheetNames);
+  if (!candidatas.length) fatal(`la planilla "${fCostos}" no tiene hojas con nombre de mes`);
+  ({ hoja: hojaCostos, mes: mesCostos } = candidatas[0]);
+  costos = buildCostos(
+    XLSX.utils.sheet_to_json(wbCostos.Sheets[hojaCostos], { header: 1, raw: true, defval: '' }),
+    hojaCostos, mesCostos,
+  );
+}
 const costoDe = makeCostMatcher(costos);
 console.log(`· costos: hoja "${hojaCostos}" (${mesCostos}) — ${costos.costo.size} SKU con costo`);
 
@@ -287,13 +353,15 @@ for (const [canal, fuente] of Object.entries(fuentesCanal)) {
 console.log(`· canales: ${Object.keys(vistas).join(', ')} × ${periodos.length} períodos`);
 
 /* ---------------------------------------------------------------- postventa */
-const fEmb = buscar(/embudo/i)[0];
+const fEmb = delPuente ? '(puente)' : buscar(/embudo/i)[0];
 let post = null;
 if (fEmb) {
   const ordenesPorMes = Object.fromEntries(serie.map((s) => [s.mes, s.ordenes]));
   // Una versión por canal, para que el filtro del tablero alcance también acá.
-  const hojas = [leerHoja(fEmb, 'Postventa'), leerHoja(fEmb, 'Preventa Minorista'),
-    leerHoja(fEmb, 'Preventa Volumen')];
+  const hojas = delPuente
+    ? [delPuente.central.postventa, delPuente.central.minorista, delPuente.central.volumen]
+    : [leerHoja(fEmb, 'Postventa'), leerHoja(fEmb, 'Preventa Minorista'),
+      leerHoja(fEmb, 'Preventa Volumen')];
   const porCanal = {
     todos: buildPostventa(...hojas, ordenesPorMes, 'todos'),
     ml: buildPostventa(...hojas, ordenesPorMes, 'Mercado Libre'),
@@ -316,7 +384,8 @@ const out = {
     previo: previo ? previo.largo : null, previoMes: previo ? previo.mes : null,
   },
   fuentes: {
-    costos: { archivo: fCostos, hoja: hojaCostos, mes: mesCostos, skus: costos.costo.size },
+    origen: estadoFuentes,
+    costos: { archivo: fCostos || '(puente)', hoja: hojaCostos, mes: mesCostos, skus: costos.costo.size },
     ventas: { meli: fMeli, tiendanube: fTn, meses: serie.map((s) => s.mes) },
     maestro: fMaestro || null,
     postventa: fEmb ? { archivo: fEmb, corte: post.corte } : null,
