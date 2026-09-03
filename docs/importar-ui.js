@@ -249,7 +249,7 @@
         + `margen bruto ${String(mb.pct).replace('.', ',')}%.`, 'bien');
       $('impPublicar').hidden = false;
       $('impBajar').hidden = false;
-      pedirClaveSiHace();
+      pedirNombreSiHace();
       $('impCerrarPie').textContent = 'Ver el tablero';
     } catch (err) {
       estado(err.message || String(err), 'mal');
@@ -262,46 +262,21 @@
   const pausa = () => new Promise((r) => setTimeout(r, 16));
 
   /* ------------------------------------------------------------- publicar
-     La clave y el nombre viven en este navegador. La clave no está en la
-     página: sin ella se puede mirar el tablero, no cambiarlo. */
-  const recordado = (k) => { try { return localStorage.getItem('naku.' + k) || ''; } catch { return ''; } };
-  const recordar = (k, v) => { try { localStorage.setItem('naku.' + k, v); } catch { /* modo privado */ } };
+     Acá no se pide clave: si estás viendo esta pantalla es porque ya entraste, y
+     la misma clave que abre el tablero deja publicar. La maneja direccion.html
+     (window.NakuClave), que es quien la necesita primero. Lo único que se pide
+     es el nombre, y es opcional: sirve para que al pie diga quién cargó. */
+  const recordado = (k) => window.NakuClave.leer(k);
+  const recordar = (k, v) => window.NakuClave.guardar(k, v);
 
-  /* La clave puede venir en el link:
-       …/direccion.html#clave=naku-xxxx&quien=Leo
-     Así el que carga exports no la escribe nunca: abre el link que le mandaron y
-     listo. El link público —el mismo, sin esa parte— sigue siendo de sólo lectura.
-     El fragmento no viaja al servidor, no queda en ningún log. */
-  function claveDelLink() {
-    const h = location.hash;
-    if (!h) return;
-    const clave = (/[#&]clave=([^&]+)/.exec(h) || [])[1];
-    const quien = (/[#&]quien=([^&]+)/.exec(h) || [])[1];
-    if (!clave && !quien) return;
-    try {
-      if (clave) recordar('clave', decodeURIComponent(clave));
-      if (quien) recordar('quien', decodeURIComponent(quien));
-    } catch { /* modo privado: se la va a tener que escribir */ }
-    // Se saca de la barra para que no quede a la vista ni en el historial.
-    history.replaceState(null, '', location.pathname + location.search);
-  }
-
-  function pedirClaveSiHace() {
-    $('impClaveInput').value = recordado('clave');
+  function pedirNombreSiHace() {
     $('impQuienInput').value = recordado('quien');
-    $('impClave').classList.toggle('pide', !$('impClaveInput').value || !$('impQuienInput').value);
   }
 
   async function publicar() {
     if (!ultimoJson) return;
-    const clave = $('impClaveInput').value.trim() || recordado('clave');
-    const quien = $('impQuienInput').value.trim() || recordado('quien');
-    if (!clave) {
-      $('impClave').classList.add('pide');
-      $('impClaveInput').focus();
-      estado('Falta la clave para publicar.', 'mal');
-      return;
-    }
+    const clave = recordado('clave');
+    const quien = $('impQuienInput').value.trim();
 
     $('impPublicar').disabled = true;
     estado('Publicando…');
@@ -317,19 +292,11 @@
         signal: AbortSignal.timeout(60000),
       });
       const j = await r.json().catch(() => ({}));
-      if (r.status === 401) {
-        // La clave guardada no sirve más: que la vuelva a escribir.
-        recordar('clave', '');
-        $('impClave').classList.add('pide');
-        $('impClaveInput').value = '';
-        $('impClaveInput').focus();
-        throw new Error('Clave incorrecta.');
-      }
+      // Sólo puede pasar si cambiaron la clave mientras esta pestaña estaba abierta.
+      if (r.status === 401) throw new Error('La clave cambió. Recargá la página y volvé a entrar.');
       if (!r.ok || !j.ok) throw new Error(j.error || `La base contestó ${r.status}.`);
 
-      recordar('clave', clave);
       recordar('quien', quien);
-      $('impClave').classList.remove('pide');
       window.NakuPublicado = { publicado: j.publicado, quien: j.quien };
       window.NakuPintar(ultimoJson);     // repinta el pie con quién publicó
       estado('Publicado. Ya lo ven todos los que abran el tablero.', 'bien');
@@ -368,7 +335,6 @@
   $('impProcesar').addEventListener('click', () => {
     $('impPublicar').textContent = 'Publicar para todos';
   });
-  claveDelLink();
   pintarZonas();
   revisarListo();
 })();

@@ -1,4 +1,4 @@
-// build-direccion.mjs — arma docs/data/direccion.json, la única fuente del
+// build-direccion.mjs — arma datos/direccion.json, la única fuente del
 // tablero de dirección (docs/direccion.html).
 //
 // Uso:
@@ -36,7 +36,9 @@ import { resolverFuente, leerConfig, traerDelPuente, probarPuente } from '../src
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(HERE, '..');
 const DATA = process.env.NAKU_DATA || path.resolve(ROOT, '..', 'Naku Datos');
-const OUT = path.join(ROOT, 'docs', 'data', 'direccion.json');
+// Fuera de docs/: lo que vive ahí lo sirve GitHub Pages a cualquiera, y este
+// archivo tiene el estado de resultados. El tablero lo lee de la base, con clave.
+const OUT = path.join(ROOT, 'datos', 'direccion.json');
 
 const MES_ES = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'];
 const MES_LARGO = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio',

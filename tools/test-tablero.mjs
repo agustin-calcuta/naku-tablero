@@ -6,7 +6,7 @@
 // estado de resultados deje de cerrar, que los períodos no sumen el mes, que un
 // canal se coma órdenes del otro, que aparezcan cifras imposibles.
 //
-// Corre sobre docs/data/direccion.json, así que primero hay que generar el
+// Corre sobre datos/direccion.json, así que primero hay que generar el
 // tablero (`npm run tablero`).
 
 import fs from 'node:fs';
@@ -14,10 +14,10 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const RUTA = path.join(ROOT, 'docs', 'data', 'direccion.json');
+const RUTA = path.join(ROOT, 'datos', 'direccion.json');
 
 if (!fs.existsSync(RUTA)) {
-  console.error('✗ falta docs/data/direccion.json — corré antes: npm run tablero');
+  console.error('✗ falta datos/direccion.json — corré antes: npm run tablero');
   process.exit(1);
 }
 const D = JSON.parse(fs.readFileSync(RUTA, 'utf8'));
