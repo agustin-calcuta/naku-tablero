@@ -267,6 +267,25 @@
   const recordado = (k) => { try { return localStorage.getItem('naku.' + k) || ''; } catch { return ''; } };
   const recordar = (k, v) => { try { localStorage.setItem('naku.' + k, v); } catch { /* modo privado */ } };
 
+  /* La clave puede venir en el link:
+       …/direccion.html#clave=naku-xxxx&quien=Leo
+     Así el que carga exports no la escribe nunca: abre el link que le mandaron y
+     listo. El link público —el mismo, sin esa parte— sigue siendo de sólo lectura.
+     El fragmento no viaja al servidor, no queda en ningún log. */
+  function claveDelLink() {
+    const h = location.hash;
+    if (!h) return;
+    const clave = (/[#&]clave=([^&]+)/.exec(h) || [])[1];
+    const quien = (/[#&]quien=([^&]+)/.exec(h) || [])[1];
+    if (!clave && !quien) return;
+    try {
+      if (clave) recordar('clave', decodeURIComponent(clave));
+      if (quien) recordar('quien', decodeURIComponent(quien));
+    } catch { /* modo privado: se la va a tener que escribir */ }
+    // Se saca de la barra para que no quede a la vista ni en el historial.
+    history.replaceState(null, '', location.pathname + location.search);
+  }
+
   function pedirClaveSiHace() {
     $('impClaveInput').value = recordado('clave');
     $('impQuienInput').value = recordado('quien');
@@ -349,6 +368,7 @@
   $('impProcesar').addEventListener('click', () => {
     $('impPublicar').textContent = 'Publicar para todos';
   });
+  claveDelLink();
   pintarZonas();
   revisarListo();
 })();

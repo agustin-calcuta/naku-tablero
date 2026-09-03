@@ -121,6 +121,18 @@ La clave la escribe cada uno una vez en el panel y queda en **su** navegador
 (`localStorage`). No está en la página: por eso el tablero se puede compartir sin
 que nadie de afuera lo pueda cambiar.
 
+**Para que nadie tenga que escribirla**, va en el link:
+
+```
+…/direccion.html                                  ← el que se comparte: sólo lectura
+…/direccion.html#clave=naku-xxxx&quien=Leo        ← el que carga exports: no escribe nada
+```
+
+El navegador se la guarda y la borra de la barra al instante, así no queda ni en
+el historial. Lo que va después del `#` **no viaja al servidor**: no aparece en
+ningún log de GitHub Pages ni de Neon. Mandale a cada uno su link con su nombre y
+el pie del tablero va a decir quién cargó los últimos datos.
+
 ### La pieza de atrás
 
 Proyecto Neon **`naku-tablero`** (`flat-fire-69274162`, región Ohio — Neon
