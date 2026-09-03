@@ -98,8 +98,11 @@ const cuenta = (arr, fn) => {
  * @param aoaMinorista   hoja 'Preventa Minorista'
  * @param aoaVolumen     hoja 'Preventa Volumen'
  * @param ordenesPorMes  { '2026-08': 11385, … } para reclamos cada 100 órdenes
+ * @param canal          'todos' | 'Mercado Libre' | 'Tienda Nube' — el filtro del
+ *                       tablero alcanza también a la central de atención
  */
-export function buildPostventa(aoaPostventa, aoaMinorista, aoaVolumen, ordenesPorMes = {}) {
+export function buildPostventa(aoaPostventa, aoaMinorista, aoaVolumen, ordenesPorMes = {}, canal = 'todos') {
+  const delCanal = (c) => canal === 'todos' || c === canal;
   const pv = filasPorNombre(aoaPostventa).map((r) => ({
     id: txt(r['Caso']),
     ingreso: fecha(r['Ingreso del mensaje']),
@@ -114,7 +117,7 @@ export function buildPostventa(aoaPostventa, aoaMinorista, aoaVolumen, ordenesPo
     area: txt(r['Área derivada']),
     estatus: txt(r['7· Estatus']),
     responsable: txt(r['Último responsable']),
-  })).filter((r) => r.id);
+  })).filter((r) => r.id && delCanal(r.canalVenta));
 
   if (!pv.length) return null;
 
@@ -213,7 +216,11 @@ export function buildPostventa(aoaPostventa, aoaMinorista, aoaVolumen, ordenesPo
     seguimiento: fecha(r['3· Seguimiento']),
     estatus: txt(r['Estatus']),
     canal: txt(r['Canal de comunicación']),
-  })).filter((r) => r.id);
+  })).filter((r) => r.id
+    // La preventa no registra canal de venta —todavía no hay venta—, así que el
+    // canal de comunicación es lo más cercano: Mercado Libre o el resto.
+    && (canal === 'todos'
+      || (canal === 'Mercado Libre' ? r.canal === 'Mercado Libre' : r.canal !== 'Mercado Libre')));
 
   const minMes = min.filter((r) => mesDe(r.alta) === mesRef);
   const minBase = minMes.length ? minMes : min;
@@ -226,6 +233,7 @@ export function buildPostventa(aoaPostventa, aoaMinorista, aoaVolumen, ordenesPo
   const vol = filasPorNombre(aoaVolumen).filter((r) => txt(r['Caso']));
 
   return {
+    canal,
     corte: corte.toISOString().slice(0, 10),
     mesRef,
     mesRefLargo: mesLegible(mesRef),
