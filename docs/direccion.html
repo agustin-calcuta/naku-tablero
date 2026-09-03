@@ -88,8 +88,18 @@ a{color:var(--azul)}
 :focus-visible{outline:2px solid var(--azul);outline-offset:2px;border-radius:4px}
 
 /* ---------- barra superior ---------- */
-.top{position:sticky;top:0;z-index:30;background:color-mix(in srgb,var(--papel) 92%,transparent);
-  backdrop-filter:blur(10px);border-bottom:1px solid var(--linea)}
+/* La barra de arriba va en el lima de Naku, igual en claro y en oscuro: es la
+   marca, no parte del tema. Por eso el texto se fija en tinta oscura acá —sobre
+   lima, el color claro del modo oscuro sería ilegible. */
+.top{position:sticky;top:0;z-index:30;background:var(--lima);color:#111315;
+  border-bottom:1px solid rgba(17,19,21,.14)}
+.top .marca b,.top .marca span{color:#111315}
+.top .marca span{opacity:.62}
+.top .nav a{color:#111315;opacity:.72}
+.top .nav a:hover{opacity:1}
+.top .nav a[aria-current]{background:#111315;color:var(--lima);opacity:1}
+.top .tema{background:rgba(255,255,255,.55);border-color:rgba(17,19,21,.18);color:#111315}
+.top .tema:hover{background:rgba(255,255,255,.85)}
 .topin{max-width:1200px;margin:0 auto;padding:12px 24px;display:flex;align-items:center;gap:20px;flex-wrap:wrap}
 /* lockup: el isotipo real de Naku, redibujado para que el hueco de la
    cápsula deje pasar el fondo en los dos temas */
@@ -341,6 +351,63 @@ table.casos tr.vencido td.dias{color:var(--mal);font-weight:600}
 .filtros .resumen b{color:var(--tinta);font-weight:600}
 .filtros select{font-family:inherit;font-size:12.5px;font-weight:600;color:var(--tinta);
   background:var(--panel);border:1px solid var(--linea);border-radius:8px;padding:6px 10px}
+/* Un período que todavía no tiene exports se ve, pero se ve que le falta. */
+.pestanas button.sindatos{color:var(--tenue);font-weight:500}
+.pestanas button.sindatos::after{content:'·';margin-left:5px;color:var(--tenue)}
+.pestanas button.sindatos[aria-selected="true"]{background:var(--panel3);color:var(--media)}
+
+/* ---------- actualizar datos ---------- */
+.btn-act{font-family:inherit;font-size:12.5px;font-weight:600;color:#111315;
+  background:rgba(255,255,255,.62);border:1px solid rgba(17,19,21,.2);
+  border-radius:8px;padding:6px 12px;cursor:pointer;white-space:nowrap}
+.btn-act:hover{background:rgba(255,255,255,.92)}
+
+.imp-fondo{position:fixed;inset:0;z-index:80;background:rgba(14,21,38,.42);
+  backdrop-filter:blur(3px);display:flex;align-items:flex-start;justify-content:center;
+  padding:5vh 16px 16px;overflow:auto}
+.imp-caja{background:var(--panel);border:1px solid var(--linea);border-radius:14px;
+  box-shadow:0 24px 64px rgba(14,21,38,.28);width:100%;max-width:720px}
+.imp-top{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;padding:20px 22px 0}
+.imp-top h2{font-size:19px;font-weight:700;letter-spacing:-.02em;margin:0}
+.imp-top p{margin:5px 0 0;font-size:13px;color:var(--media);line-height:1.5;max-width:46ch}
+.imp-x{background:none;border:0;font-size:22px;line-height:1;color:var(--tenue);cursor:pointer;padding:0 2px}
+.imp-x:hover{color:var(--tinta)}
+.imp-cuerpo{padding:16px 22px 20px}
+.imp-zonas{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:11px}
+@media (max-width:560px){.imp-zonas{grid-template-columns:minmax(0,1fr)}}
+.imp-zona.apoyo{opacity:.9}
+.imp-cab{display:flex;align-items:baseline;justify-content:space-between;gap:8px;margin-bottom:5px}
+.imp-cab b{font-size:13.5px;font-weight:700}
+.imp-cab span{font-size:11px;color:var(--tenue)}
+.imp-drop{display:block;border:1.5px dashed var(--linea);border-radius:10px;padding:16px 12px;
+  text-align:center;cursor:pointer;background:var(--panel2);font-size:12.5px;color:var(--media);
+  transition:border-color .15s,background .15s}
+.imp-drop:hover,.imp-drop.encima{border-color:var(--azul);background:var(--azul-suave)}
+.imp-drop.cargado{border-style:solid;border-color:var(--bien);background:var(--bien-fondo);
+  color:var(--bien);font-weight:600}
+.imp-lleno{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:block}
+.imp-estado{margin:14px 0 0;font-size:13px;color:var(--media);line-height:1.5;min-height:20px}
+.imp-estado.bien{color:var(--bien);font-weight:600}
+.imp-estado.mal{color:var(--mal)}
+.imp-nota{margin:10px 0 0;font-size:12px;color:var(--tenue)}
+.imp-pie{display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin-top:16px;
+  padding-top:16px;border-top:1px solid var(--linea)}
+.imp-pie button{font-family:inherit;font-size:13px;font-weight:600;border-radius:8px;padding:8px 15px;
+  cursor:pointer;border:1px solid var(--linea);background:var(--panel);color:var(--tinta)}
+.imp-pie .primario{background:var(--azul);border-color:var(--azul);color:#fff}
+.imp-pie .primario:disabled{opacity:.45;cursor:not-allowed}
+.imp-pie .suelto{margin-left:auto}
+.imp-privado{margin:14px 0 0;font-size:11.5px;color:var(--tenue);line-height:1.5}
+
+/* ---------- período sin datos cargados ---------- */
+.vacio{max-width:52ch;margin:40px auto 56px;text-align:center}
+.vacio .ico{font-family:var(--mono);font-size:34px;color:var(--linea);line-height:1}
+.vacio h2{margin:14px 0 8px;font-size:19px;font-weight:700;letter-spacing:-.02em}
+.vacio p{margin:0;font-size:14px;color:var(--media);line-height:1.6}
+.vacio .acciones{display:flex;gap:9px;justify-content:center;flex-wrap:wrap;margin-top:18px}
+.vacio button{font-family:inherit;font-size:13px;font-weight:600;border-radius:8px;
+  padding:8px 15px;cursor:pointer;border:1px solid var(--linea);background:var(--panel);color:var(--tinta)}
+.vacio button.primario{background:var(--azul);border-color:var(--azul);color:#fff}
 @media (max-width:620px){.filtros .resumen{margin-left:0;width:100%}}
 
 /* ============================================================
@@ -432,9 +499,9 @@ try {
           </mask>
           <clipPath id="sobre"><rect width="89" height="28"/></clipPath>
         </defs>
-        <rect x="22" y="7" width="44" height="80" rx="22" fill="none" stroke="#1452F0"
+        <rect x="22" y="7" width="44" height="80" rx="22" fill="none" stroke="#111315"
           stroke-width="14" clip-path="url(#sobre)"/>
-        <rect y="28" width="89" height="85" fill="#1452F0" mask="url(#asa)"/>
+        <rect y="28" width="89" height="85" fill="#111315" mask="url(#asa)"/>
       </svg>
       <b>NAKU</b><span>Tablero de dirección</span>
     </div>
@@ -445,6 +512,7 @@ try {
       <a href="#clientes">Clientes</a>
       <a href="#agenda">La semana</a>
     </nav>
+    <button class="btn-act" id="btnActualizar" type="button" hidden>Actualizar datos</button>
     <button class="tema" id="tema" type="button" aria-label="Cambiar a modo oscuro">
       <svg class="luna" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
         stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -458,6 +526,31 @@ try {
     </button>
   </div>
 </header>
+
+<div class="imp-fondo" id="impFondo" hidden role="dialog" aria-modal="true" aria-labelledby="impTitulo">
+  <div class="imp-caja">
+    <div class="imp-top">
+      <div>
+        <h2 id="impTitulo">Actualizar datos</h2>
+        <p>Arrastrá cada archivo en la casilla que le toca. Se procesan en esta
+           computadora: no se suben a ningún lado.</p>
+      </div>
+      <button class="imp-x" id="impCerrar" type="button" aria-label="Cerrar">&times;</button>
+    </div>
+    <div class="imp-cuerpo">
+      <div class="imp-zonas" id="impZonas"></div>
+      <p class="imp-estado" id="impEstado"></p>
+      <p class="imp-nota" id="impNota"></p>
+      <div class="imp-pie">
+        <button class="primario" id="impProcesar" type="button" disabled>Procesar</button>
+        <button id="impBajar" type="button" hidden>Bajar los datos</button>
+        <button class="suelto" id="impCerrarPie" type="button">Cerrar</button>
+      </div>
+      <p class="imp-privado">Lo que cargues se ve sólo en este navegador. Para que
+        lo vean los demás hay que publicar el archivo del botón «Bajar los datos».</p>
+    </div>
+  </div>
+</div>
 
 <div class="filtros" id="filtros" hidden>
   <div class="filtrosin">
@@ -689,7 +782,12 @@ function barras(destino, datos, opts = {}) {
 /* ---------------- arranque ---------------- */
 fetch('data/direccion.json', { cache: 'no-cache' })
   .then((r) => { if (!r.ok) throw new Error(r.status); return r.json(); })
-  .then(pintar)
+  .then((D) => {
+    // El importer del navegador vuelve a pintar con los datos que arme.
+    window.NakuDatos = D;
+    window.NakuPintar = pintar;
+    pintar(D);
+  })
   .catch((e) => {
     // Sin datos no hay tablero: se dice arriba de todo, donde no se puede pasar por alto.
     document.querySelector('main').insertAdjacentHTML('afterbegin',
@@ -705,6 +803,8 @@ function pintar(D) {
 
   const grupo = (cont, items, clave) => {
     $(cont).innerHTML = items.map((x) => `<button role="tab" data-v="${x.id}"
+      class="${x.disponible === false ? 'sindatos' : ''}"
+      title="${x.disponible === false ? 'Todavía no hay exports cargados para este período' : ''}"
       aria-selected="${x.id === filtro[clave]}">${x.n}</button>`).join('');
     $(cont).addEventListener('click', (ev) => {
       const b = ev.target.closest('[data-v]');
@@ -731,8 +831,16 @@ function pintar(D) {
 function pintarVista(D, filtro) {
   const canal = filtro.canal;
   const porCanal = (D.vistas && D.vistas[canal]) || D.vistas.todos;
-  const V = porCanal[filtro.periodo] || porCanal.mes;
   const P = (D.periodos || []).find((x) => x.id === filtro.periodo) || { n: '', id: 'mes' };
+  const V = porCanal[filtro.periodo];
+
+  /* El filtro ofrece rangos de varios meses desde el principio, aunque todavía no
+     haya exports que los cubran: así se ve qué falta en vez de esconderlo. */
+  if (!V) { pintarSinDatos(D, P, filtro); return; }
+  document.querySelectorAll('main section').forEach((s) => { s.hidden = false; });
+  const sinDatos = $('sinDatos');
+  if (sinDatos) sinDatos.remove();
+
   const todoElMes = P.id === 'mes';
   const serie = D.serie || [];
   const ult = serie.find((s) => s.mes === D.mesCerrado.mes) || serie[serie.length - 1] || {};
@@ -1200,6 +1308,46 @@ botonTema.setAttribute('aria-label', temaVigente() === 'dark' ? 'Cambiar a modo 
 botonTema.title = botonTema.getAttribute('aria-label');
 botonTema.addEventListener('click', () => aplicarTema(temaVigente() === 'dark' ? 'light' : 'dark', true));
 
+/**
+ * Un período elegido para el que todavía no hay exports. Se dice qué falta y
+ * cuánto, en vez de mostrar un tablero en cero que parecería una caída.
+ */
+function pintarSinDatos(D, P, filtro) {
+  document.querySelectorAll('main section').forEach((s) => { s.hidden = true; });
+  const previo = $('sinDatos');
+  if (previo) previo.remove();
+
+  const faltan = P.faltan || 0;
+  const cargados = (D.serie || []).filter((s) => !s.parcial).length;
+  const main = document.querySelector('main');
+  main.insertAdjacentHTML('beforeend', `
+    <div class="vacio" id="sinDatos">
+      <div class="ico">—</div>
+      <h2>Todavía no hay datos para «${P.n.toLowerCase()}»</h2>
+      <p>El tablero tiene ${cargados === 1 ? 'un mes cargado' : `${cargados} meses cargados`}
+         (${(D.serie || []).filter((s) => !s.parcial).map((s) => s.largo).join(', ')}).
+         ${faltan > 0 ? `Para este período faltan al menos ${faltan} export${faltan === 1 ? '' : 's'} más de los canales.` : ''}
+         Se cargan con el botón <b>Actualizar datos</b>, y el período se llena solo.</p>
+      <div class="acciones">
+        <button class="primario" type="button" data-vacio="cargar">Actualizar datos</button>
+        <button type="button" data-vacio="volver">Volver a ${(D.mesCerrado || {}).largo || 'el mes cerrado'}</button>
+      </div>
+    </div>`);
+
+  $('sinDatos').querySelector('[data-vacio="cargar"]').addEventListener('click', () => {
+    const b = $('btnActualizar');
+    if (b && !b.hidden) b.click();
+  });
+  $('sinDatos').querySelector('[data-vacio="volver"]').addEventListener('click', () => {
+    const tab = $('tabsPeriodo').querySelector('[data-v="mes"]');
+    if (tab) tab.click();
+  });
+
+  $('resumenFiltro').innerHTML = `<b>${P.n}</b> · sin datos cargados`;
+  $('mesCerrado').textContent = P.n;
+  $('mesPrevio').textContent = 'Falta cargar los exports de ese período';
+}
+
 /* ---------------- alto de los paneles ----------------
    Sólo se igualan los que ya están cerca: cuando uno tiene bastante menos
    contenido que el otro, estirarlo deja un hueco que se lee peor que la
@@ -1231,9 +1379,24 @@ const enlaces = new Map([...document.querySelectorAll('.nav a')].map((a) => [a.g
 const raizNav = document.documentElement;
 let observador = null;
 
+/* Quién manda sobre la marca del menú. El observador avisa qué sección está a la
+   vista, pero en los extremos del scroll se equivoca: arriba de todo ninguna
+   cruza su umbral, y abajo la última es demasiado corta para cruzarlo. Por eso
+   nadie marca directo: todos actualizan el estado y esta función decide. */
+let seccionVisible = null;
+let fijadaPorClic = null;
+
 function marcar(id) {
   enlaces.forEach((a) => a.removeAttribute('aria-current'));
   enlaces.get(id)?.setAttribute('aria-current', 'true');
+}
+
+function decidirMarca() {
+  if (fijadaPorClic) { marcar(fijadaPorClic); return; }
+  const fondo = document.documentElement.scrollHeight - innerHeight - scrollY;
+  if (scrollY < 40 && secciones[0]) marcar(secciones[0].id);
+  else if (fondo < 40 && secciones.length) marcar(secciones[secciones.length - 1].id);
+  else if (seccionVisible) marcar(seccionVisible);
 }
 
 function medirSticky() {
@@ -1247,23 +1410,33 @@ function medirSticky() {
 
   if (observador) observador.disconnect();
   observador = new IntersectionObserver((entradas) => {
-    entradas.forEach((e) => { if (e.isIntersecting) marcar(e.target.id); });
+    entradas.forEach((e) => { if (e.isIntersecting) seccionVisible = e.target.id; });
+    decidirMarca();
   }, { rootMargin: `-${alturaTop + alturaBarra + 8}px 0px -55% 0px`, threshold: 0 });
   secciones.forEach((s) => observador.observe(s));
 }
 
-/* Arriba de todo ninguna sección cruza el umbral del observador y la marca
-   quedaba en la segunda: la primera se marca a mano. */
-addEventListener('scroll', () => {
-  if (scrollY < 40 && secciones[0]) marcar(secciones[0].id);
-}, { passive: true });
+addEventListener('scroll', decidirMarca, { passive: true });
 
-/* Tocar un enlace lo marca al instante, sin esperar a que termine el scroll. */
-enlaces.forEach((a, id) => a.addEventListener('click', () => marcar(id)));
+/* Tocar un enlace lo marca al instante, sin esperar a que termine el scroll: el
+   scroll suave tarda, y ver el menú quieto mientras la página se mueve confunde.
+   La fijación dura hasta que el scroll llegue, y después manda el observador. */
+enlaces.forEach((a, id) => a.addEventListener('click', () => {
+  fijadaPorClic = id;
+  marcar(id);
+  clearTimeout(marcar._t);
+  marcar._t = setTimeout(() => { fijadaPorClic = null; decidirMarca(); }, 900);
+}));
 
 medirSticky();
 addEventListener('resize', () => { medirSticky(); emparejar(); });
-if (secciones[0] && scrollY < 40) marcar(secciones[0].id);
+decidirMarca();
 </script>
+
+<!-- Actualizar datos desde el navegador. Los tres son opcionales: si no cargan,
+     el tablero funciona igual y el botón no aparece. -->
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<script src="importar.js"></script>
+<script src="importar-ui.js"></script>
 </body>
 </html>

@@ -28,8 +28,9 @@ import { fileURLToPath } from 'node:url';
 
 import { buildCostos, makeCostMatcher, hojasPorMes, normSkuCosto, IVA } from '../src/costos.mjs';
 import { buildMaestro, makeMatcher } from '../src/engine.mjs';
-import { ingestFinanzasMeli, ingestFinanzasTn, unirCanales, eerr, verificarMeli, sinIva, agregar } from '../src/finanzas.mjs';
+import { ingestFinanzasMeli, ingestFinanzasTn, verificarMeli, agregar } from '../src/finanzas.mjs';
 import { buildPostventa } from '../src/postventa.mjs';
+import { armarTablero } from '../src/tablero.mjs';
 import { resolverFuente, leerConfig, traerDelPuente, probarPuente } from '../src/fuentes.mjs';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
@@ -196,161 +197,18 @@ for (const m of mapasMeli) {
   }
 }
 
-const porMes = unirCanales(...mapasMeli, ...mapasTn);
-// El tablero filtra por canal, así que el mismo mes se agrega tres veces: el
-// total y cada canal por separado. unirCanales pierde de qué canal viene cada
-// peso, por eso se arma desde los mapas originales en vez de partir el total.
-const porMesMl = unirCanales(...mapasMeli);
-const porMesTn = unirCanales(...mapasTn);
+/* ---------------------------------------------------------------- el tablero
+   El armado vive en src/tablero.mjs para que sea el mismo cálculo que corre en
+   el navegador cuando alguien arrastra los exports en el botón del tablero. */
+const previa = armarTablero({ mapasMl: mapasMeli, mapasTn });
+if (!previa.ok) fatal(previa.error);
+const { mes: mesCerrado, ordenes, margenBruto, contribucion, cobertura, parciales, canales: canalesOk } = previa.resumen;
+const serie = previa.tablero.serie;
 
-// Neto por canal (unirCanales ya perdió de qué canal venía cada peso).
-const netoCanal = new Map();
-const sumarCanal = (mapas, campo) => {
-  for (const m of mapas) for (const [mes, a] of m) {
-    if (!netoCanal.has(mes)) netoCanal.set(mes, { ml: 0, tn: 0 });
-    netoCanal.get(mes)[campo] += sinIva(agregar(a).netoLiquidado);
-  }
-};
-sumarCanal(mapasMeli, 'ml');
-sumarCanal(mapasTn, 'tn');
-
-/* ---------------------------------------------------------------- meses utilizables
-   Un mes con pocas órdenes es la cola de otro export, no un mes de operación. Un
-   mes cuyo último día con ventas queda lejos del fin de mes está a medio cerrar:
-   se marca parcial y no sirve de base de comparación. */
-const esParcial = (mes, a) => a.ultimoDia > 0 && a.ultimoDia < diasDelMes(mes) - 1;
-const totalMes = new Map([...porMes].map(([m, a]) => [m, agregar(a, 1, diasDelMes(m))]));
-const meses = [...porMes.keys()].filter((m) => totalMes.get(m).ordenes.size >= 100).sort();
-if (!meses.length) fatal('ningún mes de los exports tiene volumen suficiente (≥100 órdenes)');
-
-const serie = meses.map((mes) => {
-  const a = totalMes.get(mes);
-  const e = eerr(a);
-  const c = netoCanal.get(mes) || { ml: 0, tn: 0 };
-  return {
-    mes, m: etiqueta(mes), largo: largo(mes),
-    neto: Math.round(e.netoLiquidado),
-    ml: Math.round(c.ml), tn: Math.round(c.tn),
-    ventasNetas: Math.round(e.ventasNetas),
-    ordenes: e.ordenes, unidades: Math.round(e.unidades),
-    mb: e.margenBrutoPct, contrib: e.contribucionPct,
-    parcial: esParcial(mes, a),
-  };
-});
-
-const completos = serie.filter((s) => !s.parcial);
-if (!completos.length) fatal('todos los meses de los exports están a medio cerrar');
-const mesCerrado = completos[completos.length - 1].mes;
-const acc = porMes.get(mesCerrado);
-const est = eerr(totalMes.get(mesCerrado));
-const previo = completos.length > 1 ? completos[completos.length - 2] : null;
-
-console.log(`· mes cerrado: ${mesCerrado} — ${est.ordenes} órdenes · margen bruto ${est.margenBrutoPct}% · contribución ${est.contribucionPct}%`);
-if (serie.length > completos.length) {
-  console.log(`  · a medio cerrar (fuera del comparativo): ${serie.filter((s) => s.parcial).map((s) => s.mes).join(', ')}`);
-}
-if (est.coberturaCostosPct < 95) {
-  console.warn(`  ⚠ cobertura de costos ${est.coberturaCostosPct}%: hay SKU vendidos sin costo en la planilla`);
-}
-
-/* ---------------------------------------------------------------- cortes del mes */
-const FILAS = 10;   // cuántas líneas muestra cada lista del tablero
-
-const top = (map, n) => [...map.entries()].sort((a, b) => b[1] - a[1]).slice(0, n);
-const share = (map, n, resto) => {
-  const tot = [...map.values()].reduce((a, b) => a + b, 0) || 1;
-  const t = top(map, n);
-  const out = t.map(([k, v]) => ({ n: k, v: +(100 * v / tot).toFixed(1) }));
-  const usado = t.reduce((a, [, v]) => a + v, 0);
-  if (tot - usado > 1) out.push({ n: resto, v: +(100 * (tot - usado) / tot).toFixed(1) });
-  return out;
-};
-
-/* «Otros» es una familia real del maestro: los productos a los que nadie les
-   asignó una. Junto al agrupador del resto se leían como lo mismo. */
-const RENOMBRE_FAMILIA = { Otros: 'Sin familia asignada' };
-const RESTO_FAMILIAS = 'Resto de familias';
-
-/** Todo lo que el tablero necesita de un mes, para un canal y un rango de días. */
-function bloque(acc, mes, desde = 1, hasta = 31) {
-  if (!acc) return null;
-  const a = agregar(acc, desde, hasta);
-  if (!a.ordenes.size) return null;
-  const e = eerr(a);
-  const pctDe = (v) => (e.ventasNetas ? +(100 * v / e.ventasNetas).toFixed(1) : 0);
-
-  const familias = new Map();
-  for (const [k, v] of a.familias) {
-    const n = RENOMBRE_FAMILIA[k] || k;
-    familias.set(n, (familias.get(n) || 0) + v);
-  }
-
-  return {
-    eerr: {
-      lineas: [
-        { c: 'Ventas brutas', v: e.ventaBruta, pct: pctDe(e.ventaBruta), tipo: 'normal' },
-        { c: 'Bonificaciones de plataforma', v: e.bonificaciones, pct: pctDe(e.bonificaciones), tipo: 'normal' },
-        { c: 'Anulaciones y reembolsos', v: e.anulaciones, pct: pctDe(e.anulaciones), tipo: 'normal' },
-        { c: 'Descuentos y cupones', v: e.descuentos, pct: pctDe(e.descuentos), tipo: 'normal' },
-        { c: 'Ventas netas', v: e.ventasNetas, pct: 100, tipo: 'total' },
-        { c: 'Costo de la mercadería', v: e.cogs, pct: e.cogsPct, tipo: 'gasto' },
-        { c: 'Margen bruto', v: e.margenBruto, pct: e.margenBrutoPct, tipo: 'destacado' },
-        { c: 'Comisiones de plataforma', v: e.comisiones, pct: e.comisionesPct, tipo: 'gasto' },
-        { c: 'Envíos (neto de lo cobrado)', v: e.envio, pct: e.envioPct, tipo: 'gasto' },
-        { c: 'Impuestos de plataforma', v: e.impuestos, pct: e.impuestosPct, tipo: 'gasto' },
-        { c: 'Resultado de contribución', v: e.contribucion, pct: e.contribucionPct, tipo: 'destacado' },
-      ],
-      ordenes: e.ordenes,
-      unidades: e.unidades,
-      ticket: e.ticket,
-      netoLiquidado: e.netoLiquidado,
-      canceladas: e.canceladas,
-      cobertura: e.coberturaCostosPct,
-      sinCosto: e.skusSinCosto.slice(0, FILAS).map((x) => ({ ...x, facturacion: Math.round(x.facturacion) })),
-      faltan: ['Marketing y publicidad', 'Estructura y sueldos', 'Impuestos propios (IIBB, IVA)',
-        'Amortizaciones', 'Resultados financieros'],
-    },
-    gastos: [
-      { n: 'Costo de la mercadería', v: Math.abs(e.cogsPct) },
-      { n: 'Comisiones de plataforma', v: Math.abs(e.comisionesPct) },
-      { n: 'Envíos y logística', v: Math.abs(e.envioPct) },
-      { n: 'Impuestos de plataforma', v: Math.abs(e.impuestosPct) },
-    ],
-    productos: [...a.productos.values()]
-      .filter((p) => p.v > 0)
-      .sort((x, y) => y.v - x.v)
-      .slice(0, FILAS)
-      .map((p) => ({ sku: p.sku, n: p.n, v: Math.round(p.v), u: Math.round(p.u) })),
-    familias: share(familias, FILAS, RESTO_FAMILIAS),
-    provincias: share(a.provincias, FILAS - 4, 'Resto del país'),
-    envios: [...a.envios.entries()].map(([n, set]) => ({ n, v: set.size })).sort((x, y) => y.v - x.v),
-    dias: a.dias,
-    neto: Math.round(e.netoLiquidado),
-  };
-}
-
-/* Los períodos que los datos permiten. Con un solo export sólo se puede cortar
-   dentro del mes; cuando haya varios, acá entran los rangos multi-mes. */
-const nDias = diasDelMes(mesCerrado);
-const periodos = [
-  { id: 'mes', n: `Todo ${largo(mesCerrado).split(' ')[0]}`, desde: 1, hasta: nDias },
-  { id: 'q1', n: '1ª quincena', desde: 1, hasta: 15 },
-  { id: 'q2', n: '2ª quincena', desde: 16, hasta: nDias },
-  { id: 'u7', n: 'Últimos 7 días', desde: Math.max(1, nDias - 6), hasta: nDias },
-];
-
-const fuentesCanal = { todos: acc, ml: porMesMl.get(mesCerrado), tn: porMesTn.get(mesCerrado) };
-const vistas = {};
-for (const [canal, fuente] of Object.entries(fuentesCanal)) {
-  if (!fuente) continue;
-  vistas[canal] = {};
-  for (const p of periodos) {
-    const b = bloque(fuente, mesCerrado, p.desde, p.hasta);
-    if (b) vistas[canal][p.id] = b;
-  }
-  if (!Object.keys(vistas[canal]).length) delete vistas[canal];
-}
-console.log(`· canales: ${Object.keys(vistas).join(', ')} × ${periodos.length} períodos`);
+console.log(`· mes cerrado: ${mesCerrado} — ${ordenes} órdenes · margen bruto ${margenBruto}% · contribución ${contribucion}%`);
+if (parciales.length) console.log(`  · a medio cerrar (fuera del comparativo): ${parciales.join(', ')}`);
+if (cobertura < 95) console.warn(`  ⚠ cobertura de costos ${cobertura}%: hay SKU vendidos sin costo en la planilla`);
+console.log(`· canales: ${canalesOk.join(', ')} × ${previa.tablero.periodos.length} períodos`);
 
 /* ---------------------------------------------------------------- postventa */
 const fEmb = delPuente ? '(puente)' : buscar(/embudo/i)[0];
@@ -376,31 +234,22 @@ if (fEmb) {
 }
 
 /* ---------------------------------------------------------------- salida */
-const out = {
-  generado: new Date().toISOString().slice(0, 10),
-  iva: IVA,
-  mesCerrado: {
-    mes: mesCerrado, largo: largo(mesCerrado), dias: diasDelMes(mesCerrado),
-    previo: previo ? previo.largo : null, previoMes: previo ? previo.mes : null,
+const armado = armarTablero({
+  mapasMl: mapasMeli,
+  mapasTn,
+  post,
+  meta: {
+    fuentes: {
+      origen: estadoFuentes,
+      costos: { archivo: fCostos || '(puente)', hoja: hojaCostos, mes: mesCostos, skus: costos.costo.size },
+      ventas: { meli: fMeli, tiendanube: fTn, meses: serie.map((s) => s.mes) },
+      maestro: fMaestro || null,
+      postventa: fEmb ? { archivo: fEmb, corte: post.corte } : null,
+    },
   },
-  fuentes: {
-    origen: estadoFuentes,
-    costos: { archivo: fCostos || '(puente)', hoja: hojaCostos, mes: mesCostos, skus: costos.costo.size },
-    ventas: { meli: fMeli, tiendanube: fTn, meses: serie.map((s) => s.mes) },
-    maestro: fMaestro || null,
-    postventa: fEmb ? { archivo: fEmb, corte: post.corte } : null,
-  },
-  serie,
-  // vistas[canal][periodo]: el tablero cambia de corte sin volver a pedir nada.
-  vistas,
-  periodos: periodos.filter((p) => vistas.todos && vistas.todos[p.id]),
-  canales: [
-    { id: 'todos', n: 'Los dos canales' },
-    { id: 'ml', n: 'Mercado Libre', v: Math.round((netoCanal.get(mesCerrado) || {}).ml || 0) },
-    { id: 'tn', n: 'Tienda Nube', v: Math.round((netoCanal.get(mesCerrado) || {}).tn || 0) },
-  ].filter((c) => c.id === 'todos' || vistas[c.id]),
-  clientes: post,
-};
+});
+if (!armado.ok) fatal(armado.error);
+const out = armado.tablero;
 
 fs.mkdirSync(path.dirname(OUT), { recursive: true });
 fs.writeFileSync(OUT, JSON.stringify(out, null, 1));

@@ -41,9 +41,11 @@ console.log('Estructura');
 check('hay al menos un canal', Object.keys(D.vistas || {}).length > 0);
 check('existe la vista de los dos canales', !!(D.vistas && D.vistas.todos && D.vistas.todos.mes));
 check('hay períodos declarados', (D.periodos || []).length > 0);
-check('cada período declarado tiene su bloque',
-  (D.periodos || []).every((p) => D.vistas.todos[p.id]),
-  'un período sin datos rompe el filtro del tablero');
+check('cada período disponible tiene su bloque',
+  (D.periodos || []).filter((p) => p.disponible).every((p) => D.vistas.todos[p.id]),
+  'un período marcado disponible pero sin datos rompe el filtro');
+check('los períodos sin datos están marcados',
+  (D.periodos || []).filter((p) => !D.vistas.todos[p.id]).every((p) => !p.disponible));
 check('los canales declarados tienen vista',
   (D.canales || []).every((c) => D.vistas[c.id]));
 

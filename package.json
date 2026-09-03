@@ -5,9 +5,10 @@
   "main": "index.js",
   "scripts": {
     "actualizar": "node tools/actualizar.mjs",
-    "tablero": "node tools/build-direccion.mjs",
+    "tablero": "node tools/build-direccion.mjs && node tools/build-importer.mjs",
     "test": "node tools/test-tablero.mjs",
-    "instalar-puente": "node tools/instalar-puente.mjs"
+    "instalar-puente": "node tools/instalar-puente.mjs",
+    "importer": "node tools/build-importer.mjs"
   },
   "keywords": [],
   "author": "",
