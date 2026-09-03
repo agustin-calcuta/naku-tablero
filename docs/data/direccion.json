@@ -564,36 +564,36 @@
   "corte": "2026-09-03",
   "mesRef": "2026-08",
   "mesRefLargo": "agosto 2026",
-  "cierresAproximados": 0,
+  "cierresAproximados": 759,
   "calidad": {
-   "cierreCargado": 0,
+   "cierreCargado": 100,
    "cierreReal": 0,
    "respuestaCargada": 0,
    "faltantes": [
-    "Fecha de cierre: no se está cargando, así que no hay tiempo de resolución ni evolución de la cola mes a mes.",
+    "Los 759 casos cerrados antes del 2026-09-04 tienen una fecha de cierre aproximada: se copió de la última actualización cuando se empezó a registrar el cierre. Sirve para la tendencia mes a mes, no para medir cuánto tardó un caso. El tiempo de resolución aparece con los cierres nuevos.",
     "«3· Contactado» se marca junto con el alta del caso: mide cuándo se registró, no cuándo se le respondió al cliente."
    ]
   },
   "postventa": {
-   "total": 849,
+   "total": 858,
    "abiertos": 99,
    "vencidos": 1,
    "urgencias": [
     {
      "u": "Alta",
-     "n": 4,
+     "n": 5,
      "d": "1 hace más de 48 h",
      "clase": "alta"
     },
     {
      "u": "Media",
      "n": 77,
-     "d": "El más viejo, 58 días",
+     "d": "El más viejo, 59 días",
      "clase": "media"
     },
     {
      "u": "Baja",
-     "n": 15,
+     "n": 14,
      "d": "El más viejo, 9 días",
      "clase": "baja"
     },
@@ -611,7 +611,7 @@
     },
     {
      "n": "Resueltos",
-     "v": "689"
+     "v": "692"
     },
     {
      "n": "Resueltos satisfactoriamente",
@@ -619,7 +619,7 @@
     },
     {
      "n": "Siguen abiertos",
-     "v": "67"
+     "v": "64"
     }
    ],
    "casos": [
@@ -629,7 +629,7 @@
      "t": "Estado del envío",
      "p": "ORG-004",
      "r": "Angie",
-     "d": 7
+     "d": 8
     },
     {
      "id": "PV-0808",
@@ -656,12 +656,20 @@
      "d": 0
     },
     {
+     "id": "PV-0850",
+     "u": "Alta",
+     "t": "Producto defectuoso",
+     "p": "MC-002",
+     "r": "Celeste",
+     "d": 0
+    },
+    {
      "id": "PV-0269",
      "u": "Media",
      "t": "Producto defectuoso",
      "p": "MC-002",
      "r": "Celeste",
-     "d": 58
+     "d": 59
     },
     {
      "id": "PV-0470",
@@ -685,7 +693,7 @@
      "t": "Coordinar envío",
      "p": "CE-3",
      "r": "Celeste",
-     "d": 21
+     "d": 22
     },
     {
      "id": "PV-0336",
@@ -693,7 +701,7 @@
      "t": "Producto erróneo",
      "p": "SS-1032M",
      "r": "Celeste",
-     "d": 20
+     "d": 21
     },
     {
      "id": "PV-0390",
@@ -701,7 +709,7 @@
      "t": "Soporte de uso",
      "p": "MC-002",
      "r": "Celeste",
-     "d": 18
+     "d": 19
     },
     {
      "id": "PV-0403",
@@ -710,14 +718,6 @@
      "p": "CE-3",
      "r": "Celeste",
      "d": 18
-    },
-    {
-     "id": "PV-0412",
-     "u": "Media",
-     "t": "Coordinar envío",
-     "p": "CE-2",
-     "r": "Luis",
-     "d": 17
     },
     {
      "id": "PV-0425",
@@ -797,6 +797,14 @@
      "t": "Estado del envío",
      "p": "ORG-004",
      "r": "Celeste",
+     "d": 13
+    },
+    {
+     "id": "PV-0553",
+     "u": "Media",
+     "t": "Producto erróneo",
+     "p": "ZAP-001",
+     "r": "Celeste",
      "d": 12
     },
     {
@@ -814,14 +822,6 @@
      "p": "SP-446",
      "r": "Celeste",
      "d": 12
-    },
-    {
-     "id": "PV-0553",
-     "u": "Media",
-     "t": "Producto erróneo",
-     "p": "ZAP-001",
-     "r": "Celeste",
-     "d": 11
     },
     {
      "id": "PV-0588",
@@ -1009,11 +1009,11 @@
    "responsables": [
     {
      "n": "Celeste",
-     "v": 486
+     "v": 488
     },
     {
      "n": "Luis",
-     "v": 228
+     "v": 226
     },
     {
      "n": "Angie",
@@ -1024,7 +1024,16 @@
      "v": 11
     }
    ],
-   "cola": null
+   "cola": [
+    {
+     "mes": "2026-08",
+     "v": 109
+    },
+    {
+     "mes": "2026-09",
+     "v": 99
+    }
+   ]
   },
   "preventa": {
    "minorista": {

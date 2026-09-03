@@ -8,11 +8,11 @@
 // Tres campos que el tablero necesitaría no se están cargando, así que en vez de
 // mostrar un número inventado se informan como pendientes (ver `calidad`):
 //
-//   'Fecha de cierre'   la sella el servidor desde septiembre 2026. Los casos
-//                       cerrados antes se rellenaron con la última actualización:
-//                       son APROXIMADOS, sirven para la tendencia de la cola pero
-//                       no para medir cuánto tardó un caso puntual. Se detectan
-//                       porque cierre y 'Última actualización' coinciden exacto.
+//   'Fecha de cierre'   la sella el servidor desde el 04/09/2026. Los 759 casos
+//                       cerrados antes se rellenaron de una con la última
+//                       actualización: son APROXIMADOS. Sirven para la tendencia
+//                       de la cola mes a mes, no para medir cuánto tardó un caso.
+//                       Ver CIERRES_REALES_DESDE.
 //   '3· Contactado'     se marca junto con el alta (mediana ingreso→contactado:
 //                       medio minuto, y a veces anterior al alta). Mide cuándo
 //                       se cargó el caso, no cuándo se le respondió al cliente.
@@ -24,6 +24,19 @@
 //
 // La fecha de referencia es el último movimiento cargado, no la fecha de hoy:
 // así el snapshot da lo mismo cada vez que se regenera.
+
+/**
+ * Desde cuándo la fecha de cierre la sella el servidor de verdad.
+ *
+ * El relleno de los casos viejos copió 'Última actualización' en 'Fecha de
+ * cierre', así que esos 759 cierres son aproximados. No alcanza con comparar los
+ * dos campos para distinguirlos: al cerrar un caso, `guardarCaso()` sella los dos
+ * con el mismo instante, así que un cierre real recién hecho también los tiene
+ * iguales. La fecha de corte es la única señal que no se confunde.
+ *
+ * Es la fecha del backfill; se toca una sola vez y queda fija.
+ */
+const CIERRES_REALES_DESDE = new Date('2026-09-04T00:00:00Z');
 
 const ABIERTO = 'En gestión';
 const OK = 'Resuelto satisfactoriamente';
@@ -112,10 +125,8 @@ export function buildPostventa(aoaPostventa, aoaMinorista, aoaVolumen, ordenesPo
   // ¿Se están cargando los campos que hacen falta para medir tiempos?
   const conCierre = pv.filter((r) => r.cierre).length;
   const resueltos = pv.filter((r) => r.estatus === OK || r.estatus === MAL);
-  // Un cierre que cae al mismo instante que la última actualización viene del
-  // relleno de los casos viejos, no de un cierre real: aproxima el mes, no el caso.
-  const aproximado = (r) => r.cierre && r.actualizado
-    && Math.abs(r.cierre - r.actualizado) < 1000;
+  // Todo lo cerrado antes del backfill trae una fecha copiada, no medida.
+  const aproximado = (r) => r.cierre && r.cierre < CIERRES_REALES_DESDE;
   // Si contactado ≈ alta, la marca es del momento de la carga, no de la respuesta.
   const respuestaPropia = pv.filter((r) => r.contactado && r.alta
     && Math.abs(r.contactado - r.alta) > 30 * 60 * 1000).length;
@@ -129,10 +140,12 @@ export function buildPostventa(aoaPostventa, aoaMinorista, aoaVolumen, ordenesPo
   };
   if (calidad.cierreCargado < 20) {
     calidad.faltantes.push('Fecha de cierre: no se está cargando, así que no hay tiempo de resolución ni evolución de la cola mes a mes.');
-  } else if (cierresReales.length < 30) {
-    calidad.faltantes.push(`Los ${conCierre - cierresReales.length} casos cerrados antes de septiembre 2026 `
-      + 'tienen una fecha de cierre aproximada (se rellenó con la última actualización). '
-      + 'Sirve para la tendencia mes a mes, no para medir cuánto tardó un caso puntual.');
+  } else if (cierresReales.length < 10) {
+    const desde = CIERRES_REALES_DESDE.toISOString().slice(0, 10);
+    calidad.faltantes.push(`Los ${conCierre - cierresReales.length} casos cerrados antes del ${desde} `
+      + 'tienen una fecha de cierre aproximada: se copió de la última actualización cuando se '
+      + 'empezó a registrar el cierre. Sirve para la tendencia mes a mes, no para medir cuánto '
+      + 'tardó un caso. El tiempo de resolución aparece con los cierres nuevos.');
   }
   if (calidad.respuestaCargada < 30) {
     calidad.faltantes.push('«3· Contactado» se marca junto con el alta del caso: mide cuándo se registró, no cuándo se le respondió al cliente.');
