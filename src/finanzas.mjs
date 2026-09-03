@@ -373,7 +373,9 @@ export function eerr(acc) {
     lineas: acc.lineas,
     canceladas: acc.canceladas,
     ticket: ordenes ? ventasNetas / ordenes : 0,
-    netoLiquidado: acc.netoLiquidado,
+    // También sin IVA: si no, en TiendaNube —que casi no tiene cargos— lo
+    // depositado daba MÁS que lo vendido, que no se entiende ni es cierto.
+    netoLiquidado: sinIva(acc.netoLiquidado),
     // Qué parte de la venta quedó sin costear: si sube, el margen deja de ser confiable.
     coberturaCostosPct: acc.ventaBruta ? +(100 * (1 - acc.cogsFaltante / acc.ventaBruta)).toFixed(1) : 0,
     cogsFaltante: acc.cogsFaltante,

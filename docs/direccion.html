@@ -324,12 +324,88 @@ table.casos tr.vencido td.dias{color:var(--mal);font-weight:600}
 .leyenda:empty{display:none}
 
 /* Las clases de layout traen display propio: sin esto, [hidden] no oculta nada. */
+/* ---------- barra de filtros ---------- */
+/* --barra y --sticky los mide el JS: dependen de si la barra de filtros está. */
+.filtros{position:sticky;top:var(--barra,56px);z-index:9;
+  background:color-mix(in srgb,var(--papel) 94%,transparent);backdrop-filter:blur(10px);
+  border-bottom:1px solid var(--linea)}
+.filtrosin{max-width:1200px;margin:0 auto;padding:10px 24px;display:flex;align-items:center;
+  gap:14px;flex-wrap:wrap}
+.filtros .et{font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--tenue)}
+.filtros .resumen{margin-left:auto;font-size:12.5px;color:var(--media)}
+.filtros .resumen b{color:var(--tinta);font-weight:600}
+.filtros select{font-family:inherit;font-size:12.5px;font-weight:600;color:var(--tinta);
+  background:var(--panel);border:1px solid var(--linea);border-radius:8px;padding:6px 10px}
+@media (max-width:620px){.filtros .resumen{margin-left:0;width:100%}}
+
+/* ============================================================
+   Móvil. El tablero se mira tanto del teléfono como del escritorio,
+   así que abajo de 720px cambian cuatro cosas: la navegación pasa a
+   una sola línea deslizable en vez de apilarse en tres, la barra de
+   filtros deja de estar pegada (se usa una vez y no vale un tercio de
+   la pantalla), los rótulos de sección dejan de forzar una línea
+   única, y todo gana el margen lateral que se pueda.
+   ============================================================ */
+@media (max-width:720px){
+  .topin{padding:10px 16px;gap:10px 14px}
+  .marca span{display:none}                    /* "Tablero de dirección": lo dice el título */
+  .marca b{font-size:15px}
+  /* La nav en una línea que se desliza: apilada se comía media pantalla. */
+  .nav{order:3;width:100%;flex-wrap:nowrap;overflow-x:auto;gap:16px;
+    scrollbar-width:none;-webkit-overflow-scrolling:touch;padding-bottom:1px}
+  .nav::-webkit-scrollbar{display:none}
+  .nav a{white-space:nowrap;font-size:13px}
+  .tema{margin-left:auto}
+
+  /* Pegada arriba ocupaba un tercio de la pantalla; se elige una vez y listo. */
+  .filtros{position:static}
+  .filtrosin{padding:10px 16px;gap:9px}
+  .filtros > .filtrosin > .et{display:none}
+  .filtros .pestanas{width:100%;overflow-x:auto;scrollbar-width:none}
+  .filtros .pestanas::-webkit-scrollbar{display:none}
+  .filtros .pestanas button{white-space:nowrap;flex:1 0 auto}
+  .filtros .resumen{margin-left:0;width:100%;font-size:12px}
+
+  .hoja{padding:0 16px 56px}
+  .portada{padding:22px 0 4px}
+  .portada h1{font-size:26px}
+  .portada p{font-size:14px}
+  .periodo{text-align:left}
+
+  /* Con nowrap, el rótulo y su fuente no entraban y estiraban la página. */
+  .rotulo{flex-wrap:wrap;gap:8px 12px;margin:32px 0 12px}
+  .rotulo .lab{white-space:normal}
+  .rotulo .fuente{white-space:normal;flex-basis:100%;line-height:1.4}
+  .rotulo .regla{min-width:24px}
+
+  .panel > header{padding:13px 14px 0}
+  .panel .cuerpo{padding:12px 14px 14px}
+  .ficha{padding:13px 14px 11px}
+  .ficha .val{font-size:26px}
+  .fichas{gap:10px;margin-top:14px}
+  .rejilla{gap:10px}
+
+  .agenda{gap:10px}
+  .nota{padding:13px 14px}
+  .pie-doc{margin-top:36px;font-size:12px}
+  .fuente-t{padding:12px 14px}
+}
+
+@media (max-width:420px){
+  .luces,.luces.cuatro{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+  .luz{padding:9px 10px}
+  .luz .n{font-size:22px}
+  .ficha .val{font-size:24px}
+  .portada h1{font-size:23px}
+}
+
 [hidden]{display:none !important}
 
 @media (prefers-reduced-motion:reduce){
   *{animation:none !important;transition:none !important;scroll-behavior:auto !important}
 }
-html{scroll-behavior:smooth;scroll-padding-top:96px}
+html{scroll-behavior:smooth;scroll-padding-top:calc(var(--sticky,96px) + 18px)}
 </style>
 </head>
 <body>
@@ -379,6 +455,16 @@ try {
     </button>
   </div>
 </header>
+
+<div class="filtros" id="filtros" hidden>
+  <div class="filtrosin">
+    <span class="et">Canal</span>
+    <div class="pestanas" role="tablist" aria-label="Filtrar por canal" id="tabsCanal"></div>
+    <label class="et" for="selMes" id="labelMes" hidden>Mes</label>
+    <select id="selMes" hidden aria-label="Mes"></select>
+    <span class="resumen" id="resumenFiltro"></span>
+  </div>
+</div>
 
 <main class="hoja">
 
@@ -614,18 +700,64 @@ fetch('data/direccion.json', { cache: 'no-cache' })
   });
 
 function pintar(D) {
+  /* ---------------- filtro de canal ---------------- */
+  let canal = 'todos';
+  const canales = D.canales || [{ id: 'todos', n: 'Los dos canales' }];
+  if (canales.length > 1) {
+    $('filtros').hidden = false;
+    if (typeof medirSticky === 'function') medirSticky();
+    $('tabsCanal').innerHTML = canales.map((c) => `<button role="tab" data-canal="${c.id}"
+      aria-selected="${c.id === canal}">${c.n}</button>`).join('');
+    $('tabsCanal').addEventListener('click', (ev) => {
+      const b = ev.target.closest('[data-canal]');
+      if (!b || b.dataset.canal === canal) return;
+      canal = b.dataset.canal;
+      $('tabsCanal').querySelectorAll('[data-canal]').forEach((o) =>
+        o.setAttribute('aria-selected', String(o.dataset.canal === canal)));
+      pintarVista(D, canal);
+    });
+  }
+
+  /* El selector de mes aparece cuando haya más de un export cargado. */
+  const completos = (D.serie || []).filter((s) => !s.parcial);
+  if (completos.length > 1) {
+    $('selMes').hidden = false;
+    $('labelMes').hidden = false;
+    $('selMes').innerHTML = completos.map((s) =>
+      `<option value="${s.mes}"${s.mes === D.mesCerrado.mes ? ' selected' : ''}>${s.largo}</option>`).join('');
+    $('selMes').disabled = true;   // el JSON trae los cortes de un mes por vez
+    $('selMes').title = 'Por ahora el detalle es del último mes cerrado';
+  }
+
+  pintarVista(D, canal);
+  pintarFijo(D);
+}
+
+/** Todo lo que cambia al filtrar por canal. */
+function pintarVista(D, canal) {
+  const V = (D.vistas && D.vistas[canal]) || D.vistas.todos;
   const serie = D.serie || [];
   const ult = serie.find((s) => s.mes === D.mesCerrado.mes) || serie[serie.length - 1] || {};
   /* Sólo se compara contra un mes entero: un mes cortado a mitad daría una
      variación falsa. Con un único export todavía no hay contra qué comparar. */
   const prev = serie.find((s) => s.mes === D.mesCerrado.previoMes) || {};
   const glosaPrev = prev.m ? `contra ${prev.m}` : '';
-  const dias = D.dias || [];
-  const E = D.eerr;
+  const dias = V.dias || [];
+  const E = V.eerr;
   const linea = (nombre) => (E.lineas || []).find((l) => l.c === nombre) || { v: 0, pct: 0 };
   const ventasNetas = linea('Ventas netas');
   const margen = linea('Margen bruto');
   const contrib = linea('Resultado de contribución');
+  const soloUno = canal !== 'todos';
+  const nombreCanal = (canales_(D).find((c) => c.id === canal) || {}).n || 'los canales';
+  /* El nombre del canal entra en frases distintas: "Mercado Libre depositó" pero
+     "los canales depositaron". Sin las dos formas quedan textos mal armados. */
+  const sujeto = soloUno ? nombreCanal : 'los dos canales';
+  const deposito = soloUno ? 'depositó' : 'depositaron';
+
+  $('resumenFiltro').innerHTML = soloUno
+    ? `Mostrando sólo <b>${nombreCanal}</b> · ${nf.format(E.ordenes)} órdenes de ${D.mesCerrado.largo}`
+    : `<b>${nf.format(E.ordenes)}</b> órdenes de ${D.mesCerrado.largo}`;
 
   /* ---------------- encabezado ---------------- */
   $('mesCerrado').textContent = D.mesCerrado.largo.replace(/^./, (c) => c.toUpperCase());
@@ -633,43 +765,37 @@ function pintar(D) {
     ? `Comparado contra ${D.mesCerrado.previo}`
     : `${nf.format(E.ordenes)} órdenes · ${nf.format(E.unidades)} unidades`;
 
-  const F = D.fuentes;
-
-  $('fuenteFinanzas').textContent = `Exports de los canales + planilla de costos (${F.costos.hoja.toLowerCase()})`;
-  $('fuenteVentas').textContent = 'Exports de Mercado Libre y Tienda Nube';
-  $('fuenteClientes').textContent = F.postventa ? `Central de atención · corte ${F.postventa.corte}` : 'sin conectar';
-  $('fuenteGenerado').textContent = `Generado el ${D.generado}`;
-  $('pieFuentes').textContent =
-    `Importes sin IVA (${pct(D.iva * 100, 0)}). Costos de la planilla de compras, hoja ${F.costos.hoja}.`;
 
   /* ---------------- fichas del pulso ---------------- */
+  /* Las glosas explican cada número en castellano, no en contable: el tablero lo
+     miran los socios, no el que armó el estado de resultados. */
   const fichas = [
     {
-      et: 'Cobrado de los canales', val: moneyM(ult.neto),
-      d: variacion(ult.neto, prev.neto),
-      glosa: `Neto liquidado por los dos canales${glosaPrev ? ' ' + glosaPrev : ''}`,
+      et: 'Vendimos', val: moneyM(ventasNetas.v),
+      glosa: 'Lo que se vendió en el mes, antes de descontar nada',
     },
     {
-      et: 'Ventas netas', val: moneyM(ventasNetas.v), sub: 'sin IVA',
-      glosa: 'Antes de comisiones y envíos',
+      et: 'Nos depositaron', val: moneyM(V.neto),
+      d: variacion(V.neto, prev.neto),
+      glosa: `Lo que ${sujeto} ${deposito}, ya con sus comisiones descontadas`,
     },
     {
       et: 'Margen bruto', val: pct(margen.pct), sub: moneyM(margen.v),
-      glosa: 'Ventas netas menos costo de la mercadería',
+      glosa: 'Queda después de pagar la mercadería',
     },
     {
-      et: 'Contribución', val: pct(contrib.pct), sub: moneyM(contrib.v),
-      glosa: 'Después de comisiones, envíos e impuestos del canal',
+      et: 'Nos queda', val: pct(contrib.pct), sub: moneyM(contrib.v),
+      glosa: 'Después de mercadería, comisiones y envíos. Sin contar sueldos ni marketing',
     },
     {
-      et: 'Órdenes', val: nf.format(ult.ordenes),
-      d: variacion(ult.ordenes, prev.ordenes),
-      glosa: `Mercado Libre + Tienda Nube${glosaPrev ? ' ' + glosaPrev : ''}`,
+      et: 'Órdenes', val: nf.format(E.ordenes),
+      d: variacion(E.ordenes, prev.ordenes),
+      glosa: `Ventas del mes en ${soloUno ? nombreCanal : 'los dos canales'}`,
     },
     {
-      et: 'Ticket promedio', val: money(ult.neto / ult.ordenes),
-      d: variacion(ult.neto / ult.ordenes, prev.neto / prev.ordenes),
-      glosa: `Cobrado por orden${glosaPrev ? ' ' + glosaPrev : ''}`,
+      et: 'Ticket promedio', val: money(E.ordenes ? V.neto / E.ordenes : 0),
+      d: variacion(V.neto / E.ordenes, prev.neto / prev.ordenes),
+      glosa: 'Lo que deja cada orden en promedio',
     },
   ];
 
@@ -699,7 +825,7 @@ function pintar(D) {
     </tr>`;
   }).join('');
 
-  barras('gastos', D.gastos, { formato: (v) => pct(v), clase: 'c3' });
+  barras('gastos', V.gastos, { formato: (v) => pct(v), clase: 'c3' });
 
   /* El margen mes a mes necesita el export crudo de cada mes; hoy sólo hay uno. */
   const conMargen = serie.filter((s) => s.mb != null && !s.parcial);
@@ -711,11 +837,11 @@ function pintar(D) {
 
   /* ---------------- ventas ---------------- */
   const pico = dias.reduce((a, x) => (x.v > a.v ? x : a), dias[0] || { v: 0, d: 0 });
-  $('subMeses').textContent = `${D.mesCerrado.largo} · neto liquidado por cada canal`
+  $('subMeses').textContent = `${D.mesCerrado.largo}${soloUno ? ` · ${nombreCanal}` : ' · neto liquidado por cada canal'}`
     + (pico.v ? ` · el día más fuerte fue el ${pico.d} con ${moneyM(pico.v)}` : '');
-  $('leyendaMeses').innerHTML =
-    '<span><i style="background:var(--c1)"></i> Mercado Libre</span>'
-    + '<span><i style="background:var(--c2)"></i> Tienda Nube</span>';
+  $('leyendaMeses').innerHTML = soloUno ? ''
+    : '<span><i style="background:var(--c1)"></i> Mercado Libre</span>'
+      + '<span><i style="background:var(--c2)"></i> Tienda Nube</span>';
   graficoDias(dias, D.mesCerrado);
 
   const mesCortes = D.mesCerrado.largo;
@@ -724,20 +850,32 @@ function pintar(D) {
   $('subProvincias').textContent = `facturación de ${mesCortes} por provincia`;
   $('subEnvios').textContent = `órdenes de ${mesCortes} por tipo de envío`;
 
-  barras('productos', D.productos.map((p) => ({ n: p.n, sku: p.sku, v: p.v, u: p.u })), {
+  barras('productos', V.productos.map((p) => ({ n: p.n, sku: p.sku, v: p.v, u: p.u })), {
     formato: (v) => moneyM(v),
     extra: (d) => `<span>${nf.format(d.u)} u</span>`,
   });
-  barras('familias', D.familias, { formato: (v) => pct(v), clase: 'c2' });
-  barras('provincias', D.provincias, { formato: (v) => pct(v) });
-  barras('envios', D.envios, { formato: (v) => nf.format(v) + ' órdenes', clase: 'c4' });
+  barras('familias', V.familias, { formato: (v) => pct(v), clase: 'c2' });
+  barras('provincias', V.provincias, { formato: (v) => pct(v) });
+  barras('envios', V.envios, { formato: (v) => nf.format(v) + ' órdenes', clase: 'c4' });
 
-  /* ---------------- atención al cliente ---------------- */
+  pintarNotas(D, V, canal);
+}
+
+const canales_ = (D) => D.canales || [{ id: 'todos', n: 'Los dos canales' }];
+
+/** Lo que no cambia con el filtro: fuentes, atención al cliente y pie. */
+function pintarFijo(D) {
+  const F = D.fuentes;
+  $('fuenteFinanzas').textContent = `Exports de los canales + planilla de costos (${F.costos.hoja.toLowerCase()})`;
+  $('fuenteVentas').textContent = 'Exports de Mercado Libre y Tienda Nube';
+  $('fuenteClientes').textContent = F.postventa ? `Central de atención · corte ${F.postventa.corte}` : 'sin conectar';
+  $('fuenteGenerado').textContent = `Generado el ${D.generado}`;
+  $('pieFuentes').textContent =
+    `Importes sin IVA (${pct(D.iva * 100, 0)}). Costos de la planilla de compras, hoja ${F.costos.hoja}.`;
+
   if (D.clientes) pintarClientes(D.clientes, D);
   else document.getElementById('clientes').hidden = true;
 
-  /* ---------------- notas y conexión ---------------- */
-  pintarNotas(D);
   pintarConexion(D);
 }
 
@@ -881,8 +1019,8 @@ function pintarClientes(C, D) {
     barras('colaMeses', P.cola.map((c) => ({ n: c.mes, v: c.v })), {
       formato: (v) => `${nf.format(v)} casos`, clase: 'c4',
     });
-  } else if (C.calidad.faltantes.length) {
-    t.innerHTML = `<p class="nodato">${C.calidad.faltantes.map((f) => `<b>·</b> ${f}`).join('<br>')}</p>`;
+  } else {
+    t.innerHTML = '';
   }
 
   /* Tabla de casos abiertos, filtrable por urgencia. */
@@ -924,38 +1062,34 @@ function pintarClientes(C, D) {
       <span class="riel"><i style="width:${(100 * e.v / tope).toFixed(1)}%"></i></span>
     </div>`).join('');
 
-  $('embudoNota').innerHTML = M.resultadoConfiable
+  $('embudoNota').textContent = M.resultadoConfiable
     ? `${M.ganados} ganadas y ${M.perdidos} perdidas sobre ${M.total} consultas.`
-    : `<b>No hay conversión todavía:</b> ${M.sinResolver} de las ${M.total} consultas siguen en el estado
-       inicial, así que no se sabe cuántas terminaron en venta. Con el estatus cargado
-       (ganado / perdido) el embudo se completa solo.`;
+    : '';
 
   $('subReclamos').textContent = `Motivos de los ${P.kpis[0].v} casos de ${C.mesRefLargo || C.mesRef}`;
   barras('reclamos', P.reclamos, { formato: (v) => nf.format(v), clase: 'c3' });
 
-  if (C.preventa.volumen.casos === 0) {
-    $('embudoNota').innerHTML += '<br>Preventa por volumen: todavía sin casos cargados.';
-  }
 }
 
 /* ---------------- lo que el tablero marca solo ---------------- */
-function pintarNotas(D) {
+function pintarNotas(D, V, canal) {
   const notas = [];
   const serie = D.serie || [];
   const ult = serie.find((s) => s.mes === D.mesCerrado.mes) || serie[serie.length - 1] || {};
   const prev = serie.find((s) => s.mes === D.mesCerrado.previoMes) || {};
-  const dias = D.dias || [];
-  const E = D.eerr;
+  const dias = V.dias || [];
+  const E = V.eerr;
   const C = D.clientes;
+  const soloUno = canal !== 'todos';
   const mes = D.mesCerrado.largo;
   const Mes = mes.replace(/^./, (c) => c.toUpperCase());
 
-  const v = variacion(ult.neto, prev.neto);
+  const v = variacion(V.neto, prev.neto);
   if (v != null) {
     notas.push({
       sev: v >= 0 ? 'bien' : 'ojo',
-      h: `Los canales liquidaron ${moneyM(ult.neto)}, ${signo(v)}% contra ${prev.largo}`,
-      p: `${nf.format(ult.ordenes)} órdenes, ticket ${money(ult.neto / ult.ordenes)}.`,
+      h: `Los canales liquidaron ${moneyM(V.neto)}, ${signo(v)}% contra ${prev.largo}`,
+      p: `${nf.format(E.ordenes)} órdenes, ticket ${money(V.neto / E.ordenes)}.`,
       q: 'Ventas',
     });
   } else if (dias.length) {
@@ -966,28 +1100,45 @@ function pintarNotas(D) {
     const top10 = orden.slice(0, 10).reduce((a, x) => a + x.v, 0);
     notas.push({
       sev: 'info',
-      h: `${Mes} cerró en ${moneyM(ult.neto)} con ${nf.format(ult.ordenes)} órdenes`,
+      h: soloUno
+        ? `En ${D.canales.find((c) => c.id === canal).n}, ${mes} cerró en ${moneyM(V.neto)} con ${nf.format(E.ordenes)} órdenes`
+        : `${Mes} cerró en ${moneyM(V.neto)} con ${nf.format(E.ordenes)} órdenes`,
       p: `Los diez mejores días explican el ${pct(100 * top10 / total)} del mes; el más fuerte fue el `
-        + `${orden[0].d} con ${moneyM(orden[0].v)}. Ticket promedio ${money(ult.neto / ult.ordenes)}.`,
+        + `${orden[0].d} con ${moneyM(orden[0].v)}. Ticket promedio ${money(V.neto / E.ordenes)}.`,
       q: 'Ventas',
     });
   }
 
-  const tn = ult.tn ?? 0;
-  if (tn && ult.neto) {
+  /* Con los dos canales juntos, cuánto pesa el propio; mirando uno solo, cómo se
+     compara su rentabilidad contra el otro — que es la pregunta que abre el filtro. */
+  const otro = soloUno ? D.vistas[canal === 'ml' ? 'tn' : 'ml'] : null;
+  if (soloUno && otro) {
+    const mio = (E.lineas.find((l) => l.c === 'Resultado de contribución') || {}).pct;
+    const suyo = (otro.eerr.lineas.find((l) => l.c === 'Resultado de contribución') || {}).pct;
+    const nOtro = canal === 'ml' ? 'Tienda Nube' : 'Mercado Libre';
     notas.push({
       sev: 'info',
-      h: `Tienda Nube es el ${pct(100 * tn / ult.neto)} de lo cobrado`,
+      h: `Acá queda el ${pct(mio)} de la venta; en ${nOtro}, el ${pct(suyo)}`,
+      p: mio > suyo
+        ? `Este canal deja ${coma((mio - suyo).toFixed(1))} puntos más, sobre un volumen de ${moneyM(V.neto)}.`
+        : `${nOtro} deja ${coma((suyo - mio).toFixed(1))} puntos más, aunque sobre otro volumen.`,
+      q: 'Comercial',
+    });
+  } else if (!soloUno && ult.tn && ult.neto) {
+    notas.push({
+      sev: 'info',
+      h: `Tienda Nube es el ${pct(100 * ult.tn / ult.neto)} de lo cobrado`,
       p: prev.neto
         ? `El mes anterior era el ${pct(100 * (prev.tn ?? 0) / prev.neto)}. Mercado Libre explica el resto.`
-        : `Mercado Libre puso los otros ${moneyM(ult.ml ?? (ult.neto - tn))}.`,
+        : `Mercado Libre puso los otros ${moneyM(ult.ml ?? (ult.neto - ult.tn))}.`,
       q: 'Comercial',
     });
   }
 
   const contrib = (E.lineas || []).find((l) => l.c === 'Resultado de contribución');
   const com = (E.lineas || []).find((l) => l.c === 'Comisiones de plataforma');
-  if (contrib && com) {
+  // Con un canal elegido esto repetiría la comparativa de arriba.
+  if (contrib && com && !soloUno) {
     notas.push({
       sev: 'info',
       h: `Después del canal queda el ${pct(contrib.pct)} de la venta`,
@@ -997,7 +1148,7 @@ function pintarNotas(D) {
     });
   }
 
-  if (E.cobertura < 99) {
+  if (E.cobertura < 99 && !soloUno) {
     const top = (E.sinCosto || []).slice(0, 3).map((x) => x.sku).join(', ');
     notas.push({
       sev: E.cobertura < 95 ? 'mal' : 'ojo',
@@ -1008,7 +1159,7 @@ function pintarNotas(D) {
     });
   }
 
-  if (C) {
+  if (C && !soloUno) {
     const alta = C.postventa.urgencias.find((u) => u.u === 'Alta') || { n: 0 };
     if (C.postventa.vencidos > 0) {
       notas.push({
@@ -1050,8 +1201,8 @@ function pintarConexion(D) {
         + `${F.ventas.meses.length === 1 ? F.ventas.meses[0] : F.ventas.meses.join(', ')}`,
     },
     {
-      estado: D.eerr.cobertura >= 99 ? '' : 'parcial', et: 'Costos', h: 'Planilla madre de compras',
-      p: `Costo unitario sin IVA por SKU, columna «COSTO SIN IVA». Cubre el ${pct(D.eerr.cobertura)} `
+      estado: D.vistas.todos.eerr.cobertura >= 99 ? '' : 'parcial', et: 'Costos', h: 'Planilla madre de compras',
+      p: `Costo unitario sin IVA por SKU, columna «COSTO SIN IVA». Cubre el ${pct(D.vistas.todos.eerr.cobertura)} `
         + 'de la venta del mes; el resto son SKU nuevos o variantes sin costear.'
         + (D.fuentes.maestro ? '' : ' Falta el maestro de nombres y familias.'),
       dato: `hoja ${F.costos.hoja} · ${F.costos.skus} SKU con costo`,
@@ -1097,18 +1248,49 @@ botonTema.setAttribute('aria-label', temaVigente() === 'dark' ? 'Cambiar a modo 
 botonTema.title = botonTema.getAttribute('aria-label');
 botonTema.addEventListener('click', () => aplicarTema(temaVigente() === 'dark' ? 'light' : 'dark', true));
 
-/* ---------------- navegación ---------------- */
+/* ---------------- navegación ----------------
+   La altura pegada arriba cambia según haya barra de filtros o no, y de ella
+   dependen tres cosas: dónde se pega la barra, cuánto baja el scroll al tocar un
+   ancla, y desde qué altura el observador considera "visible" una sección. Se
+   mide una vez y se comparte por variables CSS. */
 const secciones = [...document.querySelectorAll('main section')];
 const enlaces = new Map([...document.querySelectorAll('.nav a')].map((a) => [a.getAttribute('href').slice(1), a]));
-const observador = new IntersectionObserver((entradas) => {
-  entradas.forEach((e) => {
-    if (e.isIntersecting) {
-      enlaces.forEach((a) => a.removeAttribute('aria-current'));
-      enlaces.get(e.target.id)?.setAttribute('aria-current', 'true');
-    }
-  });
-}, { rootMargin: '-96px 0px -60% 0px', threshold: 0 });
-secciones.forEach((s) => observador.observe(s));
+const raizNav = document.documentElement;
+let observador = null;
+
+function marcar(id) {
+  enlaces.forEach((a) => a.removeAttribute('aria-current'));
+  enlaces.get(id)?.setAttribute('aria-current', 'true');
+}
+
+function medirSticky() {
+  const alturaTop = document.querySelector('.top').offsetHeight;
+  const barra = document.getElementById('filtros');
+  // En móvil la barra de filtros no queda pegada, así que no cuenta para el ancla.
+  const pegada = barra && !barra.hidden && getComputedStyle(barra).position === 'sticky';
+  const alturaBarra = pegada ? barra.offsetHeight : 0;
+  raizNav.style.setProperty('--barra', alturaTop + 'px');
+  raizNav.style.setProperty('--sticky', (alturaTop + alturaBarra) + 'px');
+
+  if (observador) observador.disconnect();
+  observador = new IntersectionObserver((entradas) => {
+    entradas.forEach((e) => { if (e.isIntersecting) marcar(e.target.id); });
+  }, { rootMargin: `-${alturaTop + alturaBarra + 8}px 0px -55% 0px`, threshold: 0 });
+  secciones.forEach((s) => observador.observe(s));
+}
+
+/* Arriba de todo ninguna sección cruza el umbral del observador y la marca
+   quedaba en la segunda: la primera se marca a mano. */
+addEventListener('scroll', () => {
+  if (scrollY < 40 && secciones[0]) marcar(secciones[0].id);
+}, { passive: true });
+
+/* Tocar un enlace lo marca al instante, sin esperar a que termine el scroll. */
+enlaces.forEach((a, id) => a.addEventListener('click', () => marcar(id)));
+
+medirSticky();
+addEventListener('resize', medirSticky);
+if (secciones[0] && scrollY < 40) marcar(secciones[0].id);
 </script>
 </body>
 </html>
