@@ -28,7 +28,7 @@ import { fileURLToPath } from 'node:url';
 
 import { buildCostos, makeCostMatcher, hojasPorMes, IVA } from '../src/costos.mjs';
 import { buildMaestro, makeMatcher } from '../src/engine.mjs';
-import { ingestFinanzasMeli, ingestFinanzasTn, unirCanales, eerr, verificarMeli } from '../src/finanzas.mjs';
+import { ingestFinanzasMeli, ingestFinanzasTn, unirCanales, eerr, verificarMeli, sinIva } from '../src/finanzas.mjs';
 import { buildPostventa } from '../src/postventa.mjs';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
@@ -131,13 +131,18 @@ for (const m of mapasMeli) {
 }
 
 const porMes = unirCanales(...mapasMeli, ...mapasTn);
+// El tablero filtra por canal, así que el mismo mes se agrega tres veces: el
+// total y cada canal por separado. unirCanales pierde de qué canal viene cada
+// peso, por eso se arma desde los mapas originales en vez de partir el total.
+const porMesMl = unirCanales(...mapasMeli);
+const porMesTn = unirCanales(...mapasTn);
 
 // Neto por canal (unirCanales ya perdió de qué canal venía cada peso).
 const netoCanal = new Map();
 const sumarCanal = (mapas, campo) => {
   for (const m of mapas) for (const [mes, a] of m) {
     if (!netoCanal.has(mes)) netoCanal.set(mes, { ml: 0, tn: 0 });
-    netoCanal.get(mes)[campo] += a.netoLiquidado;
+    netoCanal.get(mes)[campo] += sinIva(a.netoLiquidado);
   }
 };
 sumarCanal(mapasMeli, 'ml');
@@ -157,7 +162,7 @@ const serie = meses.map((mes) => {
   const c = netoCanal.get(mes) || { ml: 0, tn: 0 };
   return {
     mes, m: etiqueta(mes), largo: largo(mes),
-    neto: Math.round(a.netoLiquidado),
+    neto: Math.round(e.netoLiquidado),
     ml: Math.round(c.ml), tn: Math.round(c.tn),
     ventasNetas: Math.round(e.ventasNetas),
     ordenes: e.ordenes, unidades: Math.round(e.unidades),
@@ -182,6 +187,8 @@ if (est.coberturaCostosPct < 95) {
 }
 
 /* ---------------------------------------------------------------- cortes del mes */
+const FILAS = 10;   // cuántas líneas muestra cada lista del tablero
+
 const top = (map, n) => [...map.entries()].sort((a, b) => b[1] - a[1]).slice(0, n);
 const share = (map, n, resto) => {
   const tot = [...map.values()].reduce((a, b) => a + b, 0) || 1;
@@ -192,28 +199,74 @@ const share = (map, n, resto) => {
   return out;
 };
 
-const productos = [...acc.productos.values()]
-  .filter((p) => p.v > 0)
-  .sort((a, b) => b.v - a.v)
-  .slice(0, 8)
-  .map((p) => ({ sku: p.sku, n: p.n, v: Math.round(p.v), u: Math.round(p.u) }));
+/** Todo lo que el tablero necesita de un mes, para el total o para un canal. */
+function bloque(a, mes) {
+  if (!a || !a.ordenes.size) return null;
+  const e = eerr(a);
+  const pctDe = (v) => (e.ventasNetas ? +(100 * v / e.ventasNetas).toFixed(1) : 0);
 
-const envios = [...acc.envios.entries()]
-  .map(([n, set]) => ({ n, v: set.size }))
-  .sort((a, b) => b.v - a.v);
+  const dias = [];
+  for (let d = 1; d <= diasDelMes(mes); d++) {
+    const x = a.dias.get(d);
+    dias.push({
+      d,
+      ml: x ? Math.round(x.ml) : 0,
+      tn: x ? Math.round(x.tn) : 0,
+      v: x ? Math.round(x.ml + x.tn) : 0,
+      ordenes: x ? x.ordenes.size : 0,
+    });
+  }
 
-// Un punto por día del mes, con los días sin ventas en cero (así el eje no miente).
-const dias = [];
-for (let d = 1; d <= diasDelMes(mesCerrado); d++) {
-  const x = acc.dias.get(d);
-  dias.push({
-    d,
-    ml: x ? Math.round(x.ml) : 0,
-    tn: x ? Math.round(x.tn) : 0,
-    v: x ? Math.round(x.ml + x.tn) : 0,
-    ordenes: x ? x.ordenes.size : 0,
-  });
+  return {
+    eerr: {
+      lineas: [
+        { c: 'Ventas brutas', v: e.ventaBruta, pct: pctDe(e.ventaBruta), tipo: 'normal' },
+        { c: 'Bonificaciones de plataforma', v: e.bonificaciones, pct: pctDe(e.bonificaciones), tipo: 'normal' },
+        { c: 'Anulaciones y reembolsos', v: e.anulaciones, pct: pctDe(e.anulaciones), tipo: 'normal' },
+        { c: 'Descuentos y cupones', v: e.descuentos, pct: pctDe(e.descuentos), tipo: 'normal' },
+        { c: 'Ventas netas', v: e.ventasNetas, pct: 100, tipo: 'total' },
+        { c: 'Costo de la mercadería', v: e.cogs, pct: e.cogsPct, tipo: 'gasto' },
+        { c: 'Margen bruto', v: e.margenBruto, pct: e.margenBrutoPct, tipo: 'destacado' },
+        { c: 'Comisiones de plataforma', v: e.comisiones, pct: e.comisionesPct, tipo: 'gasto' },
+        { c: 'Envíos (neto de lo cobrado)', v: e.envio, pct: e.envioPct, tipo: 'gasto' },
+        { c: 'Impuestos de plataforma', v: e.impuestos, pct: e.impuestosPct, tipo: 'gasto' },
+        { c: 'Resultado de contribución', v: e.contribucion, pct: e.contribucionPct, tipo: 'destacado' },
+      ],
+      ordenes: e.ordenes,
+      unidades: e.unidades,
+      ticket: e.ticket,
+      netoLiquidado: e.netoLiquidado,
+      canceladas: e.canceladas,
+      cobertura: e.coberturaCostosPct,
+      sinCosto: e.skusSinCosto.slice(0, FILAS).map((x) => ({ ...x, facturacion: Math.round(x.facturacion) })),
+      faltan: ['Marketing y publicidad', 'Estructura y sueldos', 'Impuestos propios (IIBB, IVA)',
+        'Amortizaciones', 'Resultados financieros'],
+    },
+    gastos: [
+      { n: 'Costo de la mercadería', v: Math.abs(e.cogsPct) },
+      { n: 'Comisiones de plataforma', v: Math.abs(e.comisionesPct) },
+      { n: 'Envíos y logística', v: Math.abs(e.envioPct) },
+      { n: 'Impuestos de plataforma', v: Math.abs(e.impuestosPct) },
+    ],
+    productos: [...a.productos.values()]
+      .filter((p) => p.v > 0)
+      .sort((x, y) => y.v - x.v)
+      .slice(0, FILAS)
+      .map((p) => ({ sku: p.sku, n: p.n, v: Math.round(p.v), u: Math.round(p.u) })),
+    familias: share(a.familias, FILAS, 'Las demás familias'),
+    provincias: share(a.provincias, FILAS - 4, 'Resto del país'),
+    envios: [...a.envios.entries()].map(([n, set]) => ({ n, v: set.size })).sort((x, y) => y.v - x.v),
+    dias,
+    neto: Math.round(e.netoLiquidado),
+  };
 }
+
+const vistas = {
+  todos: bloque(acc, mesCerrado),
+  ml: bloque(porMesMl.get(mesCerrado), mesCerrado),
+  tn: bloque(porMesTn.get(mesCerrado), mesCerrado),
+};
+console.log(`· canales: ${Object.entries(vistas).filter(([, v]) => v).map(([k]) => k).join(', ')}`);
 
 /* ---------------------------------------------------------------- postventa */
 const fEmb = buscar(/embudo/i)[0];
@@ -233,7 +286,6 @@ if (fEmb) {
 }
 
 /* ---------------------------------------------------------------- salida */
-const pctDe = (v) => (est.ventasNetas ? +(100 * v / est.ventasNetas).toFixed(1) : 0);
 const out = {
   generado: new Date().toISOString().slice(0, 10),
   iva: IVA,
@@ -248,46 +300,13 @@ const out = {
     postventa: fEmb ? { archivo: fEmb, corte: post.corte } : null,
   },
   serie,
-  dias,
-  eerr: {
-    lineas: [
-      { c: 'Ventas brutas', v: est.ventaBruta, pct: pctDe(est.ventaBruta), tipo: 'normal' },
-      { c: 'Bonificaciones de plataforma', v: est.bonificaciones, pct: pctDe(est.bonificaciones), tipo: 'normal' },
-      { c: 'Anulaciones y reembolsos', v: est.anulaciones, pct: pctDe(est.anulaciones), tipo: 'normal' },
-      { c: 'Descuentos y cupones', v: est.descuentos, pct: pctDe(est.descuentos), tipo: 'normal' },
-      { c: 'Ventas netas', v: est.ventasNetas, pct: 100, tipo: 'total' },
-      { c: 'Costo de la mercadería', v: est.cogs, pct: est.cogsPct, tipo: 'gasto' },
-      { c: 'Margen bruto', v: est.margenBruto, pct: est.margenBrutoPct, tipo: 'destacado' },
-      { c: 'Comisiones de plataforma', v: est.comisiones, pct: est.comisionesPct, tipo: 'gasto' },
-      { c: 'Envíos (neto de lo cobrado)', v: est.envio, pct: est.envioPct, tipo: 'gasto' },
-      { c: 'Impuestos de plataforma', v: est.impuestos, pct: est.impuestosPct, tipo: 'gasto' },
-      { c: 'Resultado de contribución', v: est.contribucion, pct: est.contribucionPct, tipo: 'destacado' },
-    ],
-    ordenes: est.ordenes,
-    unidades: est.unidades,
-    ticket: est.ticket,
-    netoLiquidado: est.netoLiquidado,
-    canceladas: est.canceladas,
-    cobertura: est.coberturaCostosPct,
-    sinCosto: est.skusSinCosto.slice(0, 10).map((x) => ({ ...x, facturacion: Math.round(x.facturacion) })),
-    // Lo que todavía no tiene fuente. El tablero lo dice en vez de dibujar cero.
-    faltan: ['Marketing y publicidad', 'Estructura y sueldos', 'Impuestos propios (IIBB, IVA)',
-      'Amortizaciones', 'Resultados financieros'],
-  },
-  gastos: [
-    { n: 'Costo de la mercadería', v: Math.abs(est.cogsPct) },
-    { n: 'Comisiones de plataforma', v: Math.abs(est.comisionesPct) },
-    { n: 'Envíos y logística', v: Math.abs(est.envioPct) },
-    { n: 'Impuestos de plataforma', v: Math.abs(est.impuestosPct) },
-  ],
+  // Un bloque por filtro de canal: el tablero cambia de vista sin volver a pedir nada.
+  vistas,
   canales: [
-    { n: 'Mercado Libre', v: Math.round((netoCanal.get(mesCerrado) || {}).ml || 0) },
-    { n: 'Tienda Nube', v: Math.round((netoCanal.get(mesCerrado) || {}).tn || 0) },
-  ],
-  productos,
-  familias: share(acc.familias, 8, 'Las demás familias'),
-  provincias: share(acc.provincias, 5, 'Resto del país'),
-  envios,
+    { id: 'todos', n: 'Los dos canales' },
+    { id: 'ml', n: 'Mercado Libre', v: Math.round((netoCanal.get(mesCerrado) || {}).ml || 0) },
+    { id: 'tn', n: 'Tienda Nube', v: Math.round((netoCanal.get(mesCerrado) || {}).tn || 0) },
+  ].filter((c) => c.id === 'todos' || vistas[c.id]),
   clientes: post,
 };
 
