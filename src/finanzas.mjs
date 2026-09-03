@@ -66,43 +66,81 @@ function idx(headerRow) {
   return (name) => (pos.has(name) ? pos.get(name) : -1);
 }
 
+/** Los importes que se suman día por día. */
+const MONTOS = ['ventaBruta', 'bonificaciones', 'anulaciones', 'descuentos', 'comisiones',
+  'envioCobrado', 'envioCosto', 'impuestos', 'netoLiquidado', 'cogs', 'cogsFaltante',
+  'lineas', 'canceladas', 'unidades', 'ml', 'tn'];
+
+/**
+ * TODO —importes y cortes— se acumula por día del mes. Así el tablero recorta
+ * cualquier rango de fechas, estado de resultados incluido, sin volver a leer el
+ * export. `agregar()` aplana el rango que se pida.
+ */
 const vacio = () => ({
-  ventaBruta: 0, bonificaciones: 0, anulaciones: 0, descuentos: 0,
-  comisiones: 0, envioCobrado: 0, envioCosto: 0, impuestos: 0,
-  netoLiquidado: 0, cogs: 0, cogsFaltante: 0,
-  ordenes: new Set(), lineas: 0, canceladas: 0, unidades: 0,
-  ultimoDia: 0,          // día del mes de la venta más reciente: detecta meses a medio cerrar
-  skusSinCosto: new Map(),
-  // Cortes del mismo export, para no depender del histórico del motor.
-  productos: new Map(),  // sku  -> { sku, n, v, u }
-  familias: new Map(),   // familia  -> venta bruta sin IVA
-  provincias: new Map(), // provincia -> venta bruta sin IVA
-  envios: new Map(),     // bucket -> Set de órdenes
-  dias: new Map(),       // día del mes -> { ml, tn, ordenes:Set }
+  ultimoDia: 0,          // día de la venta más reciente: detecta meses a medio cerrar
+  porDia: new Map(),
 });
 
-/** Suma una línea a los cortes por producto, familia, provincia, envío y día. */
-function acumularCortes(a, { sku, nombre, familia, unidades, monto, provincia, envio, orden, dia, canal }) {
-  if (sku || nombre) {
-    const k = sku || nombre;
-    const p = a.productos.get(k) || { sku, n: nombre || sku, v: 0, u: 0 };
-    p.v += monto; p.u += unidades;
-    if (!p.n && nombre) p.n = nombre;
-    a.productos.set(k, p);
+/** El casillero de un día, creado a demanda. */
+function diaDe(a, dia) {
+  if (!a.porDia.has(dia)) {
+    const d = { ordenes: new Set(), skusSinCosto: new Map(),
+      productos: new Map(), familias: new Map(), provincias: new Map(), envios: new Map() };
+    for (const k of MONTOS) d[k] = 0;
+    a.porDia.set(dia, d);
   }
-  if (familia) a.familias.set(familia, (a.familias.get(familia) || 0) + monto);
-  if (provincia) a.provincias.set(provincia, (a.provincias.get(provincia) || 0) + monto);
-  const b = bucketEnvio(envio);
-  if (b) {
-    if (!a.envios.has(b)) a.envios.set(b, new Set());
-    a.envios.get(b).add(orden);
+  return a.porDia.get(dia);
+}
+
+/**
+ * Aplana los días de un rango en un acumulador con la forma que espera eerr().
+ * Sin argumentos devuelve el mes entero.
+ */
+export function agregar(acc, desde = 1, hasta = 31) {
+  const t = { ordenes: new Set(), skusSinCosto: new Map(),
+    productos: new Map(), familias: new Map(), provincias: new Map(), envios: new Map(),
+    dias: [], ultimoDia: acc.ultimoDia };
+  for (const k of MONTOS) t[k] = 0;
+
+  for (let dia = desde; dia <= hasta; dia++) {
+    const x = acc.porDia.get(dia);
+    t.dias.push({
+      d: dia,
+      ml: x ? Math.round(x.ml) : 0,
+      tn: x ? Math.round(x.tn) : 0,
+      v: x ? Math.round(x.ml + x.tn) : 0,
+      ordenes: x ? x.ordenes.size : 0,
+    });
+    if (!x) continue;
+    for (const k of MONTOS) t[k] += x[k];
+    for (const o of x.ordenes) t.ordenes.add(o);
+    for (const [k, v] of x.skusSinCosto) {
+      const p = t.skusSinCosto.get(k) || { facturacion: 0, lineas: 0 };
+      p.facturacion += v.facturacion; p.lineas += v.lineas;
+      t.skusSinCosto.set(k, p);
+    }
+    for (const [k, p] of x.productos) {
+      const q = t.productos.get(k) || { sku: p.sku, n: p.n, v: 0, u: 0 };
+      q.v += p.v; q.u += p.u;
+      t.productos.set(k, q);
+    }
+    for (const campo of ['familias', 'provincias']) {
+      for (const [k, v] of x[campo]) t[campo].set(k, (t[campo].get(k) || 0) + v);
+    }
+    for (const [k, set] of x.envios) {
+      if (!t.envios.has(k)) t.envios.set(k, new Set());
+      for (const o of set) t.envios.get(k).add(o);
+    }
   }
-  if (dia) {
-    if (!a.dias.has(dia)) a.dias.set(dia, { ml: 0, tn: 0, ordenes: new Set() });
-    const d = a.dias.get(dia);
-    d[canal] += monto;
-    d.ordenes.add(orden);
-  }
+  return t;
+}
+
+/** Acumula una línea sin costo del día, para el reporte de cobertura. */
+function faltante(d, sku, monto) {
+  const k = String(sku ?? '').trim().toUpperCase() || '(sin sku)';
+  const p = d.skusSinCosto.get(k) || { facturacion: 0, lineas: 0 };
+  p.facturacion += monto; p.lineas++;
+  d.skusSinCosto.set(k, p);
 }
 
 /** Día del mes de una fecha de export ('31 de julio de 2026' / '31/07/2026'). */
@@ -111,12 +149,27 @@ function diaDelMes(v) {
   return m ? +m[1] : 0;
 }
 
-/** Acumula una línea sin costo, para el reporte de cobertura. */
-function faltante(acc, sku, monto) {
-  const k = String(sku ?? '').trim().toUpperCase() || '(sin sku)';
-  const p = acc.skusSinCosto.get(k) || { facturacion: 0, lineas: 0 };
-  p.facturacion += monto; p.lineas++;
-  acc.skusSinCosto.set(k, p);
+/** Suma una línea a los cortes del día que le toca. */
+function acumularCortes(a, { sku, nombre, familia, unidades, monto, provincia, envio, orden, dia, canal }) {
+  if (!dia) return;                 // sin fecha no entra en ningún corte
+  const d = diaDe(a, dia);
+
+  if (sku || nombre) {
+    const k = sku || nombre;
+    const p = d.productos.get(k) || { sku, n: nombre || sku, v: 0, u: 0 };
+    p.v += monto; p.u += unidades;
+    if (!p.n && nombre) p.n = nombre;
+    d.productos.set(k, p);
+  }
+  if (familia) d.familias.set(familia, (d.familias.get(familia) || 0) + monto);
+  if (provincia) d.provincias.set(provincia, (d.provincias.get(provincia) || 0) + monto);
+  const b = bucketEnvio(envio);
+  if (b) {
+    if (!d.envios.has(b)) d.envios.set(b, new Set());
+    d.envios.get(b).add(orden);
+  }
+  d[canal] += monto;
+  d.ordenes.add(orden);
 }
 
 /**
@@ -165,28 +218,36 @@ export function ingestFinanzasMeli(aoa, costoDe, match = null) {
 
     const estado = String(row[C.estado] ?? '');
     const desc = String(C.desc >= 0 ? row[C.desc] ?? '' : '');
-    if (CANCEL_RE.test(estado) || CANCEL_RE.test(desc)) { a.canceladas++; continue; }
+    if (CANCEL_RE.test(estado) || CANCEL_RE.test(desc)) {
+      const dc = diaDelMes(row[C.fecha]);
+      if (dc) diaDe(a, dc).canceladas++;
+      continue;
+    }
 
-    a.lineas++;
-    a.ordenes.add(String(venta).trim());
-    a.ultimoDia = Math.max(a.ultimoDia, diaDelMes(row[C.fecha]));
+    const dia = diaDelMes(row[C.fecha]);
+    if (!dia) continue;
+    a.ultimoDia = Math.max(a.ultimoDia, dia);
+    const d = diaDe(a, dia);
+
+    d.lineas++;
+    d.ordenes.add(String(venta).trim());
 
     // Los cargos ya vienen firmados en negativo: se suman, no se restan.
-    a.ventaBruta += num(row[C.bruto]);
-    a.comisiones += num(row[C.cargoVenta]) + num(row[C.costoFijo]) + num(row[C.cargoCuotas]);
-    a.envioCobrado += num(row[C.envioIngreso]);
-    a.envioCosto += num(row[C.envioCosto]);
-    a.impuestos += num(row[C.impuestos]);
-    a.bonificaciones += num(row[C.bonif]);
-    a.anulaciones += num(row[C.anul]);
-    a.netoLiquidado += num(row[C.total]);
+    d.ventaBruta += num(row[C.bruto]);
+    d.comisiones += num(row[C.cargoVenta]) + num(row[C.costoFijo]) + num(row[C.cargoCuotas]);
+    d.envioCobrado += num(row[C.envioIngreso]);
+    d.envioCosto += num(row[C.envioCosto]);
+    d.impuestos += num(row[C.impuestos]);
+    d.bonificaciones += num(row[C.bonif]);
+    d.anulaciones += num(row[C.anul]);
+    d.netoLiquidado += num(row[C.total]);
 
     const u = num(row[C.unidades]) || 1;
-    a.unidades += u;
+    d.unidades += u;
     const bruto = num(row[C.bruto]);
     const { costo } = costoDe(row[C.sku]);
-    if (costo == null) { a.cogsFaltante += bruto; faltante(a, row[C.sku], bruto); }
-    else a.cogs += costo * u;
+    if (costo == null) { d.cogsFaltante += bruto; faltante(d, row[C.sku], bruto); }
+    else d.cogs += costo * u;
 
     const titulo = C.titulo >= 0 ? cleanName(row[C.titulo]) : '';
     const skuRaw = String(row[C.sku] ?? '').trim();
@@ -200,7 +261,7 @@ export function ingestFinanzasMeli(aoa, costoDe, match = null) {
       provincia: iProv >= 0 ? String(row[iProv] ?? '').trim() : '',
       envio: C.envio >= 0 ? String(row[C.envio] ?? '').trim() : '',
       orden: String(venta).trim(),
-      dia: diaDelMes(row[C.fecha]),
+      dia,
       canal: 'ml',
     });
   }
@@ -237,30 +298,33 @@ export function ingestFinanzasTn(aoa, costoDe, match = null) {
     if (!porMes.has(mes)) porMes.set(mes, vacio());
     const a = porMes.get(mes);
 
-    if (CANCEL_RE.test(String(row[C.estado] ?? ''))) { a.canceladas++; continue; }
+    const dia = diaDelMes(row[C.fecha]);
+    if (!dia) continue;
+    if (CANCEL_RE.test(String(row[C.estado] ?? ''))) { diaDe(a, dia).canceladas++; continue; }
 
     const orden = String(row[C.orden]).trim();
-    a.lineas++;
-    a.ordenes.add(orden);
-    a.ultimoDia = Math.max(a.ultimoDia, diaDelMes(row[C.fecha]));
+    a.ultimoDia = Math.max(a.ultimoDia, dia);
+    const d = diaDe(a, dia);
+    d.lineas++;
+    d.ordenes.add(orden);
 
     const claveOrden = `${mes}|${orden}`;
     if (!vistas.has(claveOrden)) {
       vistas.add(claveOrden);
-      a.ventaBruta += num(row[C.subtotal]);
-      a.descuentos += -num(row[C.descuento]);
-      a.envioCosto += -num(row[C.envio]);
-      a.comisiones += -(num(row[C.proceso]) + num(row[C.interes]));
-      a.impuestos += -num(row[C.impuestos]);
-      a.netoLiquidado += num(row[C.neto]);
+      d.ventaBruta += num(row[C.subtotal]);
+      d.descuentos += -num(row[C.descuento]);
+      d.envioCosto += -num(row[C.envio]);
+      d.comisiones += -(num(row[C.proceso]) + num(row[C.interes]));
+      d.impuestos += -num(row[C.impuestos]);
+      d.netoLiquidado += num(row[C.neto]);
     }
 
     const q = num(row[C.cant]) || 1;
-    a.unidades += q;
+    d.unidades += q;
     const monto = num(row[C.precio]) * q;
     const { costo } = costoDe(row[C.sku]);
-    if (costo == null) { a.cogsFaltante += monto; faltante(a, row[C.sku], monto); }
-    else a.cogs += costo * q;
+    if (costo == null) { d.cogsFaltante += monto; faltante(d, row[C.sku], monto); }
+    else d.cogs += costo * q;
 
     const titulo = C.titulo >= 0 ? cleanName(row[C.titulo]) : '';
     const skuRaw = String(row[C.sku] ?? '').trim();
@@ -274,7 +338,7 @@ export function ingestFinanzasTn(aoa, costoDe, match = null) {
       provincia: C.provincia >= 0 ? String(row[C.provincia] ?? '').trim() : '',
       envio: C.envio >= 0 ? String(row[C.envio] ?? '').trim() : '',
       orden,
-      dia: diaDelMes(row[C.fecha]),
+      dia,
       canal: 'tn',
     });
   }
@@ -288,6 +352,8 @@ export function ingestFinanzasTn(aoa, costoDe, match = null) {
  * que en la reunión de directorio.
  */
 export function verificarMeli(acc) {
+  // acc puede venir por día: se aplana primero.
+  if (acc.porDia) acc = agregar(acc);
   const suma = acc.ventaBruta + acc.envioCobrado + acc.comisiones + acc.envioCosto
     + acc.impuestos + acc.bonificaciones + acc.anulaciones;
   const delta = suma - acc.netoLiquidado;
@@ -302,33 +368,28 @@ export function unirCanales(...mapas) {
     for (const [mes, a] of m) {
       if (!out.has(mes)) out.set(mes, vacio());
       const t = out.get(mes);
-      for (const k of ['ventaBruta', 'bonificaciones', 'anulaciones', 'descuentos', 'comisiones',
-        'envioCobrado', 'envioCosto', 'impuestos', 'netoLiquidado', 'cogs', 'cogsFaltante',
-        'lineas', 'canceladas', 'unidades']) t[k] += a[k];
       t.ultimoDia = Math.max(t.ultimoDia, a.ultimoDia);
-      for (const o of a.ordenes) t.ordenes.add(o);
-      for (const [sku, v] of a.skusSinCosto) {
-        const p = t.skusSinCosto.get(sku) || { facturacion: 0, lineas: 0 };
-        p.facturacion += v.facturacion; p.lineas += v.lineas;
-        t.skusSinCosto.set(sku, p);
-      }
-      for (const [k, v] of a.productos) {
-        const p = t.productos.get(k) || { sku: v.sku, n: v.n, v: 0, u: 0 };
-        p.v += v.v; p.u += v.u;
-        t.productos.set(k, p);
-      }
-      for (const campo of ['familias', 'provincias']) {
-        for (const [k, v] of a[campo]) t[campo].set(k, (t[campo].get(k) || 0) + v);
-      }
-      for (const [k, set] of a.envios) {
-        if (!t.envios.has(k)) t.envios.set(k, new Set());
-        for (const o of set) t.envios.get(k).add(o);
-      }
-      for (const [k, v] of a.dias) {
-        if (!t.dias.has(k)) t.dias.set(k, { ml: 0, tn: 0, ordenes: new Set() });
-        const d = t.dias.get(k);
-        d.ml += v.ml; d.tn += v.tn;
-        for (const o of v.ordenes) d.ordenes.add(o);
+      for (const [dia, x] of a.porDia) {
+        const d = diaDe(t, dia);
+        for (const k of MONTOS) d[k] += x[k];
+        for (const o of x.ordenes) d.ordenes.add(o);
+        for (const [k, v] of x.skusSinCosto) {
+          const p = d.skusSinCosto.get(k) || { facturacion: 0, lineas: 0 };
+          p.facturacion += v.facturacion; p.lineas += v.lineas;
+          d.skusSinCosto.set(k, p);
+        }
+        for (const [k, p] of x.productos) {
+          const q = d.productos.get(k) || { sku: p.sku, n: p.n, v: 0, u: 0 };
+          q.v += p.v; q.u += p.u;
+          d.productos.set(k, q);
+        }
+        for (const campo of ['familias', 'provincias']) {
+          for (const [k, v] of x[campo]) d[campo].set(k, (d[campo].get(k) || 0) + v);
+        }
+        for (const [k, set] of x.envios) {
+          if (!d.envios.has(k)) d.envios.set(k, new Set());
+          for (const o of set) d.envios.get(k).add(o);
+        }
       }
     }
   }
