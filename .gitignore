@@ -26,3 +26,8 @@ scratchpad/
 
 # credenciales del puente de Apps Script (url + token)
 .naku-puente.json
+
+# El JSON del tablero de dirección: tiene el estado de resultados y el repo es
+# público. Vive acá y se sube a la base, que lo sirve con clave.
+# (docs/data/lines.json es otra cosa: lo necesita el tablero de ventas de Leo.)
+datos/

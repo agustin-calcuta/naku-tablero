@@ -2,9 +2,13 @@
 -- Esquema del tablero publicado — proyecto Neon "naku-tablero"
 -- (flat-fire-69274162, rama br-wispy-lake-ayf0dl28, base neondb)
 --
--- Acá vive TODA la lógica de publicar: la función de neon/api/index.mjs es
--- sólo el puente HTTP. Se hizo así porque la clave y la validación tienen
--- que estar del lado de la base, no en un archivo que se sube y se baja.
+-- Acá vive TODA la lógica: la función de neon/api/index.mjs es sólo el puente
+-- HTTP. Se hizo así porque la clave y la validación tienen que estar del lado
+-- de la base, no en un archivo que se sube y se baja.
+--
+-- Hay UNA clave y hace las dos cosas: deja entrar al tablero y deja publicar.
+-- El control está en la puerta; adentro no se pide nada más. El HTML de la
+-- página es público pero está vacío: los números no salen de acá sin clave.
 --
 -- Este archivo es el registro de lo que está aplicado. Para cambiar algo,
 -- editalo y corré el bloque que corresponda desde el editor SQL de Neon.
@@ -26,7 +30,7 @@ create table if not exists tablero_historial (
   quien     text
 );
 
--- La clave para publicar, guardada como sha256. Se cambia con:
+-- La clave, guardada como sha256. Se cambia con:
 --   insert into naku_clave (id, hash) values (1, encode(sha256('la-nueva'::bytea),'hex'))
 --     on conflict (id) do update set hash = excluded.hash, cambiada = now();
 create table if not exists naku_clave (
@@ -36,9 +40,62 @@ create table if not exists naku_clave (
   check (id = 1)
 );
 
+-- Sin políticas: nadie llega a las tablas por fuera de las funciones de abajo,
+-- que son SECURITY DEFINER y piden la clave.
 alter table tablero           enable row level security;
 alter table tablero_historial enable row level security;
 alter table naku_clave        enable row level security;
+
+-- ------------------------------------------------------------------ la puerta
+create or replace function puede_leer(p_clave text) returns boolean
+language sql
+stable
+security definer
+set search_path = public, pg_temp
+as $fn$
+  select exists (
+    select 1 from naku_clave
+     where id = 1 and encode(sha256(coalesce(p_clave, '')::bytea), 'hex') = hash
+  )
+$fn$;
+
+-- --------------------------------------------------------------------- traer
+create or replace function traer(p_clave text)
+returns jsonb
+language plpgsql
+stable
+security definer
+set search_path = public, pg_temp
+as $fn$
+declare r record;
+begin
+  if not puede_leer(p_clave) then
+    raise exception using errcode = 'PT401', message = 'Clave incorrecta.';
+  end if;
+  select datos, actualizado, quien into r from tablero where id = 'direccion';
+  if not found then return jsonb_build_object('hay', false); end if;
+  return jsonb_build_object('hay', true, 'publicado', r.actualizado,
+                            'quien', r.quien, 'datos', r.datos);
+end $fn$;
+
+-- -------------------------------------------------------------------- estado
+create or replace function estado(p_clave text)
+returns jsonb
+language plpgsql
+stable
+security definer
+set search_path = public, pg_temp
+as $fn$
+declare r record;
+begin
+  if not puede_leer(p_clave) then
+    raise exception using errcode = 'PT401', message = 'Clave incorrecta.';
+  end if;
+  select generado, actualizado, quien into r from tablero where id = 'direccion';
+  if not found then return jsonb_build_object('hay', false); end if;
+  return jsonb_build_object('hay', true, 'generado', r.generado,
+                            'actualizado', r.actualizado, 'quien', r.quien);
+end $fn$;
 
 -- ------------------------------------------------------------------ publicar
 -- Devuelve {ok, publicado, quien}. Levanta PT401 si la clave no va y PT400 si
@@ -51,12 +108,10 @@ security definer
 set search_path = public, pg_temp
 as $fn$
 declare
-  v_hash  text;
   v_quien text := nullif(left(coalesce(p_quien, ''), 80), '');
   v_ahora timestamptz := now();
 begin
-  select hash into v_hash from naku_clave where id = 1;
-  if v_hash is null or encode(sha256(coalesce(p_clave, '')::bytea), 'hex') is distinct from v_hash then
+  if not puede_leer(p_clave) then
     raise exception using errcode = 'PT401', message = 'Clave incorrecta.';
   end if;
 
@@ -91,12 +146,9 @@ language plpgsql
 security definer
 set search_path = public, pg_temp
 as $fn$
-declare
-  v_hash  text;
-  v_datos jsonb;
+declare v_datos jsonb;
 begin
-  select hash into v_hash from naku_clave where id = 1;
-  if v_hash is null or encode(sha256(coalesce(p_clave, '')::bytea), 'hex') is distinct from v_hash then
+  if not puede_leer(p_clave) then
     raise exception using errcode = 'PT401', message = 'Clave incorrecta.';
   end if;
   select datos into v_datos from tablero_historial where id = 'direccion' and n = p_n;
@@ -113,10 +165,8 @@ language plpgsql
 security definer
 set search_path = public, pg_temp
 as $fn$
-declare v_hash text;
 begin
-  select hash into v_hash from naku_clave where id = 1;
-  if v_hash is null or encode(sha256(coalesce(p_clave, '')::bytea), 'hex') is distinct from v_hash then
+  if not puede_leer(p_clave) then
     raise exception using errcode = 'PT401', message = 'Clave incorrecta.';
   end if;
   return query
@@ -124,6 +174,9 @@ begin
       from tablero_historial h where h.id = 'direccion' order by h.n desc limit 30;
 end $fn$;
 
+revoke all on function puede_leer(text)            from public;
+revoke all on function traer(text)                 from public;
+revoke all on function estado(text)                from public;
 revoke all on function publicar(text, jsonb, text) from public;
 revoke all on function volver(text, bigint)        from public;
 revoke all on function versiones(text)             from public;

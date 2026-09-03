@@ -7,12 +7,14 @@
 
      GET  /            → el tablero publicado
      GET  /estado      → cuándo y quién publicó, sin bajar los 180 KB
-     GET  /versiones   → las últimas publicaciones (pide la clave)
-     PUT  /            → publica (pide la clave)
-     PUT  /volver?n=N  → vuelve a una versión anterior (pide la clave)
+     GET  /versiones   → las últimas publicaciones
+     PUT  /            → publica
+     PUT  /volver?n=N  → vuelve a una versión anterior
 
-   Leer es público —el tablero ya vive en una URL pública—; escribir pide
-   la clave, que viaja en el header x-naku-clave.
+   Todo pide clave, que viaja en el header x-naku-clave. Hay dos: la de
+   lectura, que se le da a quien tenga que mirar el tablero, y la de publicar,
+   que además deja cambiarlo (y sirve para leer). El HTML de la página es
+   público, pero está vacío: los números no salen de acá sin clave.
 
    Acá no hay lógica: la validación de la clave y la escritura viven en la
    base, en las funciones publicar() / volver() / versiones() (ver
@@ -79,9 +81,7 @@ export default {
     try {
       if (request.method === 'GET') {
         if (ruta === '/estado') {
-          const f = primera(await sql(
-            'select generado, actualizado, quien from tablero where id = $1', ['direccion']));
-          return json(f ? { hay: true, ...f } : { hay: false });
+          return json(primera(await sql('select estado($1) as r', [clave])).r);
         }
 
         if (ruta === '/versiones') {
@@ -91,10 +91,8 @@ export default {
 
         if (ruta !== '/') return json({ error: 'No existe esa ruta.' }, 404);
 
-        const f = primera(await sql(
-          'select datos, actualizado, quien from tablero where id = $1', ['direccion']));
-        if (!f) return json({ hay: false }, 404);
-        return json({ hay: true, publicado: f.actualizado, quien: f.quien, datos: f.datos });
+        const r = primera(await sql('select traer($1) as r', [clave])).r;
+        return json(r, r.hay ? 200 : 404);
       }
 
       if (request.method === 'PUT') {

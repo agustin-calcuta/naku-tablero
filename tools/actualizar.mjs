@@ -5,17 +5,16 @@
 // Hace, en orden:
 //   1. baja las planillas de Google (costos y central de atención)
 //   2. procesa los exports de los canales que haya en el directorio de datos
-//   3. regenera docs/data/direccion.json
-//   4. si cambió: lo sube a la base (lo ven todos al instante) y lo commitea
+//   3. regenera datos/direccion.json
+//   4. si cambió, lo sube a la base — que es lo que lee el tablero
 //
-// Los dos pasos del final no son lo mismo y hacen falta los dos: la base es lo
-// que lee el tablero, y el commit deja la copia de respaldo que se usa si la
-// base no contesta. El botón "Actualizar datos" del navegador hace sólo el
-// primero, y está bien: el respaldo se actualiza la próxima vez que corra esto.
+// El JSON no se commitea: tiene el estado de resultados y el repositorio es
+// público. Queda en datos/, que git ignora. Lo mismo hace el botón "Actualizar
+// datos" del navegador, así que las dos vías terminan en el mismo lugar.
 //
-//   npm run actualizar -- --sin-publicar    regenera y no toca ni la base ni git
+//   npm run actualizar -- --sin-publicar    regenera y no sube nada
 //   NAKU_DATA="/ruta" npm run actualizar    datos en otro lado
-//   NAKU_CLAVE="naku-…"                     clave para subir a la base
+//   NAKU_CLAVE="naku-…"                     clave para publicar
 
 import { execFileSync, spawnSync } from 'node:child_process';
 import fs from 'node:fs';
@@ -24,7 +23,7 @@ import { fileURLToPath } from 'node:url';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(HERE, '..');
-const JSON_SALIDA = path.join(ROOT, 'docs', 'data', 'direccion.json');
+const JSON_SALIDA = path.join(ROOT, 'datos', 'direccion.json');
 
 const publicar = !process.argv.includes('--sin-publicar');
 const git = (...args) => execFileSync('git', args, { cwd: ROOT, encoding: 'utf8' }).trim();
@@ -78,15 +77,19 @@ if (!publicar) {
   process.exit(0);
 }
 
-/* ------------------------------------------------ 4a: a la base (lo que se ve) */
-paso(3, 'Subiendo a la base');
+/* ---------------------------------------------------------------- 4: publicar */
+paso(3, 'Publicando');
 
 const API = 'https://br-wispy-lake-ayf0dl28-tablero.compute.c-5.us-east-2.aws.neon.tech';
-const clave = process.env.NAKU_CLAVE || '';
+const clave = process.env.NAKU_CLAVE;
 if (!clave) {
-  console.log('   sin NAKU_CLAVE: no subo nada. El tablero va a seguir mostrando lo anterior.');
-  console.log('   (exportála en tu ~/.zshrc: export NAKU_CLAVE="naku-…")');
-} else {
+  salir('falta NAKU_CLAVE. El JSON quedó en datos/direccion.json, pero sin la clave '
+    + 'no lo puedo subir y el tablero va a seguir mostrando lo anterior.\n\n'
+    + '  export NAKU_CLAVE="naku-…"   (ponelo en tu ~/.zshrc)');
+}
+
+let subido = false;
+for (let intento = 1; intento <= 3 && !subido; intento++) {
   try {
     const r = await fetch(`${API}/`, {
       method: 'PUT',
@@ -99,52 +102,17 @@ if (!clave) {
       signal: AbortSignal.timeout(60000),
     });
     const j = await r.json().catch(() => ({}));
+    // Una clave mal puesta no se arregla reintentando.
     if (r.status === 401) salir('la clave de NAKU_CLAVE no es la que espera la base');
     if (!r.ok || !j.ok) salir(`la base rechazó la publicación: ${j.error || r.status}`);
-    console.log(`   ✓ publicado — ya lo ve cualquiera que abra el tablero`);
+    subido = true;
   } catch (e) {
-    // Que falle la base no tiene por qué frenar el commit: son dos cosas distintas.
-    console.log(`   ⚠ no pude subirlo a la base (${e.message}). Sigo con el commit.`);
+    const espera = 2 ** intento;
+    console.log(`   falló (${e.message}); reintento en ${espera}s…`);
+    if (intento < 3) execFileSync(process.execPath, ['-e', `setTimeout(()=>{}, ${espera * 1000})`]);
   }
 }
+if (!subido) salir('no pude subirlo. El JSON quedó en datos/direccion.json; probá de nuevo.');
 
-/* -------------------------------------------- 4b: al repositorio (el respaldo) */
-paso(4, 'Commiteando el respaldo');
-
-let rama;
-try {
-  rama = git('rev-parse', '--abbrev-ref', 'HEAD');
-} catch {
-  salir('esto no parece un repo git');
-}
-
-const sucio = git('status', '--porcelain', '--', 'docs/data/direccion.json');
-if (!sucio) {
-  console.log('   git no ve cambios en el JSON; nada para publicar.');
-  process.exit(0);
-}
-
-// Sólo se publica el JSON: si hay otros cambios en curso, quedan donde están.
-const otros = git('status', '--porcelain').split('\n')
-  .filter((l) => l.trim() && !l.includes('docs/data/direccion.json'));
-if (otros.length) {
-  console.log(`   (quedan ${otros.length} cambio(s) sin commitear que no se tocan)`);
-}
-
-git('add', 'docs/data/direccion.json');
-const mensaje = `Actualiza el tablero — ${datos.mesCerrado.largo}, generado el ${datos.generado}`;
-git('commit', '-m', mensaje);
-console.log(`   commit: ${mensaje}`);
-
-let empujado = false;
-for (let intento = 1; intento <= 4 && !empujado; intento++) {
-  const r = spawnSync('git', ['push', 'origin', `HEAD:${rama}`], { cwd: ROOT, encoding: 'utf8' });
-  if (r.status === 0) { empujado = true; break; }
-  const espera = 2 ** intento;
-  console.log(`   push falló (intento ${intento}/4), reintento en ${espera}s…`);
-  if (intento < 4) execFileSync(process.execPath, ['-e', `setTimeout(()=>{}, ${espera * 1000})`]);
-}
-if (!empujado) salir('el commit quedó hecho pero el push falló. Reintentá con: git push');
-
-console.log('\n✓ Listo:');
+console.log('\n✓ Publicado. Ya lo ve cualquiera que abra el tablero:');
 console.log('  https://agustin-calcuta.github.io/naku-tablero/direccion.html');

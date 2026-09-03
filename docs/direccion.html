@@ -367,6 +367,20 @@ table.casos tr.vencido td.dias{color:var(--mal);font-weight:600}
   border-radius:8px;padding:6px 12px;cursor:pointer;white-space:nowrap}
 .btn-act:hover{background:rgba(255,255,255,.92)}
 
+.entrar{position:fixed;inset:0;z-index:200;background:var(--papel);
+  display:flex;align-items:center;justify-content:center;padding:24px}
+.entrar form{width:100%;max-width:340px;text-align:center}
+.entrar .marca{display:inline-flex;align-items:center;gap:9px;background:var(--lima);color:#111315;
+  border-radius:10px;padding:9px 14px;font-weight:800;letter-spacing:.06em;font-size:15px;margin-bottom:22px}
+.entrar h1{font-size:21px;font-weight:700;letter-spacing:-.02em;margin:0 0 6px}
+.entrar p{margin:0 0 20px;font-size:13.5px;color:var(--media);line-height:1.5}
+.entrar input{width:100%;font-family:inherit;font-size:15px;padding:11px 14px;border-radius:10px;
+  border:1px solid var(--linea);background:var(--panel);color:var(--tinta);text-align:center}
+.entrar input:focus{outline:2px solid var(--azul);outline-offset:1px}
+.entrar button{width:100%;margin-top:10px;font-family:inherit;font-size:14px;font-weight:600;
+  padding:11px 14px;border-radius:10px;border:0;background:var(--azul);color:#fff;cursor:pointer}
+.entrar button:disabled{opacity:.5;cursor:progress}
+.entrar .mal{margin:14px 0 0;font-size:13px;color:var(--mal);font-weight:600}
 .imp-fondo{position:fixed;inset:0;z-index:80;background:rgba(14,21,38,.42);
   backdrop-filter:blur(3px);display:flex;align-items:flex-start;justify-content:center;
   padding:5vh 16px 16px;overflow:auto}
@@ -539,6 +553,23 @@ try {
   </div>
 </header>
 
+<div class="entrar" id="entrar">
+  <form id="entrarForm" autocomplete="on">
+    <span class="marca">
+      <svg viewBox="0 0 24 24" width="17" height="17" fill="currentColor" aria-hidden="true">
+        <path d="M7 9V7a5 5 0 0 1 10 0v2h1.6c.8 0 1.4.6 1.4 1.4v9.2c0 .8-.6 1.4-1.4 1.4H5.4c-.8 0-1.4-.6-1.4-1.4v-9.2C4 9.6 4.6 9 5.4 9H7Zm2 0h6V7a3 3 0 0 0-6 0v2Z"/>
+      </svg>
+      NAKU
+    </span>
+    <h1>Tablero de dirección</h1>
+    <p>Los números no son públicos. Escribí la clave para verlos.</p>
+    <input id="entrarClave" type="password" placeholder="Clave" autocomplete="current-password"
+           spellcheck="false" required>
+    <button type="submit" id="entrarBtn">Entrar</button>
+    <p class="mal" id="entrarMal" hidden></p>
+  </form>
+</div>
+
 <div class="imp-fondo" id="impFondo" hidden role="dialog" aria-modal="true" aria-labelledby="impTitulo">
   <div class="imp-caja">
     <div class="imp-top">
@@ -553,16 +584,12 @@ try {
       <div class="imp-zonas" id="impZonas"></div>
       <p class="imp-estado" id="impEstado"></p>
       <p class="imp-nota" id="impNota"></p>
-      <div class="imp-clave" id="impClave">
-        <label for="impClaveInput">Clave para publicar</label>
-        <input id="impClaveInput" type="password" autocomplete="off" spellcheck="false"
-               placeholder="naku-…">
+      <div class="imp-clave pide" id="impClave">
         <label for="impQuienInput">Tu nombre</label>
         <input id="impQuienInput" type="text" autocomplete="off" spellcheck="false"
-               placeholder="Leo" maxlength="40" style="min-width:120px">
-        <small>Se guardan en este navegador; no hace falta escribirlos de nuevo.
-          El nombre queda al pie del tablero, para saber quién cargó los últimos datos.
-          (Si te pasaron un link que ya trae la clave, esto no aparece.)</small>
+               placeholder="Leo" maxlength="40">
+        <small>Queda al pie del tablero, para saber quién cargó los últimos datos.
+          Se guarda en este navegador; no hace falta escribirlo de nuevo.</small>
       </div>
       <div class="imp-pie">
         <button class="primario" id="impProcesar" type="button" disabled>Procesar</button>
@@ -765,7 +792,7 @@ try {
 
 <script>
 /* ============================================================
-   Todo lo que se ve sale de data/direccion.json, que arma
+   Todo lo que se ve sale de la base, que llena
    tools/build-direccion.mjs con tres fuentes reales:
 
      · exports de MercadoLibre / Mercado Shops y de TiendaNube
@@ -817,34 +844,93 @@ function barras(destino, datos, opts = {}) {
    igual abre con lo último que dejó el build. */
 window.NakuAPI = 'https://br-wispy-lake-ayf0dl28-tablero.compute.c-5.us-east-2.aws.neon.tech';
 
-async function traerDatos() {
-  try {
-    const r = await fetch(window.NakuAPI + '/', { signal: AbortSignal.timeout(15000) });
-    const j = r.ok ? await r.json() : null;
-    if (j && j.hay && j.datos) return { D: j.datos, publicado: j.publicado, quien: j.quien };
-  } catch (e) {
-    // No es motivo para no mostrar nada: abajo está el archivo del repositorio.
-    console.warn('No pude leer el tablero publicado, uso el del repositorio:', e.message);
+/* La clave vive en este navegador, nunca en la página. Es una sola: la que deja
+   entrar deja también cargar exports. El control está en la puerta; adentro no
+   se pide nada más.
+   En modo privado localStorage tira excepción: se la va a tener que escribir
+   cada vez, pero el tablero funciona igual. */
+window.NakuClave = {
+  leer: (k = 'clave') => { try { return localStorage.getItem('naku.' + k) || ''; } catch { return ''; } },
+  guardar: (k, v) => { try { localStorage.setItem('naku.' + k, v); } catch { /* modo privado */ } },
+};
+
+/* La clave puede venir en el link:
+     …/direccion.html#clave=naku-xxxx&quien=Leo
+   Así nadie la escribe: abre el link que le mandaron y listo. Lo que va después
+   del # no viaja al servidor, no queda en ningún log. */
+(function claveDelLink() {
+  if (!location.hash) return;
+  let algo = false;
+  for (const [campo, clave] of [['clave', 'clave'], ['quien', 'quien']]) {
+    const m = new RegExp('[#&]' + campo + '=([^&]+)').exec(location.hash);
+    if (m) { window.NakuClave.guardar(clave, decodeURIComponent(m[1])); algo = true; }
   }
-  const r = await fetch('data/direccion.json', { cache: 'no-cache' });
-  if (!r.ok) throw new Error('data/direccion.json respondió ' + r.status);
-  return { D: await r.json(), publicado: null, quien: null };
+  // Se saca de la barra para que no quede a la vista ni en el historial.
+  if (algo) history.replaceState(null, '', location.pathname + location.search);
+})();
+
+/** 401 si la clave no va; cualquier otra cosa es un problema de verdad. */
+async function traerDatos(clave) {
+  const r = await fetch(window.NakuAPI + '/', {
+    headers: { 'x-naku-clave': clave },
+    signal: AbortSignal.timeout(20000),
+  });
+  if (r.status === 401) return { noEntra: true };
+  const j = await r.json().catch(() => ({}));
+  if (r.status === 404 || (r.ok && !j.hay)) throw new Error('todavía no publicó nadie');
+  if (!r.ok) throw new Error(j.error || 'la base contestó ' + r.status);
+  return { D: j.datos, publicado: j.publicado, quien: j.quien };
 }
 
-traerDatos()
-  .then(({ D, publicado, quien }) => {
-    // El importer del navegador vuelve a pintar con los datos que arme.
-    window.NakuDatos = D;
-    window.NakuPintar = pintar;
-    window.NakuPublicado = { publicado, quien };
-    pintar(D);
-  })
-  .catch((e) => {
-    // Sin datos no hay tablero: se dice arriba de todo, donde no se puede pasar por alto.
-    document.querySelector('main').insertAdjacentHTML('afterbegin',
-      '<p class="nodato" style="margin:28px 0">No pude leer los datos del tablero, '
-      + 'ni de la base ni del repositorio. (' + e.message + ')</p>');
-  });
+function mostrarTablero({ D, publicado, quien }) {
+  $('entrar').hidden = true;
+  document.body.style.overflow = '';
+  window.scrollTo(0, 0);   // el fondo pudo haber scrolleado detrás de la pantalla de clave
+  // El importer del navegador vuelve a pintar con los datos que arme.
+  window.NakuDatos = D;
+  window.NakuPintar = pintar;
+  window.NakuPublicado = { publicado, quien };
+  pintar(D);
+}
+
+function pedirClave(mensaje) {
+  $('entrar').hidden = false;
+  document.body.style.overflow = 'hidden';
+  $('entrarMal').hidden = !mensaje;
+  $('entrarMal').textContent = mensaje || '';
+  $('entrarBtn').disabled = false;
+  $('entrarClave').focus();
+}
+
+$('entrarForm').addEventListener('submit', async (ev) => {
+  ev.preventDefault();
+  const clave = $('entrarClave').value.trim();
+  if (!clave) return;
+  $('entrarBtn').disabled = true;
+  $('entrarBtn').textContent = 'Entrando…';
+  try {
+    const r = await traerDatos(clave);
+    if (r.noEntra) { pedirClave('Esa clave no es.'); return; }
+    window.NakuClave.guardar('clave', clave);
+    mostrarTablero(r);
+  } catch (e) {
+    pedirClave('No pude entrar: ' + e.message);
+  } finally {
+    $('entrarBtn').textContent = 'Entrar';
+  }
+});
+
+(async function arrancar() {
+  const guardada = window.NakuClave.leer('clave');
+  if (!guardada) { pedirClave(''); return; }
+  try {
+    const r = await traerDatos(guardada);
+    if (r.noEntra) { pedirClave('La clave guardada ya no sirve.'); return; }
+    mostrarTablero(r);
+  } catch (e) {
+    pedirClave('No pude leer el tablero: ' + e.message);
+  }
+})();
 
 function pintar(D) {
   /* ---------------- filtros: canal y período ---------------- */
@@ -1085,7 +1171,7 @@ function origenTexto() {
   if (!o || !o.publicado) return ' Datos del repositorio.';
   const d = new Date(o.publicado.replace(' ', 'T'));
   if (isNaN(d)) return '';
-  const cuando = d.toLocaleString('es-AR', { day: 'numeric', month: 'numeric', hour: '2-digit', minute: '2-digit' });
+  const cuando = d.toLocaleString('es-AR', { day: 'numeric', month: 'numeric', hour: '2-digit', minute: '2-digit', hour12: false });
   return ` Publicado el ${cuando}${o.quien ? ' por ' + o.quien : ''}.`;
 }
 

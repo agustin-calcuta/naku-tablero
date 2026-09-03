@@ -93,8 +93,8 @@ function leerMaestro() {
   return '';
 }
 
-const jsonTablero = path.join(ROOT, 'docs', 'data', 'direccion.json');
-if (!fs.existsSync(jsonTablero)) fatal('falta docs/data/direccion.json — corré antes: npm run tablero');
+const jsonTablero = path.join(ROOT, 'datos', 'direccion.json');
+if (!fs.existsSync(jsonTablero)) fatal('falta datos/direccion.json — corré antes: npm run tablero');
 const tablero = JSON.parse(fs.readFileSync(jsonTablero, 'utf8'));
 
 // Los costos salen de la planilla del mes; se embeben como pares [sku, costo].
