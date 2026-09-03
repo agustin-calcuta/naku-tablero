@@ -39,7 +39,9 @@ console.log(`\nTablero de ${D.mesCerrado.largo}, generado el ${D.generado}\n`);
 /* ---------------------------------------------------------------- estructura */
 console.log('Estructura');
 check('hay al menos un canal', Object.keys(D.vistas || {}).length > 0);
-check('existe la vista de los dos canales', !!(D.vistas && D.vistas.todos && D.vistas.todos.mes));
+// El período por defecto es el primero disponible; con un mes cargado, "últimos 3 meses".
+check('existe la vista de los dos canales',
+  !!(D.vistas && D.vistas.todos && Object.keys(D.vistas.todos).length));
 check('hay períodos declarados', (D.periodos || []).length > 0);
 check('cada período disponible tiene su bloque',
   (D.periodos || []).filter((p) => p.disponible).every((p) => D.vistas.todos[p.id]),
@@ -74,31 +76,27 @@ for (const [canal, porPeriodo] of Object.entries(D.vistas)) {
 /* ---------------------------------------------------------------- los cortes suman */
 console.log('\nPeríodos y canales');
 const T = D.vistas.todos;
-if (T.q1 && T.q2) {
-  check('las dos quincenas suman el mes en órdenes',
-    T.q1.eerr.ordenes + T.q2.eerr.ordenes === T.mes.eerr.ordenes,
-    `${T.q1.eerr.ordenes} + ${T.q2.eerr.ordenes} ≠ ${T.mes.eerr.ordenes}`);
-  check('las dos quincenas suman el mes en ventas netas',
-    cerca(linea(T.q1, 'Ventas netas') + linea(T.q2, 'Ventas netas'), linea(T.mes, 'Ventas netas')));
-}
+const PRIMER = D.periodos.find((p) => p.disponible) || {};
+check('los períodos con los mismos meses dan lo mismo',
+  !(T.m3 && T.m6) || T.m3.meses.join() !== T.m6.meses.join() || T.m3.eerr.ordenes === T.m6.eerr.ordenes);
 if (D.vistas.ml && D.vistas.tn) {
   check('los canales suman el total en órdenes',
-    D.vistas.ml.mes.eerr.ordenes + D.vistas.tn.mes.eerr.ordenes === T.mes.eerr.ordenes,
-    `${D.vistas.ml.mes.eerr.ordenes} + ${D.vistas.tn.mes.eerr.ordenes} ≠ ${T.mes.eerr.ordenes}`);
+    D.vistas.ml.m3.eerr.ordenes + D.vistas.tn.m3.eerr.ordenes === T.m3.eerr.ordenes,
+    `${D.vistas.ml.m3.eerr.ordenes} + ${D.vistas.tn.m3.eerr.ordenes} ≠ ${T.m3.eerr.ordenes}`);
   check('los canales suman el total en ventas netas',
-    cerca(linea(D.vistas.ml.mes, 'Ventas netas') + linea(D.vistas.tn.mes, 'Ventas netas'),
-      linea(T.mes, 'Ventas netas')));
+    cerca(linea(D.vistas.ml.m3, 'Ventas netas') + linea(D.vistas.tn.m3, 'Ventas netas'),
+      linea(T.m3, 'Ventas netas')));
 }
-check('el gráfico diario cubre el mes entero', T.mes.dias.length === D.mesCerrado.dias);
+
 // Las barras del gráfico son la venta bruta sin IVA: no incluyen las
 // bonificaciones del canal, que sí entran en las ventas netas.
-check('los días suman la venta bruta del mes',
-  cerca(T.mes.dias.reduce((a, d) => a + d.v, 0), linea(T.mes, 'Ventas brutas'), 0.01),
-  `días ${Math.round(T.mes.dias.reduce((a, d) => a + d.v, 0) / 1e6)} M vs brutas ${Math.round(linea(T.mes, 'Ventas brutas') / 1e6)} M`);
+check('los puntos del gráfico suman la venta bruta',
+  cerca(T.m3.puntos.reduce((a, d) => a + d.v, 0), linea(T.m3, 'Ventas brutas'), 0.01));
+check('cada punto tiene etiqueta', T.m3.puntos.every((p) => p.etiqueta));
 
 /* ---------------------------------------------------------------- cifras plausibles */
 console.log('\nCifras');
-const M = T.mes;
+const M = T.m3;
 check('el margen bruto está entre 0% y 100%', pctDe(M, 'Margen bruto') > 0 && pctDe(M, 'Margen bruto') < 100,
   `da ${pctDe(M, 'Margen bruto')}%`);
 check('la contribución no supera al margen bruto',

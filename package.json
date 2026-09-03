@@ -8,7 +8,8 @@
     "tablero": "node tools/build-direccion.mjs && node tools/build-importer.mjs",
     "test": "node tools/test-tablero.mjs",
     "instalar-puente": "node tools/instalar-puente.mjs",
-    "importer": "node tools/build-importer.mjs"
+    "importer": "node tools/build-importer.mjs",
+    "api": "node tools/build-api.mjs"
   },
   "keywords": [],
   "author": "",
@@ -16,5 +17,8 @@
   "type": "commonjs",
   "dependencies": {
     "xlsx": "^0.18.5"
+  },
+  "devDependencies": {
+    "pg": "^8.23.0"
   }
 }

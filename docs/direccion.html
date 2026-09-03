@@ -299,7 +299,7 @@ table.casos tr.vencido td.dias{color:var(--mal);font-weight:600}
 .pestanas{display:flex;gap:3px;background:var(--panel2);border:1px solid var(--linea);
   border-radius:8px;padding:3px}
 .pestanas button{font-family:inherit;font-size:12.5px;font-weight:600;color:var(--media);
-  background:none;border:0;padding:5px 12px;border-radius:6px;cursor:pointer}
+  background:none;border:0;padding:5px 11px;border-radius:6px;cursor:pointer;white-space:nowrap}
 .pestanas button[aria-selected="true"]{background:var(--azul);color:#fff}
 .etapas{display:flex;flex-direction:column;gap:9px}
 .etapa{display:grid;grid-template-columns:1fr auto;gap:2px 12px;align-items:baseline}
@@ -343,14 +343,19 @@ table.casos tr.vencido td.dias{color:var(--mal);font-weight:600}
 .filtros{position:sticky;top:var(--barra,56px);z-index:9;
   background:color-mix(in srgb,var(--papel) 94%,transparent);backdrop-filter:blur(10px);
   border-bottom:1px solid var(--linea)}
-.filtrosin{max-width:1200px;margin:0 auto;padding:10px 24px;display:flex;align-items:center;
-  gap:14px;flex-wrap:wrap}
-.filtros .et{font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;
-  color:var(--tenue)}
-.filtros .resumen{margin-left:auto;font-size:12.5px;color:var(--media)}
+.filtrosin{max-width:1200px;margin:0 auto;padding:9px 24px;display:flex;align-items:center;
+  gap:10px;flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none}
+.filtrosin::-webkit-scrollbar{display:none}
+.filtrosin > *{flex:none}
+.filtros .et{font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--tenue);white-space:nowrap}
+.filtros .sep{width:1px;height:20px;background:var(--linea);flex:none}
+.filtros .resumen{margin-left:auto;font-size:12.5px;color:var(--media);white-space:nowrap;padding-left:8px}
 .filtros .resumen b{color:var(--tinta);font-weight:600}
 .filtros select{font-family:inherit;font-size:12.5px;font-weight:600;color:var(--tinta);
-  background:var(--panel);border:1px solid var(--linea);border-radius:8px;padding:6px 10px}
+  background:var(--panel);border:1px solid var(--linea);border-radius:7px;padding:5px 8px}
+.filtros .rango{display:flex;align-items:center;gap:6px}
+.filtros .rango .a{font-size:12px;color:var(--tenue)}
 /* Un período que todavía no tiene exports se ve, pero se ve que le falta. */
 .pestanas button.sindatos{color:var(--tenue);font-weight:500}
 .pestanas button.sindatos::after{content:'·';margin-left:5px;color:var(--tenue)}
@@ -398,6 +403,13 @@ table.casos tr.vencido td.dias{color:var(--mal);font-weight:600}
 .imp-pie .primario:disabled{opacity:.45;cursor:not-allowed}
 .imp-pie .suelto{margin-left:auto}
 .imp-privado{margin:14px 0 0;font-size:11.5px;color:var(--tenue);line-height:1.5}
+.imp-clave{margin:12px 0 0;display:none;gap:8px;align-items:center;flex-wrap:wrap}
+.imp-clave.pide{display:flex}
+.imp-clave label{font-size:12.5px;font-weight:600}
+.imp-clave input{font-family:inherit;font-size:13px;padding:7px 10px;border-radius:8px;
+  border:1px solid var(--linea);background:var(--panel);color:var(--tinta);min-width:210px}
+.imp-clave input:focus{outline:2px solid var(--azul);outline-offset:1px}
+.imp-clave small{font-size:11.5px;color:var(--tenue);flex-basis:100%}
 
 /* ---------- período sin datos cargados ---------- */
 .vacio{max-width:52ch;margin:40px auto 56px;text-align:center}
@@ -532,8 +544,8 @@ try {
     <div class="imp-top">
       <div>
         <h2 id="impTitulo">Actualizar datos</h2>
-        <p>Arrastrá cada archivo en la casilla que le toca. Se procesan en esta
-           computadora: no se suben a ningún lado.</p>
+        <p>Arrastrá cada archivo en la casilla que le toca. Se procesan acá, en
+           esta computadora; después publicás el resultado y lo ve todo el mundo.</p>
       </div>
       <button class="imp-x" id="impCerrar" type="button" aria-label="Cerrar">&times;</button>
     </div>
@@ -541,13 +553,25 @@ try {
       <div class="imp-zonas" id="impZonas"></div>
       <p class="imp-estado" id="impEstado"></p>
       <p class="imp-nota" id="impNota"></p>
+      <div class="imp-clave" id="impClave">
+        <label for="impClaveInput">Clave para publicar</label>
+        <input id="impClaveInput" type="password" autocomplete="off" spellcheck="false"
+               placeholder="naku-…">
+        <label for="impQuienInput">Tu nombre</label>
+        <input id="impQuienInput" type="text" autocomplete="off" spellcheck="false"
+               placeholder="Leo" maxlength="40" style="min-width:120px">
+        <small>Se guardan en este navegador; no hace falta escribirlos de nuevo.
+          El nombre queda al pie del tablero, para saber quién cargó los últimos datos.</small>
+      </div>
       <div class="imp-pie">
         <button class="primario" id="impProcesar" type="button" disabled>Procesar</button>
-        <button id="impBajar" type="button" hidden>Bajar los datos</button>
+        <button class="primario" id="impPublicar" type="button" hidden>Publicar para todos</button>
+        <button id="impBajar" type="button" hidden>Bajar el archivo</button>
         <button class="suelto" id="impCerrarPie" type="button">Cerrar</button>
       </div>
-      <p class="imp-privado">Lo que cargues se ve sólo en este navegador. Para que
-        lo vean los demás hay que publicar el archivo del botón «Bajar los datos».</p>
+      <p class="imp-privado">Los archivos no salen de esta computadora: se leen acá y
+        se sube sólo el resultado. Hasta que toques <b>Publicar</b>, lo que cargaste se
+        ve nada más que en esta pantalla.</p>
     </div>
   </div>
 </div>
@@ -556,8 +580,14 @@ try {
   <div class="filtrosin">
     <span class="et">Canal</span>
     <div class="pestanas" role="tablist" aria-label="Filtrar por canal" id="tabsCanal"></div>
+    <span class="sep"></span>
     <span class="et">Período</span>
     <div class="pestanas" role="tablist" aria-label="Filtrar por período" id="tabsPeriodo"></div>
+    <span class="rango" id="rango" hidden>
+      <select id="rangoDesde" aria-label="Desde"></select>
+      <span class="a">a</span>
+      <select id="rangoHasta" aria-label="Hasta"></select>
+    </span>
     <span class="resumen" id="resumenFiltro"></span>
   </div>
 </div>
@@ -779,29 +809,53 @@ function barras(destino, datos, opts = {}) {
     </div>`).join('');
 }
 
-/* ---------------- arranque ---------------- */
-fetch('data/direccion.json', { cache: 'no-cache' })
-  .then((r) => { if (!r.ok) throw new Error(r.status); return r.json(); })
-  .then((D) => {
+/* ---------------- arranque ----------------
+   El tablero que ve todo el mundo vive en la base: es lo que deja el botón
+   «Actualizar datos» cuando alguien publica. El archivo del repositorio queda
+   de red: si la base tarda, está caída o todavía no publicó nadie, el tablero
+   igual abre con lo último que dejó el build. */
+window.NakuAPI = 'https://br-wispy-lake-ayf0dl28-tablero.compute.c-5.us-east-2.aws.neon.tech';
+
+async function traerDatos() {
+  try {
+    const r = await fetch(window.NakuAPI + '/', { signal: AbortSignal.timeout(15000) });
+    const j = r.ok ? await r.json() : null;
+    if (j && j.hay && j.datos) return { D: j.datos, publicado: j.publicado, quien: j.quien };
+  } catch (e) {
+    // No es motivo para no mostrar nada: abajo está el archivo del repositorio.
+    console.warn('No pude leer el tablero publicado, uso el del repositorio:', e.message);
+  }
+  const r = await fetch('data/direccion.json', { cache: 'no-cache' });
+  if (!r.ok) throw new Error('data/direccion.json respondió ' + r.status);
+  return { D: await r.json(), publicado: null, quien: null };
+}
+
+traerDatos()
+  .then(({ D, publicado, quien }) => {
     // El importer del navegador vuelve a pintar con los datos que arme.
     window.NakuDatos = D;
     window.NakuPintar = pintar;
+    window.NakuPublicado = { publicado, quien };
     pintar(D);
   })
   .catch((e) => {
     // Sin datos no hay tablero: se dice arriba de todo, donde no se puede pasar por alto.
     document.querySelector('main').insertAdjacentHTML('afterbegin',
-      '<p class="nodato" style="margin:28px 0">No pude leer <b>data/direccion.json</b>. '
-      + 'Corré «node tools/build-direccion.mjs» y volvé a publicar. (' + e.message + ')</p>');
+      '<p class="nodato" style="margin:28px 0">No pude leer los datos del tablero, '
+      + 'ni de la base ni del repositorio. (' + e.message + ')</p>');
   });
 
 function pintar(D) {
   /* ---------------- filtros: canal y período ---------------- */
-  const filtro = { canal: 'todos', periodo: 'mes' };
+  // El período por defecto es el primero que tenga datos: los ids salen del JSON
+  // y cambian según cuántos meses haya cargados, así que no se puede fijar uno.
+  const primerPeriodo = ((D.periodos || []).find((x) => x.disponible)
+    || (D.periodos || [])[0] || { id: 'm3' }).id;
+  const filtro = { canal: 'todos', periodo: primerPeriodo };
   const canales = D.canales || [{ id: 'todos', n: 'Los dos canales' }];
   const periodos = D.periodos || [];
 
-  const grupo = (cont, items, clave) => {
+  const grupo = (cont, items, clave, alCambiar) => {
     $(cont).innerHTML = items.map((x) => `<button role="tab" data-v="${x.id}"
       class="${x.disponible === false ? 'sindatos' : ''}"
       title="${x.disponible === false ? 'Todavía no hay exports cargados para este período' : ''}"
@@ -812,27 +866,65 @@ function pintar(D) {
       filtro[clave] = b.dataset.v;
       $(cont).querySelectorAll('[data-v]').forEach((o) =>
         o.setAttribute('aria-selected', String(o.dataset.v === filtro[clave])));
+      if (alCambiar) alCambiar();
       pintarVista(D, filtro);
     });
   };
+
+  /* El rango libre elige entre los meses que hay cargados. Un mes suelto sale de
+     `vistas[canal]["mes:AAAA-MM"]`; varios se resuelven al vuelo con el módulo. */
+  const meses = D.mesesCargados || [];
+  const opciones = (sel, sel2) => meses.map((m) =>
+    `<option value="${m.mes}"${m.mes === sel ? ' selected' : ''}>${m.largo}</option>`).join('');
+  function armarRango() {
+    if (!meses.length) return;
+    $('rangoDesde').innerHTML = opciones(meses[0].mes);
+    $('rangoHasta').innerHTML = opciones(meses[meses.length - 1].mes);
+  }
+  function mostrarRango() {
+    const libre = (periodos.find((p) => p.id === filtro.periodo) || {}).libre;
+    $('rango').hidden = !libre;
+  }
+  ['rangoDesde', 'rangoHasta'].forEach((id) => $(id).addEventListener('change', () => {
+    // Que "desde" no quede después de "hasta": se corrige el otro extremo.
+    const d = $('rangoDesde').value; const h = $('rangoHasta').value;
+    if (d > h) { if (id === 'rangoDesde') $('rangoHasta').value = d; else $('rangoDesde').value = h; }
+    pintarVista(D, filtro);
+  }));
 
   if (canales.length > 1 || periodos.length > 1) {
     $('filtros').hidden = false;
     if (typeof medirSticky === 'function') medirSticky();
     grupo('tabsCanal', canales, 'canal');
-    grupo('tabsPeriodo', periodos, 'periodo');
+    grupo('tabsPeriodo', periodos, 'periodo', mostrarRango);
+    armarRango();
+    mostrarRango();
   }
 
   pintarVista(D, filtro);
   pintarFijo(D);
 }
 
+/** Los meses que el filtro está pidiendo ahora mismo. */
+function mesesDelFiltro(D, filtro) {
+  const P = (D.periodos || []).find((x) => x.id === filtro.periodo);
+  if (!P) return [];
+  if (!P.libre) return P.meses || [];
+  const d = $('rangoDesde').value; const h = $('rangoHasta').value;
+  return (D.mesesCargados || []).map((m) => m.mes).filter((m) => m >= d && m <= h);
+}
+
 /** Todo lo que cambia al filtrar: prácticamente el tablero entero. */
 function pintarVista(D, filtro) {
   const canal = filtro.canal;
   const porCanal = (D.vistas && D.vistas[canal]) || D.vistas.todos;
-  const P = (D.periodos || []).find((x) => x.id === filtro.periodo) || { n: '', id: 'mes' };
-  const V = porCanal[filtro.periodo];
+  const P = (D.periodos || []).find((x) => x.id === filtro.periodo) || { n: '', id: 'm3' };
+  const mesesPedidos = mesesDelFiltro(D, filtro);
+  /* Un rango de un mes solo ya viene calculado; los de varios se arman acá con el
+     mismo módulo que usa el build, sobre los acumuladores que trae el JSON. */
+  const V = P.libre
+    ? (mesesPedidos.length === 1 ? porCanal[`mes:${mesesPedidos[0]}`] : sumarBloques(porCanal, mesesPedidos))
+    : porCanal[filtro.periodo];
 
   /* El filtro ofrece rangos de varios meses desde el principio, aunque todavía no
      haya exports que los cubran: así se ve qué falta en vez de esconderlo. */
@@ -841,14 +933,14 @@ function pintarVista(D, filtro) {
   const sinDatos = $('sinDatos');
   if (sinDatos) sinDatos.remove();
 
-  const todoElMes = P.id === 'mes';
+  const todoElMes = mesesPedidos.length <= 1;
   const serie = D.serie || [];
   const ult = serie.find((s) => s.mes === D.mesCerrado.mes) || serie[serie.length - 1] || {};
   /* Sólo se compara contra un mes entero: un mes cortado a mitad daría una
      variación falsa. Con un único export todavía no hay contra qué comparar. */
   const prev = serie.find((s) => s.mes === D.mesCerrado.previoMes) || {};
   const glosaPrev = prev.m ? `contra ${prev.m}` : '';
-  const dias = V.dias || [];
+  const dias = V.puntos || [];
   const E = V.eerr;
   const linea = (nombre) => (E.lineas || []).find((l) => l.c === nombre) || { v: 0, pct: 0 };
   const ventasNetas = linea('Ventas netas');
@@ -947,13 +1039,15 @@ function pintarVista(D, filtro) {
   }
 
   /* ---------------- ventas ---------------- */
-  const pico = dias.reduce((a, x) => (x.v > a.v ? x : a), dias[0] || { v: 0, d: 0 });
+  const porDia = V.granularidad !== 'mes';
+  const pico = dias.reduce((a, x) => (x.v > a.v ? x : a), dias[0] || { v: 0, etiqueta: '' });
+  $('tituloMeses').textContent = porDia ? 'Cómo se vendió el mes, día por día' : 'Cómo se vendió, mes a mes';
   $('subMeses').textContent = `${rotulo}${soloUno ? ` · ${nombreCanal}` : ' · vendido por cada canal, sin IVA'}`
-    + (pico.v ? ` · el día más fuerte fue el ${pico.d} con ${moneyM(pico.v)}` : '');
+    + (pico.v ? ` · ${porDia ? 'el día más fuerte fue el' : 'el mejor mes fue'} ${pico.etiqueta} con ${moneyM(pico.v)}` : '');
   $('leyendaMeses').innerHTML = soloUno ? ''
     : '<span><i style="background:var(--c1)"></i> Mercado Libre</span>'
       + '<span><i style="background:var(--c2)"></i> Tienda Nube</span>';
-  graficoDias(dias, D.mesCerrado);
+  graficoDias(dias, D.mesCerrado, porDia);
 
   $('subProductos').textContent = `${rotulo} · las 10 que más facturaron`;
   $('subFamilias').textContent = `% de la facturación de ${rotulo}`;
@@ -984,6 +1078,16 @@ function pintarVista(D, filtro) {
 
 const canales_ = (D) => D.canales || [{ id: 'todos', n: 'Los dos canales' }];
 
+/** De dónde salió lo que se está viendo: quién publicó y cuándo, o el repositorio. */
+function origenTexto() {
+  const o = window.NakuPublicado;
+  if (!o || !o.publicado) return ' Datos del repositorio.';
+  const d = new Date(o.publicado.replace(' ', 'T'));
+  if (isNaN(d)) return '';
+  const cuando = d.toLocaleString('es-AR', { day: 'numeric', month: 'numeric', hour: '2-digit', minute: '2-digit' });
+  return ` Publicado el ${cuando}${o.quien ? ' por ' + o.quien : ''}.`;
+}
+
 /** Lo que no cambia con el filtro: fuentes, atención al cliente y pie. */
 function pintarFijo(D) {
   const F = D.fuentes;
@@ -991,13 +1095,14 @@ function pintarFijo(D) {
   $('fuenteVentas').textContent = 'Exports de Mercado Libre y Tienda Nube';
   $('fuenteClientes').textContent = F.postventa ? `Central de atención · corte ${F.postventa.corte}` : 'sin conectar';
   $('pieFuentes').textContent =
-    `Importes sin IVA (${pct(D.iva * 100, 0)}). Costos de la planilla de compras, hoja ${F.costos.hoja}.`;
+    `Importes sin IVA (${pct(D.iva * 100, 0)}). Costos de la planilla de compras, hoja ${F.costos.hoja}.`
+    + origenTexto();
 
   if (!D.clientes) document.getElementById('clientes').hidden = true;
 }
 
 /* ---------------- cobrado por día del mes, apilado por canal ---------------- */
-function graficoDias(dias, mesInfo) {
+function graficoDias(dias, mesInfo, porDia = true) {
   const cont = $('gDias');
   if (!cont || !dias.length) return;
   const W = 900, H = 290, mIzq = 54, mDer = 8, mSup = 12, mInf = 30;
@@ -1011,7 +1116,7 @@ function graficoDias(dias, mesInfo) {
   const paso = [1, 2, 2.5, 5, 10].map((k) => k * magnitud).find((k) => k >= bruto) || magnitud * 10;
   const tope = Math.ceil(maxV / paso) * paso;
   const pasoX = ancho / dias.length;
-  const barra = Math.max(4, Math.min(20, pasoX * 0.66));
+  const barra = Math.max(4, Math.min(porDia ? 20 : 38, pasoX * 0.66));
   const y = (v) => mSup + alto - (v / tope) * alto;
 
   let ejes = '';
@@ -1029,17 +1134,20 @@ function graficoDias(dias, mesInfo) {
       ${x.tn ? `<rect class="s2" x="${px}" y="${yTot}" width="${barra}" height="${hTn}" rx="1.5"/>` : ''}`;
   }).join('');
 
-  // Etiquetas cada cinco días: 31 números seguidos no se leen.
+  /* Con 31 días, una etiqueta cada cinco; con meses, todas: son pocas y cada una
+     dice algo. */
+  const cada = porDia ? Math.ceil(dias.length / 6) : 1;
   const etiquetas = dias
-    .filter((x) => x.d === 1 || x.d % 5 === 0)
-    .map((x) => `<text class="eje" x="${cx(x.d - 1)}" y="${H - 10}" text-anchor="middle">${x.d}</text>`)
+    .map((x, i) => ({ x, i }))
+    .filter(({ i }) => i === 0 || (i + 1) % cada === 0 || i === dias.length - 1)
+    .map(({ x, i }) => `<text class="eje" x="${cx(i)}" y="${H - 10}" text-anchor="middle">${x.etiqueta}</text>`)
     .join('');
 
   const zonas = dias.map((x, i) => `<rect class="zona" data-i="${i}" x="${cx(i) - pasoX / 2}"
       y="${mSup}" width="${pasoX}" height="${alto}" fill="transparent"/>`).join('');
 
   cont.innerHTML = `<svg viewBox="0 0 ${W} ${H}" role="img"
-      aria-label="Vendido por día de ${mesInfo.largo}, separado por canal">
+      aria-label="Vendido por ${porDia ? 'día' : 'mes'}, separado por canal">
       ${ejes}${barrasSvg}${etiquetas}
       <line class="base" x1="${mIzq}" y1="${mSup + alto}" x2="${W - mDer}" y2="${mSup + alto}"/>
       ${zonas}
@@ -1050,7 +1158,7 @@ function graficoDias(dias, mesInfo) {
   svg.querySelectorAll('.zona').forEach((r) => {
     const mostrar = () => {
       const x = dias[+r.dataset.i];
-      globo.innerHTML = `<b>${x.d} de ${mesInfo.largo.split(' ')[0]}</b>
+      globo.innerHTML = `<b>${porDia ? `${x.etiqueta} de ${mesInfo.largo.split(' ')[0]}` : x.etiqueta}</b>
         <span>Vendido ${moneyM(x.v)}</span>
         <span>Mercado Libre ${moneyM(x.ml)}</span>
         ${x.tn ? `<span>Tienda Nube ${moneyM(x.tn)}</span>` : ''}
@@ -1196,7 +1304,7 @@ function pintarNotas(D, V, filtro, ctx) {
   const { rotulo, todoElMes, soloUno } = ctx;
   const serie = D.serie || [];
   const prev = todoElMes ? (serie.find((s) => s.mes === D.mesCerrado.previoMes) || {}) : {};
-  const dias = V.dias || [];
+  const dias = V.puntos || [];
   const E = V.eerr;
   const ventasNetas = (E.lineas.find((l) => l.c === 'Ventas netas') || {}).v || 0;
   const C = D.clientes;
@@ -1309,6 +1417,90 @@ botonTema.title = botonTema.getAttribute('aria-label');
 botonTema.addEventListener('click', () => aplicarTema(temaVigente() === 'dark' ? 'light' : 'dark', true));
 
 /**
+ * Suma los bloques mensuales que ya vienen calculados. Se usa sólo para el rango
+ * libre: los períodos fijos llegan armados del build. Los porcentajes se
+ * recalculan sobre el total, no se promedian — promediar porcentajes de meses de
+ * distinto tamaño da un número que no es de nadie.
+ */
+function sumarBloques(porCanal, meses) {
+  const bloques = meses.map((m) => porCanal[`mes:${m}`]).filter(Boolean);
+  if (!bloques.length) return null;
+  if (bloques.length === 1) return bloques[0];
+
+  const sumaLinea = (c) => bloques.reduce((a, b) =>
+    a + ((b.eerr.lineas.find((l) => l.c === c) || {}).v || 0), 0);
+  const netas = sumaLinea('Ventas netas') || 1;
+  const lineas = bloques[0].eerr.lineas.map((l) => {
+    const v = sumaLinea(l.c);
+    return { c: l.c, v, pct: +(100 * v / netas).toFixed(1), tipo: l.tipo };
+  });
+
+  const juntar = (campo, clave, valor) => {
+    const m = new Map();
+    for (const b of bloques) {
+      for (const x of b[campo]) {
+        const k = clave(x);
+        m.set(k, (m.get(k) || 0) + valor(x));
+      }
+    }
+    return m;
+  };
+
+  const prod = new Map();
+  for (const b of bloques) {
+    for (const p of b.productos) {
+      const q = prod.get(p.sku) || { sku: p.sku, n: p.n, v: 0, u: 0 };
+      q.v += p.v; q.u += p.u;
+      prod.set(p.sku, q);
+    }
+  }
+
+  /* Los porcentajes de familias y provincias vuelven a normalizarse: cada bloque
+     traía el suyo sobre su propio total. */
+  const reponderar = (campo) => {
+    const abs = new Map();
+    for (const b of bloques) {
+      const netasB = (b.eerr.lineas.find((l) => l.c === 'Ventas netas') || {}).v || 0;
+      for (const x of b[campo]) abs.set(x.n, (abs.get(x.n) || 0) + x.v * netasB / 100);
+    }
+    const tot = [...abs.values()].reduce((a, b2) => a + b2, 0) || 1;
+    return [...abs.entries()]
+      .map(([n, v]) => ({ n, v: +(100 * v / tot).toFixed(1) }))
+      .sort((a, b2) => b2.v - a.v);
+  };
+
+  return {
+    eerr: {
+      ...bloques[0].eerr,
+      lineas,
+      ordenes: bloques.reduce((a, b) => a + b.eerr.ordenes, 0),
+      unidades: bloques.reduce((a, b) => a + b.eerr.unidades, 0),
+      cobertura: +(bloques.reduce((a, b) => a + b.eerr.cobertura, 0) / bloques.length).toFixed(1),
+    },
+    gastos: ['Costo de la mercadería', 'Comisiones de plataforma', 'Envíos y logística', 'Impuestos de plataforma']
+      .map((n, i) => ({
+        n,
+        v: Math.abs((lineas.find((l) => l.c === ['Costo de la mercadería', 'Comisiones de plataforma',
+          'Envíos (neto de lo cobrado)', 'Impuestos de plataforma'][i]) || {}).pct || 0),
+      })),
+    productos: [...prod.values()].sort((a, b) => b.v - a.v).slice(0, 10),
+    familias: reponderar('familias').slice(0, 11),
+    provincias: reponderar('provincias').slice(0, 7),
+    envios: [...juntar('envios', (x) => x.n, (x) => x.v).entries()]
+      .map(([n, v]) => ({ n, v })).sort((a, b) => b.v - a.v),
+    puntos: bloques.map((b, i) => {
+      const p = b.puntos.reduce((a, x) => ({
+        ml: a.ml + x.ml, tn: a.tn + x.tn, v: a.v + x.v, ordenes: a.ordenes + x.ordenes,
+      }), { ml: 0, tn: 0, v: 0, ordenes: 0 });
+      return { ...p, d: meses[i], etiqueta: (b.meses || [meses[i]])[0].slice(5) + '/' + meses[i].slice(2, 4) };
+    }),
+    granularidad: 'mes',
+    meses: meses.slice(),
+    neto: bloques.reduce((a, b) => a + b.neto, 0),
+  };
+}
+
+/**
  * Un período elegido para el que todavía no hay exports. Se dice qué falta y
  * cuánto, en vez de mostrar un tablero en cero que parecería una caída.
  */
@@ -1330,7 +1522,7 @@ function pintarSinDatos(D, P, filtro) {
          Se cargan con el botón <b>Actualizar datos</b>, y el período se llena solo.</p>
       <div class="acciones">
         <button class="primario" type="button" data-vacio="cargar">Actualizar datos</button>
-        <button type="button" data-vacio="volver">Volver a ${(D.mesCerrado || {}).largo || 'el mes cerrado'}</button>
+        <button type="button" data-vacio="volver">Volver a lo que sí hay</button>
       </div>
     </div>`);
 
@@ -1339,7 +1531,9 @@ function pintarSinDatos(D, P, filtro) {
     if (b && !b.hidden) b.click();
   });
   $('sinDatos').querySelector('[data-vacio="volver"]').addEventListener('click', () => {
-    const tab = $('tabsPeriodo').querySelector('[data-v="mes"]');
+    // Al primer período que sí tenga datos: los ids cambian según lo cargado.
+    const primero = (D.periodos || []).find((x) => x.disponible);
+    const tab = primero && $('tabsPeriodo').querySelector(`[data-v="${primero.id}"]`);
     if (tab) tab.click();
   });
 

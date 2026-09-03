@@ -8,6 +8,13 @@
   "previo": null,
   "previoMes": null
  },
+ "mesesCargados": [
+  {
+   "mes": "2026-07",
+   "largo": "julio 2026",
+   "corto": "jul 26"
+  }
+ ],
  "fuentes": {
   "origen": {
    "costos": {
@@ -67,7 +74,7 @@
  ],
  "vistas": {
   "todos": {
-   "mes": {
+   "m3": {
     "eerr": {
      "lineas": [
       {
@@ -375,328 +382,368 @@
       "v": 66
      }
     ],
-    "dias": [
+    "puntos": [
      {
       "d": 1,
       "ml": 21530917,
       "tn": 1209115,
       "v": 22740032,
-      "ordenes": 483
+      "ordenes": 483,
+      "etiqueta": "1"
      },
      {
       "d": 2,
       "ml": 22259880,
       "tn": 1376437,
       "v": 23636318,
-      "ordenes": 498
+      "ordenes": 498,
+      "etiqueta": "2"
      },
      {
       "d": 3,
       "ml": 17891331,
       "tn": 1244536,
       "v": 19135867,
-      "ordenes": 403
+      "ordenes": 403,
+      "etiqueta": "3"
      },
      {
       "d": 4,
       "ml": 10884911,
       "tn": 932224,
       "v": 11817135,
-      "ordenes": 265
+      "ordenes": 265,
+      "etiqueta": "4"
      },
      {
       "d": 5,
       "ml": 11478083,
       "tn": 830825,
       "v": 12308908,
-      "ordenes": 268
+      "ordenes": 268,
+      "etiqueta": "5"
      },
      {
       "d": 6,
       "ml": 21714164,
       "tn": 805368,
       "v": 22519531,
-      "ordenes": 496
+      "ordenes": 496,
+      "etiqueta": "6"
      },
      {
       "d": 7,
       "ml": 16231796,
       "tn": 818702,
       "v": 17050498,
-      "ordenes": 339
+      "ordenes": 339,
+      "etiqueta": "7"
      },
      {
       "d": 8,
       "ml": 14937236,
       "tn": 928133,
       "v": 15865369,
-      "ordenes": 350
+      "ordenes": 350,
+      "etiqueta": "8"
      },
      {
       "d": 9,
       "ml": 17281016,
       "tn": 324793,
       "v": 17605808,
-      "ordenes": 360
+      "ordenes": 360,
+      "etiqueta": "9"
      },
      {
       "d": 10,
       "ml": 22737183,
       "tn": 1737510,
       "v": 24474693,
-      "ordenes": 563
+      "ordenes": 563,
+      "etiqueta": "10"
      },
      {
       "d": 11,
       "ml": 15279585,
       "tn": 586691,
       "v": 15866276,
-      "ordenes": 336
+      "ordenes": 336,
+      "etiqueta": "11"
      },
      {
       "d": 12,
       "ml": 13826333,
       "tn": 714459,
       "v": 14540791,
-      "ordenes": 344
+      "ordenes": 344,
+      "etiqueta": "12"
      },
      {
       "d": 13,
       "ml": 25422272,
       "tn": 1444947,
       "v": 26867219,
-      "ordenes": 606
+      "ordenes": 606,
+      "etiqueta": "13"
      },
      {
       "d": 14,
       "ml": 21927085,
       "tn": 969237,
       "v": 22896322,
-      "ordenes": 504
+      "ordenes": 504,
+      "etiqueta": "14"
      },
      {
       "d": 15,
       "ml": 11778864,
       "tn": 1436067,
       "v": 13214931,
-      "ordenes": 273
+      "ordenes": 273,
+      "etiqueta": "15"
      },
      {
       "d": 16,
       "ml": 13096836,
       "tn": 1576852,
       "v": 14673688,
-      "ordenes": 327
+      "ordenes": 327,
+      "etiqueta": "16"
      },
      {
       "d": 17,
       "ml": 15687369,
       "tn": 571483,
       "v": 16258851,
-      "ordenes": 326
+      "ordenes": 326,
+      "etiqueta": "17"
      },
      {
       "d": 18,
       "ml": 10387095,
       "tn": 234707,
       "v": 10621802,
-      "ordenes": 243
+      "ordenes": 243,
+      "etiqueta": "18"
      },
      {
       "d": 19,
       "ml": 8912090,
       "tn": 67272,
       "v": 8979362,
-      "ordenes": 199
+      "ordenes": 199,
+      "etiqueta": "19"
      },
      {
       "d": 20,
       "ml": 15876839,
       "tn": 1940736,
       "v": 17817575,
-      "ordenes": 345
+      "ordenes": 345,
+      "etiqueta": "20"
      },
      {
       "d": 21,
       "ml": 17032952,
       "tn": 672349,
       "v": 17705301,
-      "ordenes": 377
+      "ordenes": 377,
+      "etiqueta": "21"
      },
      {
       "d": 22,
       "ml": 20084570,
       "tn": 693220,
       "v": 20777790,
-      "ordenes": 427
+      "ordenes": 427,
+      "etiqueta": "22"
      },
      {
       "d": 23,
       "ml": 16372190,
       "tn": 1168008,
       "v": 17540198,
-      "ordenes": 371
+      "ordenes": 371,
+      "etiqueta": "23"
      },
      {
       "d": 24,
       "ml": 15823382,
       "tn": 507332,
       "v": 16330714,
-      "ordenes": 344
+      "ordenes": 344,
+      "etiqueta": "24"
      },
      {
       "d": 25,
       "ml": 10329865,
       "tn": 1054950,
       "v": 11384814,
-      "ordenes": 242
+      "ordenes": 242,
+      "etiqueta": "25"
      },
      {
       "d": 26,
       "ml": 8983931,
       "tn": 507844,
       "v": 9491775,
-      "ordenes": 211
+      "ordenes": 211,
+      "etiqueta": "26"
      },
      {
       "d": 27,
       "ml": 15191028,
       "tn": 647517,
       "v": 15838545,
-      "ordenes": 393
+      "ordenes": 393,
+      "etiqueta": "27"
      },
      {
       "d": 28,
       "ml": 17640884,
       "tn": 1756026,
       "v": 19396910,
-      "ordenes": 412
+      "ordenes": 412,
+      "etiqueta": "28"
      },
      {
       "d": 29,
       "ml": 15497512,
       "tn": 807508,
       "v": 16305021,
-      "ordenes": 379
+      "ordenes": 379,
+      "etiqueta": "29"
      },
      {
       "d": 30,
       "ml": 13208078,
       "tn": 716756,
       "v": 13924834,
-      "ordenes": 331
+      "ordenes": 331,
+      "etiqueta": "30"
      },
      {
       "d": 31,
       "ml": 14695292,
       "tn": 956022,
       "v": 15651314,
-      "ordenes": 370
+      "ordenes": 370,
+      "etiqueta": "31"
      }
+    ],
+    "granularidad": "dia",
+    "meses": [
+     "2026-07"
     ],
     "neto": 411168178
    },
-   "q1": {
+   "m6": {
     "eerr": {
      "lineas": [
       {
        "c": "Ventas brutas",
-       "v": 282725320.7272725,
-       "pct": 98.1,
+       "v": 527380992.11570233,
+       "pct": 98,
        "tipo": "normal"
       },
       {
        "c": "Bonificaciones de plataforma",
-       "v": 7570109.297520662,
-       "pct": 2.6,
+       "v": 14648273.760330578,
+       "pct": 2.7,
        "tipo": "normal"
       },
       {
        "c": "Anulaciones y reembolsos",
-       "v": -401299.69421487604,
+       "v": -633986.0991735538,
        "pct": -0.1,
        "tipo": "normal"
       },
       {
        "c": "Descuentos y cupones",
-       "v": -1715764.5619834715,
+       "v": -3334618.925619835,
        "pct": -0.6,
        "tipo": "normal"
       },
       {
        "c": "Ventas netas",
-       "v": 288178365.7685948,
+       "v": 538060660.8512396,
        "pct": 100,
        "tipo": "total"
       },
       {
        "c": "Costo de la mercadería",
-       "v": -129079846.96000004,
-       "pct": -44.8,
+       "v": -239984502.7650002,
+       "pct": -44.6,
        "tipo": "gasto"
       },
       {
        "c": "Margen bruto",
-       "v": 159098518.80859476,
-       "pct": 55.2,
+       "v": 298076158.08623934,
+       "pct": 55.4,
        "tipo": "destacado"
       },
       {
        "c": "Comisiones de plataforma",
-       "v": -48846418.32231406,
-       "pct": -17,
+       "v": -90271064.67768595,
+       "pct": -16.8,
        "tipo": "gasto"
       },
       {
        "c": "Envíos (neto de lo cobrado)",
-       "v": -15383678.834710741,
-       "pct": -5.3,
+       "v": -27625768.090909097,
+       "pct": -5.1,
        "tipo": "gasto"
       },
       {
        "c": "Impuestos de plataforma",
-       "v": -3130058.586776859,
+       "v": -5889423.975206614,
        "pct": -1.1,
        "tipo": "gasto"
       },
       {
        "c": "Resultado de contribución",
-       "v": 91738363.06479311,
-       "pct": 31.8,
+       "v": 174289901.34243768,
+       "pct": 32.4,
        "tipo": "destacado"
       }
      ],
-     "ordenes": 6088,
-     "unidades": 6693,
-     "ticket": 47335.47400929612,
-     "netoLiquidado": 219308744.66942158,
-     "canceladas": 377,
-     "cobertura": 96.8,
+     "ordenes": 11385,
+     "unidades": 12574,
+     "ticket": 47260.488436648186,
+     "netoLiquidado": 411168178.14049596,
+     "canceladas": 634,
+     "cobertura": 96.7,
      "sinCosto": [
       {
        "sku": "GZB-002R",
-       "facturacion": 1778999,
-       "lineas": 10
+       "facturacion": 6230971,
+       "lineas": 38
       },
       {
        "sku": "VP-001N",
-       "facturacion": 741000,
-       "lineas": 35
+       "facturacion": 1159000,
+       "lineas": 54
       },
       {
        "sku": "VP-001B",
-       "facturacion": 490010,
-       "lineas": 25
+       "facturacion": 735870,
+       "lineas": 39
       },
       {
        "sku": "VP-002B",
-       "facturacion": 266500,
-       "lineas": 16
+       "facturacion": 287000,
+       "lineas": 18
+      },
+      {
+       "sku": "GZB-002 R",
+       "facturacion": 158999,
+       "lineas": 1
       },
       {
        "sku": "VP-002N",
-       "facturacion": 101956,
-       "lineas": 6
+       "facturacion": 142956,
+       "lineas": 8
       },
       {
        "sku": "SP-46B",
@@ -720,15 +767,15 @@
     "gastos": [
      {
       "n": "Costo de la mercadería",
-      "v": 44.8
+      "v": 44.6
      },
      {
       "n": "Comisiones de plataforma",
-      "v": 17
+      "v": 16.8
      },
      {
       "n": "Envíos y logística",
-      "v": 5.3
+      "v": 5.1
      },
      {
       "n": "Impuestos de plataforma",
@@ -737,513 +784,106 @@
     ],
     "productos": [
      {
-      "sku": "MC-002",
-      "n": "Máquina de Coser MC-002 Mini 12 Puntadas con Pedal y Luz LED",
-      "v": 26016891,
-      "u": 564
-     },
-     {
       "sku": "SP-446",
       "n": "Soporte Articulado Naku SP-446 de Pared Para TV de 32\" a 75\"",
-      "v": 24929703,
-      "u": 539
-     },
-     {
-      "sku": "ESC-001",
-      "n": "Escalera Naku ESC-001 de Aluminio Multipropósito 12 Escalones - 8 Posiciones",
-      "v": 24618017,
-      "u": 230
+      "v": 49571979,
+      "u": 1080
      },
      {
       "sku": "SS-1032M",
       "n": "Soporte Hidráulico Monitor 13-32\" VESA 75x100",
-      "v": 19214534,
-      "u": 478
+      "v": 40820323,
+      "u": 1044
+     },
+     {
+      "sku": "MC-002",
+      "n": "Máquina de Coser MC-002 Mini 12 Puntadas con Pedal y Luz LED",
+      "v": 34717712,
+      "u": 752
+     },
+     {
+      "sku": "ESC-001",
+      "n": "Escalera Naku ESC-001 de Aluminio Multipropósito 12 Escalones - 8 Posiciones",
+      "v": 33974214,
+      "u": 318
      },
      {
       "sku": "SS-C024D",
       "n": "Soporte Doble Monitor Hidráulico SS-C024D 13-32\"",
-      "v": 15243523,
-      "u": 223
+      "v": 30028228,
+      "u": 443
      },
      {
       "sku": "SH-443XWL",
       "n": "Soporte Articulado Naku SH-443XWL de Pared Para TV de 32\" a 80\"",
-      "v": 11146489,
-      "u": 174
+      "v": 20224063,
+      "u": 313
      },
      {
       "sku": "SH-446",
       "n": "Soporte Articulado Naku SH-446 de Pared Para TV de 32\" a 75\"",
-      "v": 10570680,
-      "u": 242
+      "v": 19212375,
+      "u": 436
+     },
+     {
+      "sku": "SM-C024",
+      "n": "Soporte Articulado Naku SM-C024 de Mesa Para Monitores de 13\" a 32\"",
+      "v": 15146650,
+      "u": 420
      },
      {
       "sku": "SE-446",
       "n": "Soporte Articulado Naku SE-446 de Pared Para TV de 20\" a 75\"",
-      "v": 10296325,
-      "u": 261
+      "v": 14993213,
+      "u": 384
      },
      {
       "sku": "SM-C012",
       "n": "Soporte Brazo Articulado Naku SM-C012 de Mesa Para Monitor de 13\" a 32\"",
-      "v": 8984252,
-      "u": 348
-     },
-     {
-      "sku": "SM-C024",
-      "n": "Soporte Articulado Naku SM-C024 de Mesa Para Monitores de 13\" a 32\"",
-      "v": 6801446,
-      "u": 188
+      "v": 14532331,
+      "u": 558
      }
     ],
     "familias": [
      {
       "n": "Móviles con Brazo",
-      "v": 24.8
+      "v": 25.3
      },
      {
       "n": "Monitor",
-      "v": 20
+      "v": 21.8
      },
      {
       "n": "Herramientas y equipamiento",
-      "v": 11.9
-     },
-     {
-      "n": "Máquinas de coser",
-      "v": 9.3
+      "v": 8.9
      },
      {
       "n": "Escritorios ergonómicos",
-      "v": 6.8
+      "v": 7.2
+     },
+     {
+      "n": "Máquinas de coser",
+      "v": 6.7
      },
      {
       "n": "Comercio",
-      "v": 5.9
-     },
-     {
-      "n": "Organización de ropa",
-      "v": 4.5
-     },
-     {
-      "n": "Exterior y aire libre",
-      "v": 2.5
-     },
-     {
-      "n": "Sin familia asignada",
-      "v": 2.2
-     },
-     {
-      "n": "Rack y Stand TV",
-      "v": 2.1
-     },
-     {
-      "n": "Resto de familias",
-      "v": 10
-     }
-    ],
-    "provincias": [
-     {
-      "n": "Buenos Aires",
-      "v": 48.5
-     },
-     {
-      "n": "Capital Federal",
-      "v": 16
-     },
-     {
-      "n": "Córdoba",
-      "v": 7.5
-     },
-     {
-      "n": "Santa Fe",
       "v": 6.1
      },
      {
-      "n": "Mendoza",
-      "v": 3
-     },
-     {
-      "n": "Neuquén",
-      "v": 2.3
-     },
-     {
-      "n": "Resto del país",
-      "v": 16.5
-     }
-    ],
-    "envios": [
-     {
-      "n": "Flex",
-      "v": 3169
-     },
-     {
-      "n": "Full",
-      "v": 1292
-     },
-     {
-      "n": "Colecta",
-      "v": 1196
-     },
-     {
-      "n": "Envío a domicilio",
-      "v": 94
-     },
-     {
-      "n": "Correo/Andreani",
-      "v": 83
-     },
-     {
-      "n": "Retiro/Acuerdo",
-      "v": 35
-     }
-    ],
-    "dias": [
-     {
-      "d": 1,
-      "ml": 21530917,
-      "tn": 1209115,
-      "v": 22740032,
-      "ordenes": 483
-     },
-     {
-      "d": 2,
-      "ml": 22259880,
-      "tn": 1376437,
-      "v": 23636318,
-      "ordenes": 498
-     },
-     {
-      "d": 3,
-      "ml": 17891331,
-      "tn": 1244536,
-      "v": 19135867,
-      "ordenes": 403
-     },
-     {
-      "d": 4,
-      "ml": 10884911,
-      "tn": 932224,
-      "v": 11817135,
-      "ordenes": 265
-     },
-     {
-      "d": 5,
-      "ml": 11478083,
-      "tn": 830825,
-      "v": 12308908,
-      "ordenes": 268
-     },
-     {
-      "d": 6,
-      "ml": 21714164,
-      "tn": 805368,
-      "v": 22519531,
-      "ordenes": 496
-     },
-     {
-      "d": 7,
-      "ml": 16231796,
-      "tn": 818702,
-      "v": 17050498,
-      "ordenes": 339
-     },
-     {
-      "d": 8,
-      "ml": 14937236,
-      "tn": 928133,
-      "v": 15865369,
-      "ordenes": 350
-     },
-     {
-      "d": 9,
-      "ml": 17281016,
-      "tn": 324793,
-      "v": 17605808,
-      "ordenes": 360
-     },
-     {
-      "d": 10,
-      "ml": 22737183,
-      "tn": 1737510,
-      "v": 24474693,
-      "ordenes": 563
-     },
-     {
-      "d": 11,
-      "ml": 15279585,
-      "tn": 586691,
-      "v": 15866276,
-      "ordenes": 336
-     },
-     {
-      "d": 12,
-      "ml": 13826333,
-      "tn": 714459,
-      "v": 14540791,
-      "ordenes": 344
-     },
-     {
-      "d": 13,
-      "ml": 25422272,
-      "tn": 1444947,
-      "v": 26867219,
-      "ordenes": 606
-     },
-     {
-      "d": 14,
-      "ml": 21927085,
-      "tn": 969237,
-      "v": 22896322,
-      "ordenes": 504
-     },
-     {
-      "d": 15,
-      "ml": 11778864,
-      "tn": 1436067,
-      "v": 13214931,
-      "ordenes": 273
-     }
-    ],
-    "neto": 219308745
-   },
-   "q2": {
-    "eerr": {
-     "lineas": [
-      {
-       "c": "Ventas brutas",
-       "v": 244655671.38842976,
-       "pct": 97.9,
-       "tipo": "normal"
-      },
-      {
-       "c": "Bonificaciones de plataforma",
-       "v": 7078164.4628099175,
-       "pct": 2.8,
-       "tipo": "normal"
-      },
-      {
-       "c": "Anulaciones y reembolsos",
-       "v": -232686.40495867768,
-       "pct": -0.1,
-       "tipo": "normal"
-      },
-      {
-       "c": "Descuentos y cupones",
-       "v": -1618854.3636363638,
-       "pct": -0.6,
-       "tipo": "normal"
-      },
-      {
-       "c": "Ventas netas",
-       "v": 249882295.08264464,
-       "pct": 100,
-       "tipo": "total"
-      },
-      {
-       "c": "Costo de la mercadería",
-       "v": -110904655.80500016,
-       "pct": -44.4,
-       "tipo": "gasto"
-      },
-      {
-       "c": "Margen bruto",
-       "v": 138977639.2776445,
-       "pct": 55.6,
-       "tipo": "destacado"
-      },
-      {
-       "c": "Comisiones de plataforma",
-       "v": -41424646.35537189,
-       "pct": -16.6,
-       "tipo": "gasto"
-      },
-      {
-       "c": "Envíos (neto de lo cobrado)",
-       "v": -12242089.256198343,
-       "pct": -4.9,
-       "tipo": "gasto"
-      },
-      {
-       "c": "Impuestos de plataforma",
-       "v": -2759365.3884297544,
-       "pct": -1.1,
-       "tipo": "gasto"
-      },
-      {
-       "c": "Resultado de contribución",
-       "v": 82551538.27764449,
-       "pct": 33,
-       "tipo": "destacado"
-      }
-     ],
-     "ordenes": 5297,
-     "unidades": 5881,
-     "ticket": 47174.3052827345,
-     "netoLiquidado": 191859433.4710743,
-     "canceladas": 257,
-     "cobertura": 96.5,
-     "sinCosto": [
-      {
-       "sku": "GZB-002R",
-       "facturacion": 4451972,
-       "lineas": 28
-      },
-      {
-       "sku": "VP-001N",
-       "facturacion": 418000,
-       "lineas": 19
-      },
-      {
-       "sku": "VP-001B",
-       "facturacion": 245860,
-       "lineas": 14
-      },
-      {
-       "sku": "GZB-002 R",
-       "facturacion": 158999,
-       "lineas": 1
-      },
-      {
-       "sku": "VP-002N",
-       "facturacion": 41000,
-       "lineas": 2
-      },
-      {
-       "sku": "VP-002B",
-       "facturacion": 20500,
-       "lineas": 2
-      }
-     ],
-     "faltan": [
-      "Marketing y publicidad",
-      "Estructura y sueldos",
-      "Impuestos propios (IIBB, IVA)",
-      "Amortizaciones",
-      "Resultados financieros"
-     ]
-    },
-    "gastos": [
-     {
-      "n": "Costo de la mercadería",
-      "v": 44.4
-     },
-     {
-      "n": "Comisiones de plataforma",
-      "v": 16.6
-     },
-     {
-      "n": "Envíos y logística",
-      "v": 4.9
-     },
-     {
-      "n": "Impuestos de plataforma",
-      "v": 1.1
-     }
-    ],
-    "productos": [
-     {
-      "sku": "SP-446",
-      "n": "Soporte Articulado Naku SP-446 de Pared Para TV de 32\" a 75\"",
-      "v": 24642277,
-      "u": 541
-     },
-     {
-      "sku": "SS-1032M",
-      "n": "Soporte Hidráulico Monitor 13-32\" VESA 75x100",
-      "v": 21605790,
-      "u": 566
-     },
-     {
-      "sku": "SS-C024D",
-      "n": "Soporte Doble Monitor Hidráulico SS-C024D 13-32\"",
-      "v": 14784705,
-      "u": 220
-     },
-     {
-      "sku": "ESC-001",
-      "n": "Escalera Naku ESC-001 de Aluminio Multipropósito 12 Escalones - 8 Posiciones",
-      "v": 9356198,
-      "u": 88
-     },
-     {
-      "sku": "SH-443XWL",
-      "n": "Soporte Articulado Naku SH-443XWL de Pared Para TV de 32\" a 80\"",
-      "v": 9077574,
-      "u": 139
-     },
-     {
-      "sku": "MC-002",
-      "n": "Máquina de Coser MC-002 Mini 12 Puntadas con Pedal y Luz LED",
-      "v": 8700821,
-      "u": 188
-     },
-     {
-      "sku": "SH-446",
-      "n": "Soporte Articulado Naku SH-446 de Pared Para TV de 32\" a 75\"",
-      "v": 8641695,
-      "u": 194
-     },
-     {
-      "sku": "SM-C024",
-      "n": "Soporte Articulado Naku SM-C024 de Mesa Para Monitores de 13\" a 32\"",
-      "v": 8345204,
-      "u": 232
-     },
-     {
-      "sku": "22D-BEL NEGRO (MODELO ELECTRICO)",
-      "n": "Escritorio Eléctrico Sit-Stand 135x60 Negro",
-      "v": 6194206,
-      "u": 23
-     },
-     {
-      "sku": "SM-C012",
-      "n": "Soporte Brazo Articulado Naku SM-C012 de Mesa Para Monitor de 13\" a 32\"",
-      "v": 5548079,
-      "u": 210
-     }
-    ],
-    "familias": [
-     {
-      "n": "Móviles con Brazo",
-      "v": 26
-     },
-     {
-      "n": "Monitor",
-      "v": 23.8
-     },
-     {
-      "n": "Escritorios ergonómicos",
-      "v": 7.6
-     },
-     {
-      "n": "Comercio",
-      "v": 6.4
+      "n": "Organización de ropa",
+      "v": 4.6
      },
      {
       "n": "Exterior y aire libre",
-      "v": 5.5
-     },
-     {
-      "n": "Herramientas y equipamiento",
-      "v": 5.4
-     },
-     {
-      "n": "Organización de ropa",
-      "v": 4.7
-     },
-     {
-      "n": "Máquinas de coser",
-      "v": 3.6
-     },
-     {
-      "n": "Organizadores multiuso",
-      "v": 3
+      "v": 3.9
      },
      {
       "n": "Rack y Stand TV",
-      "v": 2.8
+      "v": 2.4
+     },
+     {
+      "n": "Sin familia asignada",
+      "v": 1.9
      },
      {
       "n": "Resto de familias",
@@ -1253,260 +893,430 @@
     "provincias": [
      {
       "n": "Buenos Aires",
-      "v": 46.3
+      "v": 47.5
      },
      {
       "n": "Capital Federal",
-      "v": 19.7
+      "v": 17.7
      },
      {
       "n": "Córdoba",
-      "v": 7.4
+      "v": 7.5
      },
      {
       "n": "Santa Fe",
-      "v": 6.9
+      "v": 6.5
      },
      {
       "n": "Mendoza",
       "v": 3.1
      },
      {
-      "n": "Entre Ríos",
-      "v": 2
+      "n": "Neuquén",
+      "v": 2.1
      },
      {
       "n": "Resto del país",
-      "v": 14.6
+      "v": 15.7
      }
     ],
     "envios": [
      {
       "n": "Flex",
-      "v": 2853
+      "v": 6022
      },
      {
       "n": "Full",
-      "v": 1233
+      "v": 2525
      },
      {
       "n": "Colecta",
-      "v": 907
+      "v": 2103
      },
      {
       "n": "Envío a domicilio",
-      "v": 85
+      "v": 179
      },
      {
       "n": "Correo/Andreani",
-      "v": 55
+      "v": 138
      },
      {
       "n": "Retiro/Acuerdo",
-      "v": 31
+      "v": 66
      }
     ],
-    "dias": [
+    "puntos": [
+     {
+      "d": 1,
+      "ml": 21530917,
+      "tn": 1209115,
+      "v": 22740032,
+      "ordenes": 483,
+      "etiqueta": "1"
+     },
+     {
+      "d": 2,
+      "ml": 22259880,
+      "tn": 1376437,
+      "v": 23636318,
+      "ordenes": 498,
+      "etiqueta": "2"
+     },
+     {
+      "d": 3,
+      "ml": 17891331,
+      "tn": 1244536,
+      "v": 19135867,
+      "ordenes": 403,
+      "etiqueta": "3"
+     },
+     {
+      "d": 4,
+      "ml": 10884911,
+      "tn": 932224,
+      "v": 11817135,
+      "ordenes": 265,
+      "etiqueta": "4"
+     },
+     {
+      "d": 5,
+      "ml": 11478083,
+      "tn": 830825,
+      "v": 12308908,
+      "ordenes": 268,
+      "etiqueta": "5"
+     },
+     {
+      "d": 6,
+      "ml": 21714164,
+      "tn": 805368,
+      "v": 22519531,
+      "ordenes": 496,
+      "etiqueta": "6"
+     },
+     {
+      "d": 7,
+      "ml": 16231796,
+      "tn": 818702,
+      "v": 17050498,
+      "ordenes": 339,
+      "etiqueta": "7"
+     },
+     {
+      "d": 8,
+      "ml": 14937236,
+      "tn": 928133,
+      "v": 15865369,
+      "ordenes": 350,
+      "etiqueta": "8"
+     },
+     {
+      "d": 9,
+      "ml": 17281016,
+      "tn": 324793,
+      "v": 17605808,
+      "ordenes": 360,
+      "etiqueta": "9"
+     },
+     {
+      "d": 10,
+      "ml": 22737183,
+      "tn": 1737510,
+      "v": 24474693,
+      "ordenes": 563,
+      "etiqueta": "10"
+     },
+     {
+      "d": 11,
+      "ml": 15279585,
+      "tn": 586691,
+      "v": 15866276,
+      "ordenes": 336,
+      "etiqueta": "11"
+     },
+     {
+      "d": 12,
+      "ml": 13826333,
+      "tn": 714459,
+      "v": 14540791,
+      "ordenes": 344,
+      "etiqueta": "12"
+     },
+     {
+      "d": 13,
+      "ml": 25422272,
+      "tn": 1444947,
+      "v": 26867219,
+      "ordenes": 606,
+      "etiqueta": "13"
+     },
+     {
+      "d": 14,
+      "ml": 21927085,
+      "tn": 969237,
+      "v": 22896322,
+      "ordenes": 504,
+      "etiqueta": "14"
+     },
+     {
+      "d": 15,
+      "ml": 11778864,
+      "tn": 1436067,
+      "v": 13214931,
+      "ordenes": 273,
+      "etiqueta": "15"
+     },
      {
       "d": 16,
       "ml": 13096836,
       "tn": 1576852,
       "v": 14673688,
-      "ordenes": 327
+      "ordenes": 327,
+      "etiqueta": "16"
      },
      {
       "d": 17,
       "ml": 15687369,
       "tn": 571483,
       "v": 16258851,
-      "ordenes": 326
+      "ordenes": 326,
+      "etiqueta": "17"
      },
      {
       "d": 18,
       "ml": 10387095,
       "tn": 234707,
       "v": 10621802,
-      "ordenes": 243
+      "ordenes": 243,
+      "etiqueta": "18"
      },
      {
       "d": 19,
       "ml": 8912090,
       "tn": 67272,
       "v": 8979362,
-      "ordenes": 199
+      "ordenes": 199,
+      "etiqueta": "19"
      },
      {
       "d": 20,
       "ml": 15876839,
       "tn": 1940736,
       "v": 17817575,
-      "ordenes": 345
+      "ordenes": 345,
+      "etiqueta": "20"
      },
      {
       "d": 21,
       "ml": 17032952,
       "tn": 672349,
       "v": 17705301,
-      "ordenes": 377
+      "ordenes": 377,
+      "etiqueta": "21"
      },
      {
       "d": 22,
       "ml": 20084570,
       "tn": 693220,
       "v": 20777790,
-      "ordenes": 427
+      "ordenes": 427,
+      "etiqueta": "22"
      },
      {
       "d": 23,
       "ml": 16372190,
       "tn": 1168008,
       "v": 17540198,
-      "ordenes": 371
+      "ordenes": 371,
+      "etiqueta": "23"
      },
      {
       "d": 24,
       "ml": 15823382,
       "tn": 507332,
       "v": 16330714,
-      "ordenes": 344
+      "ordenes": 344,
+      "etiqueta": "24"
      },
      {
       "d": 25,
       "ml": 10329865,
       "tn": 1054950,
       "v": 11384814,
-      "ordenes": 242
+      "ordenes": 242,
+      "etiqueta": "25"
      },
      {
       "d": 26,
       "ml": 8983931,
       "tn": 507844,
       "v": 9491775,
-      "ordenes": 211
+      "ordenes": 211,
+      "etiqueta": "26"
      },
      {
       "d": 27,
       "ml": 15191028,
       "tn": 647517,
       "v": 15838545,
-      "ordenes": 393
+      "ordenes": 393,
+      "etiqueta": "27"
      },
      {
       "d": 28,
       "ml": 17640884,
       "tn": 1756026,
       "v": 19396910,
-      "ordenes": 412
+      "ordenes": 412,
+      "etiqueta": "28"
      },
      {
       "d": 29,
       "ml": 15497512,
       "tn": 807508,
       "v": 16305021,
-      "ordenes": 379
+      "ordenes": 379,
+      "etiqueta": "29"
      },
      {
       "d": 30,
       "ml": 13208078,
       "tn": 716756,
       "v": 13924834,
-      "ordenes": 331
+      "ordenes": 331,
+      "etiqueta": "30"
      },
      {
       "d": 31,
       "ml": 14695292,
       "tn": 956022,
       "v": 15651314,
-      "ordenes": 370
+      "ordenes": 370,
+      "etiqueta": "31"
      }
     ],
-    "neto": 191859433
+    "granularidad": "dia",
+    "meses": [
+     "2026-07"
+    ],
+    "neto": 411168178
    },
-   "u7": {
+   "anio": {
     "eerr": {
      "lineas": [
       {
        "c": "Ventas brutas",
-       "v": 102937481.00826445,
-       "pct": 97.4,
+       "v": 527380992.11570233,
+       "pct": 98,
        "tipo": "normal"
       },
       {
        "c": "Bonificaciones de plataforma",
-       "v": 3553104.9586776863,
-       "pct": 3.4,
+       "v": 14648273.760330578,
+       "pct": 2.7,
        "tipo": "normal"
       },
       {
        "c": "Anulaciones y reembolsos",
-       "v": -23111.636363636364,
-       "pct": 0,
+       "v": -633986.0991735538,
+       "pct": -0.1,
        "tipo": "normal"
       },
       {
        "c": "Descuentos y cupones",
-       "v": -789467.0413223141,
-       "pct": -0.7,
+       "v": -3334618.925619835,
+       "pct": -0.6,
        "tipo": "normal"
       },
       {
        "c": "Ventas netas",
-       "v": 105678007.28925617,
+       "v": 538060660.8512396,
        "pct": 100,
        "tipo": "total"
       },
       {
        "c": "Costo de la mercadería",
-       "v": -46422187.89500007,
-       "pct": -43.9,
+       "v": -239984502.7650002,
+       "pct": -44.6,
        "tipo": "gasto"
       },
       {
        "c": "Margen bruto",
-       "v": 59255819.3942561,
-       "pct": 56.1,
+       "v": 298076158.08623934,
+       "pct": 55.4,
        "tipo": "destacado"
       },
       {
        "c": "Comisiones de plataforma",
-       "v": -17469024.983471066,
-       "pct": -16.5,
+       "v": -90271064.67768595,
+       "pct": -16.8,
        "tipo": "gasto"
       },
       {
        "c": "Envíos (neto de lo cobrado)",
-       "v": -3967095.8677685945,
-       "pct": -3.8,
+       "v": -27625768.090909097,
+       "pct": -5.1,
        "tipo": "gasto"
       },
       {
        "c": "Impuestos de plataforma",
-       "v": -1140053.23140496,
+       "v": -5889423.975206614,
        "pct": -1.1,
        "tipo": "gasto"
       },
       {
        "c": "Resultado de contribución",
-       "v": 36679645.31161148,
-       "pct": 34.7,
+       "v": 174289901.34243768,
+       "pct": 32.4,
        "tipo": "destacado"
       }
      ],
-     "ordenes": 2338,
-     "unidades": 2599,
-     "ticket": 45200.1742041301,
-     "netoLiquidado": 82017521.52892561,
-     "canceladas": 93,
-     "cobertura": 95.8,
+     "ordenes": 11385,
+     "unidades": 12574,
+     "ticket": 47260.488436648186,
+     "netoLiquidado": 411168178.14049596,
+     "canceladas": 634,
+     "cobertura": 96.7,
      "sinCosto": [
       {
        "sku": "GZB-002R",
-       "facturacion": 2861982,
+       "facturacion": 6230971,
+       "lineas": 38
+      },
+      {
+       "sku": "VP-001N",
+       "facturacion": 1159000,
+       "lineas": 54
+      },
+      {
+       "sku": "VP-001B",
+       "facturacion": 735870,
+       "lineas": 39
+      },
+      {
+       "sku": "VP-002B",
+       "facturacion": 287000,
        "lineas": 18
       },
       {
        "sku": "GZB-002 R",
        "facturacion": 158999,
+       "lineas": 1
+      },
+      {
+       "sku": "VP-002N",
+       "facturacion": 142956,
+       "lineas": 8
+      },
+      {
+       "sku": "SP-46B",
+       "facturacion": 62697,
+       "lineas": 1
+      },
+      {
+       "sku": "S-504A",
+       "facturacion": 30800,
        "lineas": 1
       }
      ],
@@ -1521,15 +1331,15 @@
     "gastos": [
      {
       "n": "Costo de la mercadería",
-      "v": 43.9
+      "v": 44.6
      },
      {
       "n": "Comisiones de plataforma",
-      "v": 16.5
+      "v": 16.8
      },
      {
       "n": "Envíos y logística",
-      "v": 3.8
+      "v": 5.1
      },
      {
       "n": "Impuestos de plataforma",
@@ -1540,222 +1350,1553 @@
      {
       "sku": "SP-446",
       "n": "Soporte Articulado Naku SP-446 de Pared Para TV de 32\" a 75\"",
-      "v": 8844353,
-      "u": 194
+      "v": 49571979,
+      "u": 1080
      },
      {
       "sku": "SS-1032M",
       "n": "Soporte Hidráulico Monitor 13-32\" VESA 75x100",
-      "v": 8798879,
-      "u": 230
+      "v": 40820323,
+      "u": 1044
      },
      {
-      "sku": "SH-446",
-      "n": "Soporte Articulado Naku SH-446 de Pared Para TV de 32\" a 75\"",
-      "v": 7858146,
-      "u": 176
-     },
-     {
-      "sku": "SS-C024D",
-      "n": "Soporte Doble Monitor Hidráulico SS-C024D 13-32\"",
-      "v": 6499217,
-      "u": 97
-     },
-     {
-      "sku": "SH-443XWL",
-      "n": "Soporte Articulado Naku SH-443XWL de Pared Para TV de 32\" a 80\"",
-      "v": 4034661,
-      "u": 61
-     },
-     {
-      "sku": "SM-C024",
-      "n": "Soporte Articulado Naku SM-C024 de Mesa Para Monitores de 13\" a 32\"",
-      "v": 3226364,
-      "u": 88
-     },
-     {
-      "sku": "GZB-002R",
-      "n": "Gazebo Con Paredes Impermeable 3x3 Plegable Naku Alta Calidad Rojo",
-      "v": 2365274,
-      "u": 18
-     },
-     {
-      "sku": "SM-C012",
-      "n": "Soporte Brazo Articulado Naku SM-C012 de Mesa Para Monitor de 13\" a 32\"",
-      "v": 2277025,
-      "u": 87
+      "sku": "MC-002",
+      "n": "Máquina de Coser MC-002 Mini 12 Puntadas con Pedal y Luz LED",
+      "v": 34717712,
+      "u": 752
      },
      {
       "sku": "ESC-001",
       "n": "Escalera Naku ESC-001 de Aluminio Multipropósito 12 Escalones - 8 Posiciones",
-      "v": 2250412,
-      "u": 21
+      "v": 33974214,
+      "u": 318
      },
      {
-      "sku": "SB-200",
-      "n": "Selladora Cortadora SB-200 20cm Regulador Repuesto",
-      "v": 2000000,
-      "u": 131
+      "sku": "SS-C024D",
+      "n": "Soporte Doble Monitor Hidráulico SS-C024D 13-32\"",
+      "v": 30028228,
+      "u": 443
+     },
+     {
+      "sku": "SH-443XWL",
+      "n": "Soporte Articulado Naku SH-443XWL de Pared Para TV de 32\" a 80\"",
+      "v": 20224063,
+      "u": 313
+     },
+     {
+      "sku": "SH-446",
+      "n": "Soporte Articulado Naku SH-446 de Pared Para TV de 32\" a 75\"",
+      "v": 19212375,
+      "u": 436
+     },
+     {
+      "sku": "SM-C024",
+      "n": "Soporte Articulado Naku SM-C024 de Mesa Para Monitores de 13\" a 32\"",
+      "v": 15146650,
+      "u": 420
+     },
+     {
+      "sku": "SE-446",
+      "n": "Soporte Articulado Naku SE-446 de Pared Para TV de 20\" a 75\"",
+      "v": 14993213,
+      "u": 384
+     },
+     {
+      "sku": "SM-C012",
+      "n": "Soporte Brazo Articulado Naku SM-C012 de Mesa Para Monitor de 13\" a 32\"",
+      "v": 14532331,
+      "u": 558
      }
     ],
     "familias": [
      {
       "n": "Móviles con Brazo",
-      "v": 24.4
+      "v": 25.3
      },
      {
       "n": "Monitor",
-      "v": 23.5
-     },
-     {
-      "n": "Comercio",
-      "v": 6.9
-     },
-     {
-      "n": "Exterior y aire libre",
-      "v": 6.6
-     },
-     {
-      "n": "Organizadores multiuso",
-      "v": 5.8
-     },
-     {
-      "n": "Escritorios ergonómicos",
-      "v": 5
-     },
-     {
-      "n": "Organización de ropa",
-      "v": 4.4
+      "v": 21.8
      },
      {
       "n": "Herramientas y equipamiento",
-      "v": 4
+      "v": 8.9
+     },
+     {
+      "n": "Escritorios ergonómicos",
+      "v": 7.2
+     },
+     {
+      "n": "Máquinas de coser",
+      "v": 6.7
+     },
+     {
+      "n": "Comercio",
+      "v": 6.1
+     },
+     {
+      "n": "Organización de ropa",
+      "v": 4.6
+     },
+     {
+      "n": "Exterior y aire libre",
+      "v": 3.9
      },
      {
       "n": "Rack y Stand TV",
-      "v": 3.5
-     },
-     {
-      "n": "GZB",
       "v": 2.4
      },
      {
+      "n": "Sin familia asignada",
+      "v": 1.9
+     },
+     {
       "n": "Resto de familias",
-      "v": 13.4
+      "v": 11.2
      }
     ],
     "provincias": [
      {
       "n": "Buenos Aires",
-      "v": 49.2
+      "v": 47.5
      },
      {
       "n": "Capital Federal",
-      "v": 20.5
+      "v": 17.7
      },
      {
       "n": "Córdoba",
-      "v": 7.4
+      "v": 7.5
      },
      {
       "n": "Santa Fe",
-      "v": 6.4
+      "v": 6.5
      },
      {
       "n": "Mendoza",
-      "v": 2.8
+      "v": 3.1
      },
      {
       "n": "Neuquén",
-      "v": 2
+      "v": 2.1
      },
      {
       "n": "Resto del país",
-      "v": 11.6
+      "v": 15.7
      }
     ],
     "envios": [
      {
       "n": "Flex",
-      "v": 1386
-     },
-     {
-      "n": "Colecta",
-      "v": 424
+      "v": 6022
      },
      {
       "n": "Full",
-      "v": 375
+      "v": 2525
+     },
+     {
+      "n": "Colecta",
+      "v": 2103
      },
      {
       "n": "Envío a domicilio",
-      "v": 39
+      "v": 179
      },
      {
       "n": "Correo/Andreani",
-      "v": 31
+      "v": 138
      },
      {
       "n": "Retiro/Acuerdo",
-      "v": 17
+      "v": 66
      }
     ],
-    "dias": [
+    "puntos": [
+     {
+      "d": 1,
+      "ml": 21530917,
+      "tn": 1209115,
+      "v": 22740032,
+      "ordenes": 483,
+      "etiqueta": "1"
+     },
+     {
+      "d": 2,
+      "ml": 22259880,
+      "tn": 1376437,
+      "v": 23636318,
+      "ordenes": 498,
+      "etiqueta": "2"
+     },
+     {
+      "d": 3,
+      "ml": 17891331,
+      "tn": 1244536,
+      "v": 19135867,
+      "ordenes": 403,
+      "etiqueta": "3"
+     },
+     {
+      "d": 4,
+      "ml": 10884911,
+      "tn": 932224,
+      "v": 11817135,
+      "ordenes": 265,
+      "etiqueta": "4"
+     },
+     {
+      "d": 5,
+      "ml": 11478083,
+      "tn": 830825,
+      "v": 12308908,
+      "ordenes": 268,
+      "etiqueta": "5"
+     },
+     {
+      "d": 6,
+      "ml": 21714164,
+      "tn": 805368,
+      "v": 22519531,
+      "ordenes": 496,
+      "etiqueta": "6"
+     },
+     {
+      "d": 7,
+      "ml": 16231796,
+      "tn": 818702,
+      "v": 17050498,
+      "ordenes": 339,
+      "etiqueta": "7"
+     },
+     {
+      "d": 8,
+      "ml": 14937236,
+      "tn": 928133,
+      "v": 15865369,
+      "ordenes": 350,
+      "etiqueta": "8"
+     },
+     {
+      "d": 9,
+      "ml": 17281016,
+      "tn": 324793,
+      "v": 17605808,
+      "ordenes": 360,
+      "etiqueta": "9"
+     },
+     {
+      "d": 10,
+      "ml": 22737183,
+      "tn": 1737510,
+      "v": 24474693,
+      "ordenes": 563,
+      "etiqueta": "10"
+     },
+     {
+      "d": 11,
+      "ml": 15279585,
+      "tn": 586691,
+      "v": 15866276,
+      "ordenes": 336,
+      "etiqueta": "11"
+     },
+     {
+      "d": 12,
+      "ml": 13826333,
+      "tn": 714459,
+      "v": 14540791,
+      "ordenes": 344,
+      "etiqueta": "12"
+     },
+     {
+      "d": 13,
+      "ml": 25422272,
+      "tn": 1444947,
+      "v": 26867219,
+      "ordenes": 606,
+      "etiqueta": "13"
+     },
+     {
+      "d": 14,
+      "ml": 21927085,
+      "tn": 969237,
+      "v": 22896322,
+      "ordenes": 504,
+      "etiqueta": "14"
+     },
+     {
+      "d": 15,
+      "ml": 11778864,
+      "tn": 1436067,
+      "v": 13214931,
+      "ordenes": 273,
+      "etiqueta": "15"
+     },
+     {
+      "d": 16,
+      "ml": 13096836,
+      "tn": 1576852,
+      "v": 14673688,
+      "ordenes": 327,
+      "etiqueta": "16"
+     },
+     {
+      "d": 17,
+      "ml": 15687369,
+      "tn": 571483,
+      "v": 16258851,
+      "ordenes": 326,
+      "etiqueta": "17"
+     },
+     {
+      "d": 18,
+      "ml": 10387095,
+      "tn": 234707,
+      "v": 10621802,
+      "ordenes": 243,
+      "etiqueta": "18"
+     },
+     {
+      "d": 19,
+      "ml": 8912090,
+      "tn": 67272,
+      "v": 8979362,
+      "ordenes": 199,
+      "etiqueta": "19"
+     },
+     {
+      "d": 20,
+      "ml": 15876839,
+      "tn": 1940736,
+      "v": 17817575,
+      "ordenes": 345,
+      "etiqueta": "20"
+     },
+     {
+      "d": 21,
+      "ml": 17032952,
+      "tn": 672349,
+      "v": 17705301,
+      "ordenes": 377,
+      "etiqueta": "21"
+     },
+     {
+      "d": 22,
+      "ml": 20084570,
+      "tn": 693220,
+      "v": 20777790,
+      "ordenes": 427,
+      "etiqueta": "22"
+     },
+     {
+      "d": 23,
+      "ml": 16372190,
+      "tn": 1168008,
+      "v": 17540198,
+      "ordenes": 371,
+      "etiqueta": "23"
+     },
+     {
+      "d": 24,
+      "ml": 15823382,
+      "tn": 507332,
+      "v": 16330714,
+      "ordenes": 344,
+      "etiqueta": "24"
+     },
      {
       "d": 25,
       "ml": 10329865,
       "tn": 1054950,
       "v": 11384814,
-      "ordenes": 242
+      "ordenes": 242,
+      "etiqueta": "25"
      },
      {
       "d": 26,
       "ml": 8983931,
       "tn": 507844,
       "v": 9491775,
-      "ordenes": 211
+      "ordenes": 211,
+      "etiqueta": "26"
      },
      {
       "d": 27,
       "ml": 15191028,
       "tn": 647517,
       "v": 15838545,
-      "ordenes": 393
+      "ordenes": 393,
+      "etiqueta": "27"
      },
      {
       "d": 28,
       "ml": 17640884,
       "tn": 1756026,
       "v": 19396910,
-      "ordenes": 412
+      "ordenes": 412,
+      "etiqueta": "28"
      },
      {
       "d": 29,
       "ml": 15497512,
       "tn": 807508,
       "v": 16305021,
-      "ordenes": 379
+      "ordenes": 379,
+      "etiqueta": "29"
      },
      {
       "d": 30,
       "ml": 13208078,
       "tn": 716756,
       "v": 13924834,
-      "ordenes": 331
+      "ordenes": 331,
+      "etiqueta": "30"
      },
      {
       "d": 31,
       "ml": 14695292,
       "tn": 956022,
       "v": 15651314,
-      "ordenes": 370
+      "ordenes": 370,
+      "etiqueta": "31"
      }
     ],
-    "neto": 82017522
+    "granularidad": "dia",
+    "meses": [
+     "2026-07"
+    ],
+    "neto": 411168178
+   },
+   "rango": {
+    "eerr": {
+     "lineas": [
+      {
+       "c": "Ventas brutas",
+       "v": 527380992.11570233,
+       "pct": 98,
+       "tipo": "normal"
+      },
+      {
+       "c": "Bonificaciones de plataforma",
+       "v": 14648273.760330578,
+       "pct": 2.7,
+       "tipo": "normal"
+      },
+      {
+       "c": "Anulaciones y reembolsos",
+       "v": -633986.0991735538,
+       "pct": -0.1,
+       "tipo": "normal"
+      },
+      {
+       "c": "Descuentos y cupones",
+       "v": -3334618.925619835,
+       "pct": -0.6,
+       "tipo": "normal"
+      },
+      {
+       "c": "Ventas netas",
+       "v": 538060660.8512396,
+       "pct": 100,
+       "tipo": "total"
+      },
+      {
+       "c": "Costo de la mercadería",
+       "v": -239984502.7650002,
+       "pct": -44.6,
+       "tipo": "gasto"
+      },
+      {
+       "c": "Margen bruto",
+       "v": 298076158.08623934,
+       "pct": 55.4,
+       "tipo": "destacado"
+      },
+      {
+       "c": "Comisiones de plataforma",
+       "v": -90271064.67768595,
+       "pct": -16.8,
+       "tipo": "gasto"
+      },
+      {
+       "c": "Envíos (neto de lo cobrado)",
+       "v": -27625768.090909097,
+       "pct": -5.1,
+       "tipo": "gasto"
+      },
+      {
+       "c": "Impuestos de plataforma",
+       "v": -5889423.975206614,
+       "pct": -1.1,
+       "tipo": "gasto"
+      },
+      {
+       "c": "Resultado de contribución",
+       "v": 174289901.34243768,
+       "pct": 32.4,
+       "tipo": "destacado"
+      }
+     ],
+     "ordenes": 11385,
+     "unidades": 12574,
+     "ticket": 47260.488436648186,
+     "netoLiquidado": 411168178.14049596,
+     "canceladas": 634,
+     "cobertura": 96.7,
+     "sinCosto": [
+      {
+       "sku": "GZB-002R",
+       "facturacion": 6230971,
+       "lineas": 38
+      },
+      {
+       "sku": "VP-001N",
+       "facturacion": 1159000,
+       "lineas": 54
+      },
+      {
+       "sku": "VP-001B",
+       "facturacion": 735870,
+       "lineas": 39
+      },
+      {
+       "sku": "VP-002B",
+       "facturacion": 287000,
+       "lineas": 18
+      },
+      {
+       "sku": "GZB-002 R",
+       "facturacion": 158999,
+       "lineas": 1
+      },
+      {
+       "sku": "VP-002N",
+       "facturacion": 142956,
+       "lineas": 8
+      },
+      {
+       "sku": "SP-46B",
+       "facturacion": 62697,
+       "lineas": 1
+      },
+      {
+       "sku": "S-504A",
+       "facturacion": 30800,
+       "lineas": 1
+      }
+     ],
+     "faltan": [
+      "Marketing y publicidad",
+      "Estructura y sueldos",
+      "Impuestos propios (IIBB, IVA)",
+      "Amortizaciones",
+      "Resultados financieros"
+     ]
+    },
+    "gastos": [
+     {
+      "n": "Costo de la mercadería",
+      "v": 44.6
+     },
+     {
+      "n": "Comisiones de plataforma",
+      "v": 16.8
+     },
+     {
+      "n": "Envíos y logística",
+      "v": 5.1
+     },
+     {
+      "n": "Impuestos de plataforma",
+      "v": 1.1
+     }
+    ],
+    "productos": [
+     {
+      "sku": "SP-446",
+      "n": "Soporte Articulado Naku SP-446 de Pared Para TV de 32\" a 75\"",
+      "v": 49571979,
+      "u": 1080
+     },
+     {
+      "sku": "SS-1032M",
+      "n": "Soporte Hidráulico Monitor 13-32\" VESA 75x100",
+      "v": 40820323,
+      "u": 1044
+     },
+     {
+      "sku": "MC-002",
+      "n": "Máquina de Coser MC-002 Mini 12 Puntadas con Pedal y Luz LED",
+      "v": 34717712,
+      "u": 752
+     },
+     {
+      "sku": "ESC-001",
+      "n": "Escalera Naku ESC-001 de Aluminio Multipropósito 12 Escalones - 8 Posiciones",
+      "v": 33974214,
+      "u": 318
+     },
+     {
+      "sku": "SS-C024D",
+      "n": "Soporte Doble Monitor Hidráulico SS-C024D 13-32\"",
+      "v": 30028228,
+      "u": 443
+     },
+     {
+      "sku": "SH-443XWL",
+      "n": "Soporte Articulado Naku SH-443XWL de Pared Para TV de 32\" a 80\"",
+      "v": 20224063,
+      "u": 313
+     },
+     {
+      "sku": "SH-446",
+      "n": "Soporte Articulado Naku SH-446 de Pared Para TV de 32\" a 75\"",
+      "v": 19212375,
+      "u": 436
+     },
+     {
+      "sku": "SM-C024",
+      "n": "Soporte Articulado Naku SM-C024 de Mesa Para Monitores de 13\" a 32\"",
+      "v": 15146650,
+      "u": 420
+     },
+     {
+      "sku": "SE-446",
+      "n": "Soporte Articulado Naku SE-446 de Pared Para TV de 20\" a 75\"",
+      "v": 14993213,
+      "u": 384
+     },
+     {
+      "sku": "SM-C012",
+      "n": "Soporte Brazo Articulado Naku SM-C012 de Mesa Para Monitor de 13\" a 32\"",
+      "v": 14532331,
+      "u": 558
+     }
+    ],
+    "familias": [
+     {
+      "n": "Móviles con Brazo",
+      "v": 25.3
+     },
+     {
+      "n": "Monitor",
+      "v": 21.8
+     },
+     {
+      "n": "Herramientas y equipamiento",
+      "v": 8.9
+     },
+     {
+      "n": "Escritorios ergonómicos",
+      "v": 7.2
+     },
+     {
+      "n": "Máquinas de coser",
+      "v": 6.7
+     },
+     {
+      "n": "Comercio",
+      "v": 6.1
+     },
+     {
+      "n": "Organización de ropa",
+      "v": 4.6
+     },
+     {
+      "n": "Exterior y aire libre",
+      "v": 3.9
+     },
+     {
+      "n": "Rack y Stand TV",
+      "v": 2.4
+     },
+     {
+      "n": "Sin familia asignada",
+      "v": 1.9
+     },
+     {
+      "n": "Resto de familias",
+      "v": 11.2
+     }
+    ],
+    "provincias": [
+     {
+      "n": "Buenos Aires",
+      "v": 47.5
+     },
+     {
+      "n": "Capital Federal",
+      "v": 17.7
+     },
+     {
+      "n": "Córdoba",
+      "v": 7.5
+     },
+     {
+      "n": "Santa Fe",
+      "v": 6.5
+     },
+     {
+      "n": "Mendoza",
+      "v": 3.1
+     },
+     {
+      "n": "Neuquén",
+      "v": 2.1
+     },
+     {
+      "n": "Resto del país",
+      "v": 15.7
+     }
+    ],
+    "envios": [
+     {
+      "n": "Flex",
+      "v": 6022
+     },
+     {
+      "n": "Full",
+      "v": 2525
+     },
+     {
+      "n": "Colecta",
+      "v": 2103
+     },
+     {
+      "n": "Envío a domicilio",
+      "v": 179
+     },
+     {
+      "n": "Correo/Andreani",
+      "v": 138
+     },
+     {
+      "n": "Retiro/Acuerdo",
+      "v": 66
+     }
+    ],
+    "puntos": [
+     {
+      "d": 1,
+      "ml": 21530917,
+      "tn": 1209115,
+      "v": 22740032,
+      "ordenes": 483,
+      "etiqueta": "1"
+     },
+     {
+      "d": 2,
+      "ml": 22259880,
+      "tn": 1376437,
+      "v": 23636318,
+      "ordenes": 498,
+      "etiqueta": "2"
+     },
+     {
+      "d": 3,
+      "ml": 17891331,
+      "tn": 1244536,
+      "v": 19135867,
+      "ordenes": 403,
+      "etiqueta": "3"
+     },
+     {
+      "d": 4,
+      "ml": 10884911,
+      "tn": 932224,
+      "v": 11817135,
+      "ordenes": 265,
+      "etiqueta": "4"
+     },
+     {
+      "d": 5,
+      "ml": 11478083,
+      "tn": 830825,
+      "v": 12308908,
+      "ordenes": 268,
+      "etiqueta": "5"
+     },
+     {
+      "d": 6,
+      "ml": 21714164,
+      "tn": 805368,
+      "v": 22519531,
+      "ordenes": 496,
+      "etiqueta": "6"
+     },
+     {
+      "d": 7,
+      "ml": 16231796,
+      "tn": 818702,
+      "v": 17050498,
+      "ordenes": 339,
+      "etiqueta": "7"
+     },
+     {
+      "d": 8,
+      "ml": 14937236,
+      "tn": 928133,
+      "v": 15865369,
+      "ordenes": 350,
+      "etiqueta": "8"
+     },
+     {
+      "d": 9,
+      "ml": 17281016,
+      "tn": 324793,
+      "v": 17605808,
+      "ordenes": 360,
+      "etiqueta": "9"
+     },
+     {
+      "d": 10,
+      "ml": 22737183,
+      "tn": 1737510,
+      "v": 24474693,
+      "ordenes": 563,
+      "etiqueta": "10"
+     },
+     {
+      "d": 11,
+      "ml": 15279585,
+      "tn": 586691,
+      "v": 15866276,
+      "ordenes": 336,
+      "etiqueta": "11"
+     },
+     {
+      "d": 12,
+      "ml": 13826333,
+      "tn": 714459,
+      "v": 14540791,
+      "ordenes": 344,
+      "etiqueta": "12"
+     },
+     {
+      "d": 13,
+      "ml": 25422272,
+      "tn": 1444947,
+      "v": 26867219,
+      "ordenes": 606,
+      "etiqueta": "13"
+     },
+     {
+      "d": 14,
+      "ml": 21927085,
+      "tn": 969237,
+      "v": 22896322,
+      "ordenes": 504,
+      "etiqueta": "14"
+     },
+     {
+      "d": 15,
+      "ml": 11778864,
+      "tn": 1436067,
+      "v": 13214931,
+      "ordenes": 273,
+      "etiqueta": "15"
+     },
+     {
+      "d": 16,
+      "ml": 13096836,
+      "tn": 1576852,
+      "v": 14673688,
+      "ordenes": 327,
+      "etiqueta": "16"
+     },
+     {
+      "d": 17,
+      "ml": 15687369,
+      "tn": 571483,
+      "v": 16258851,
+      "ordenes": 326,
+      "etiqueta": "17"
+     },
+     {
+      "d": 18,
+      "ml": 10387095,
+      "tn": 234707,
+      "v": 10621802,
+      "ordenes": 243,
+      "etiqueta": "18"
+     },
+     {
+      "d": 19,
+      "ml": 8912090,
+      "tn": 67272,
+      "v": 8979362,
+      "ordenes": 199,
+      "etiqueta": "19"
+     },
+     {
+      "d": 20,
+      "ml": 15876839,
+      "tn": 1940736,
+      "v": 17817575,
+      "ordenes": 345,
+      "etiqueta": "20"
+     },
+     {
+      "d": 21,
+      "ml": 17032952,
+      "tn": 672349,
+      "v": 17705301,
+      "ordenes": 377,
+      "etiqueta": "21"
+     },
+     {
+      "d": 22,
+      "ml": 20084570,
+      "tn": 693220,
+      "v": 20777790,
+      "ordenes": 427,
+      "etiqueta": "22"
+     },
+     {
+      "d": 23,
+      "ml": 16372190,
+      "tn": 1168008,
+      "v": 17540198,
+      "ordenes": 371,
+      "etiqueta": "23"
+     },
+     {
+      "d": 24,
+      "ml": 15823382,
+      "tn": 507332,
+      "v": 16330714,
+      "ordenes": 344,
+      "etiqueta": "24"
+     },
+     {
+      "d": 25,
+      "ml": 10329865,
+      "tn": 1054950,
+      "v": 11384814,
+      "ordenes": 242,
+      "etiqueta": "25"
+     },
+     {
+      "d": 26,
+      "ml": 8983931,
+      "tn": 507844,
+      "v": 9491775,
+      "ordenes": 211,
+      "etiqueta": "26"
+     },
+     {
+      "d": 27,
+      "ml": 15191028,
+      "tn": 647517,
+      "v": 15838545,
+      "ordenes": 393,
+      "etiqueta": "27"
+     },
+     {
+      "d": 28,
+      "ml": 17640884,
+      "tn": 1756026,
+      "v": 19396910,
+      "ordenes": 412,
+      "etiqueta": "28"
+     },
+     {
+      "d": 29,
+      "ml": 15497512,
+      "tn": 807508,
+      "v": 16305021,
+      "ordenes": 379,
+      "etiqueta": "29"
+     },
+     {
+      "d": 30,
+      "ml": 13208078,
+      "tn": 716756,
+      "v": 13924834,
+      "ordenes": 331,
+      "etiqueta": "30"
+     },
+     {
+      "d": 31,
+      "ml": 14695292,
+      "tn": 956022,
+      "v": 15651314,
+      "ordenes": 370,
+      "etiqueta": "31"
+     }
+    ],
+    "granularidad": "dia",
+    "meses": [
+     "2026-07"
+    ],
+    "neto": 411168178
+   },
+   "mes:2026-07": {
+    "eerr": {
+     "lineas": [
+      {
+       "c": "Ventas brutas",
+       "v": 527380992.11570233,
+       "pct": 98,
+       "tipo": "normal"
+      },
+      {
+       "c": "Bonificaciones de plataforma",
+       "v": 14648273.760330578,
+       "pct": 2.7,
+       "tipo": "normal"
+      },
+      {
+       "c": "Anulaciones y reembolsos",
+       "v": -633986.0991735538,
+       "pct": -0.1,
+       "tipo": "normal"
+      },
+      {
+       "c": "Descuentos y cupones",
+       "v": -3334618.925619835,
+       "pct": -0.6,
+       "tipo": "normal"
+      },
+      {
+       "c": "Ventas netas",
+       "v": 538060660.8512396,
+       "pct": 100,
+       "tipo": "total"
+      },
+      {
+       "c": "Costo de la mercadería",
+       "v": -239984502.7650002,
+       "pct": -44.6,
+       "tipo": "gasto"
+      },
+      {
+       "c": "Margen bruto",
+       "v": 298076158.08623934,
+       "pct": 55.4,
+       "tipo": "destacado"
+      },
+      {
+       "c": "Comisiones de plataforma",
+       "v": -90271064.67768595,
+       "pct": -16.8,
+       "tipo": "gasto"
+      },
+      {
+       "c": "Envíos (neto de lo cobrado)",
+       "v": -27625768.090909097,
+       "pct": -5.1,
+       "tipo": "gasto"
+      },
+      {
+       "c": "Impuestos de plataforma",
+       "v": -5889423.975206614,
+       "pct": -1.1,
+       "tipo": "gasto"
+      },
+      {
+       "c": "Resultado de contribución",
+       "v": 174289901.34243768,
+       "pct": 32.4,
+       "tipo": "destacado"
+      }
+     ],
+     "ordenes": 11385,
+     "unidades": 12574,
+     "ticket": 47260.488436648186,
+     "netoLiquidado": 411168178.14049596,
+     "canceladas": 634,
+     "cobertura": 96.7,
+     "sinCosto": [
+      {
+       "sku": "GZB-002R",
+       "facturacion": 6230971,
+       "lineas": 38
+      },
+      {
+       "sku": "VP-001N",
+       "facturacion": 1159000,
+       "lineas": 54
+      },
+      {
+       "sku": "VP-001B",
+       "facturacion": 735870,
+       "lineas": 39
+      },
+      {
+       "sku": "VP-002B",
+       "facturacion": 287000,
+       "lineas": 18
+      },
+      {
+       "sku": "GZB-002 R",
+       "facturacion": 158999,
+       "lineas": 1
+      },
+      {
+       "sku": "VP-002N",
+       "facturacion": 142956,
+       "lineas": 8
+      },
+      {
+       "sku": "SP-46B",
+       "facturacion": 62697,
+       "lineas": 1
+      },
+      {
+       "sku": "S-504A",
+       "facturacion": 30800,
+       "lineas": 1
+      }
+     ],
+     "faltan": [
+      "Marketing y publicidad",
+      "Estructura y sueldos",
+      "Impuestos propios (IIBB, IVA)",
+      "Amortizaciones",
+      "Resultados financieros"
+     ]
+    },
+    "gastos": [
+     {
+      "n": "Costo de la mercadería",
+      "v": 44.6
+     },
+     {
+      "n": "Comisiones de plataforma",
+      "v": 16.8
+     },
+     {
+      "n": "Envíos y logística",
+      "v": 5.1
+     },
+     {
+      "n": "Impuestos de plataforma",
+      "v": 1.1
+     }
+    ],
+    "productos": [
+     {
+      "sku": "SP-446",
+      "n": "Soporte Articulado Naku SP-446 de Pared Para TV de 32\" a 75\"",
+      "v": 49571979,
+      "u": 1080
+     },
+     {
+      "sku": "SS-1032M",
+      "n": "Soporte Hidráulico Monitor 13-32\" VESA 75x100",
+      "v": 40820323,
+      "u": 1044
+     },
+     {
+      "sku": "MC-002",
+      "n": "Máquina de Coser MC-002 Mini 12 Puntadas con Pedal y Luz LED",
+      "v": 34717712,
+      "u": 752
+     },
+     {
+      "sku": "ESC-001",
+      "n": "Escalera Naku ESC-001 de Aluminio Multipropósito 12 Escalones - 8 Posiciones",
+      "v": 33974214,
+      "u": 318
+     },
+     {
+      "sku": "SS-C024D",
+      "n": "Soporte Doble Monitor Hidráulico SS-C024D 13-32\"",
+      "v": 30028228,
+      "u": 443
+     },
+     {
+      "sku": "SH-443XWL",
+      "n": "Soporte Articulado Naku SH-443XWL de Pared Para TV de 32\" a 80\"",
+      "v": 20224063,
+      "u": 313
+     },
+     {
+      "sku": "SH-446",
+      "n": "Soporte Articulado Naku SH-446 de Pared Para TV de 32\" a 75\"",
+      "v": 19212375,
+      "u": 436
+     },
+     {
+      "sku": "SM-C024",
+      "n": "Soporte Articulado Naku SM-C024 de Mesa Para Monitores de 13\" a 32\"",
+      "v": 15146650,
+      "u": 420
+     },
+     {
+      "sku": "SE-446",
+      "n": "Soporte Articulado Naku SE-446 de Pared Para TV de 20\" a 75\"",
+      "v": 14993213,
+      "u": 384
+     },
+     {
+      "sku": "SM-C012",
+      "n": "Soporte Brazo Articulado Naku SM-C012 de Mesa Para Monitor de 13\" a 32\"",
+      "v": 14532331,
+      "u": 558
+     }
+    ],
+    "familias": [
+     {
+      "n": "Móviles con Brazo",
+      "v": 25.3
+     },
+     {
+      "n": "Monitor",
+      "v": 21.8
+     },
+     {
+      "n": "Herramientas y equipamiento",
+      "v": 8.9
+     },
+     {
+      "n": "Escritorios ergonómicos",
+      "v": 7.2
+     },
+     {
+      "n": "Máquinas de coser",
+      "v": 6.7
+     },
+     {
+      "n": "Comercio",
+      "v": 6.1
+     },
+     {
+      "n": "Organización de ropa",
+      "v": 4.6
+     },
+     {
+      "n": "Exterior y aire libre",
+      "v": 3.9
+     },
+     {
+      "n": "Rack y Stand TV",
+      "v": 2.4
+     },
+     {
+      "n": "Sin familia asignada",
+      "v": 1.9
+     },
+     {
+      "n": "Resto de familias",
+      "v": 11.2
+     }
+    ],
+    "provincias": [
+     {
+      "n": "Buenos Aires",
+      "v": 47.5
+     },
+     {
+      "n": "Capital Federal",
+      "v": 17.7
+     },
+     {
+      "n": "Córdoba",
+      "v": 7.5
+     },
+     {
+      "n": "Santa Fe",
+      "v": 6.5
+     },
+     {
+      "n": "Mendoza",
+      "v": 3.1
+     },
+     {
+      "n": "Neuquén",
+      "v": 2.1
+     },
+     {
+      "n": "Resto del país",
+      "v": 15.7
+     }
+    ],
+    "envios": [
+     {
+      "n": "Flex",
+      "v": 6022
+     },
+     {
+      "n": "Full",
+      "v": 2525
+     },
+     {
+      "n": "Colecta",
+      "v": 2103
+     },
+     {
+      "n": "Envío a domicilio",
+      "v": 179
+     },
+     {
+      "n": "Correo/Andreani",
+      "v": 138
+     },
+     {
+      "n": "Retiro/Acuerdo",
+      "v": 66
+     }
+    ],
+    "puntos": [
+     {
+      "d": 1,
+      "ml": 21530917,
+      "tn": 1209115,
+      "v": 22740032,
+      "ordenes": 483,
+      "etiqueta": "1"
+     },
+     {
+      "d": 2,
+      "ml": 22259880,
+      "tn": 1376437,
+      "v": 23636318,
+      "ordenes": 498,
+      "etiqueta": "2"
+     },
+     {
+      "d": 3,
+      "ml": 17891331,
+      "tn": 1244536,
+      "v": 19135867,
+      "ordenes": 403,
+      "etiqueta": "3"
+     },
+     {
+      "d": 4,
+      "ml": 10884911,
+      "tn": 932224,
+      "v": 11817135,
+      "ordenes": 265,
+      "etiqueta": "4"
+     },
+     {
+      "d": 5,
+      "ml": 11478083,
+      "tn": 830825,
+      "v": 12308908,
+      "ordenes": 268,
+      "etiqueta": "5"
+     },
+     {
+      "d": 6,
+      "ml": 21714164,
+      "tn": 805368,
+      "v": 22519531,
+      "ordenes": 496,
+      "etiqueta": "6"
+     },
+     {
+      "d": 7,
+      "ml": 16231796,
+      "tn": 818702,
+      "v": 17050498,
+      "ordenes": 339,
+      "etiqueta": "7"
+     },
+     {
+      "d": 8,
+      "ml": 14937236,
+      "tn": 928133,
+      "v": 15865369,
+      "ordenes": 350,
+      "etiqueta": "8"
+     },
+     {
+      "d": 9,
+      "ml": 17281016,
+      "tn": 324793,
+      "v": 17605808,
+      "ordenes": 360,
+      "etiqueta": "9"
+     },
+     {
+      "d": 10,
+      "ml": 22737183,
+      "tn": 1737510,
+      "v": 24474693,
+      "ordenes": 563,
+      "etiqueta": "10"
+     },
+     {
+      "d": 11,
+      "ml": 15279585,
+      "tn": 586691,
+      "v": 15866276,
+      "ordenes": 336,
+      "etiqueta": "11"
+     },
+     {
+      "d": 12,
+      "ml": 13826333,
+      "tn": 714459,
+      "v": 14540791,
+      "ordenes": 344,
+      "etiqueta": "12"
+     },
+     {
+      "d": 13,
+      "ml": 25422272,
+      "tn": 1444947,
+      "v": 26867219,
+      "ordenes": 606,
+      "etiqueta": "13"
+     },
+     {
+      "d": 14,
+      "ml": 21927085,
+      "tn": 969237,
+      "v": 22896322,
+      "ordenes": 504,
+      "etiqueta": "14"
+     },
+     {
+      "d": 15,
+      "ml": 11778864,
+      "tn": 1436067,
+      "v": 13214931,
+      "ordenes": 273,
+      "etiqueta": "15"
+     },
+     {
+      "d": 16,
+      "ml": 13096836,
+      "tn": 1576852,
+      "v": 14673688,
+      "ordenes": 327,
+      "etiqueta": "16"
+     },
+     {
+      "d": 17,
+      "ml": 15687369,
+      "tn": 571483,
+      "v": 16258851,
+      "ordenes": 326,
+      "etiqueta": "17"
+     },
+     {
+      "d": 18,
+      "ml": 10387095,
+      "tn": 234707,
+      "v": 10621802,
+      "ordenes": 243,
+      "etiqueta": "18"
+     },
+     {
+      "d": 19,
+      "ml": 8912090,
+      "tn": 67272,
+      "v": 8979362,
+      "ordenes": 199,
+      "etiqueta": "19"
+     },
+     {
+      "d": 20,
+      "ml": 15876839,
+      "tn": 1940736,
+      "v": 17817575,
+      "ordenes": 345,
+      "etiqueta": "20"
+     },
+     {
+      "d": 21,
+      "ml": 17032952,
+      "tn": 672349,
+      "v": 17705301,
+      "ordenes": 377,
+      "etiqueta": "21"
+     },
+     {
+      "d": 22,
+      "ml": 20084570,
+      "tn": 693220,
+      "v": 20777790,
+      "ordenes": 427,
+      "etiqueta": "22"
+     },
+     {
+      "d": 23,
+      "ml": 16372190,
+      "tn": 1168008,
+      "v": 17540198,
+      "ordenes": 371,
+      "etiqueta": "23"
+     },
+     {
+      "d": 24,
+      "ml": 15823382,
+      "tn": 507332,
+      "v": 16330714,
+      "ordenes": 344,
+      "etiqueta": "24"
+     },
+     {
+      "d": 25,
+      "ml": 10329865,
+      "tn": 1054950,
+      "v": 11384814,
+      "ordenes": 242,
+      "etiqueta": "25"
+     },
+     {
+      "d": 26,
+      "ml": 8983931,
+      "tn": 507844,
+      "v": 9491775,
+      "ordenes": 211,
+      "etiqueta": "26"
+     },
+     {
+      "d": 27,
+      "ml": 15191028,
+      "tn": 647517,
+      "v": 15838545,
+      "ordenes": 393,
+      "etiqueta": "27"
+     },
+     {
+      "d": 28,
+      "ml": 17640884,
+      "tn": 1756026,
+      "v": 19396910,
+      "ordenes": 412,
+      "etiqueta": "28"
+     },
+     {
+      "d": 29,
+      "ml": 15497512,
+      "tn": 807508,
+      "v": 16305021,
+      "ordenes": 379,
+      "etiqueta": "29"
+     },
+     {
+      "d": 30,
+      "ml": 13208078,
+      "tn": 716756,
+      "v": 13924834,
+      "ordenes": 331,
+      "etiqueta": "30"
+     },
+     {
+      "d": 31,
+      "ml": 14695292,
+      "tn": 956022,
+      "v": 15651314,
+      "ordenes": 370,
+      "etiqueta": "31"
+     }
+    ],
+    "granularidad": "dia",
+    "meses": [
+     "2026-07"
+    ],
+    "neto": 411168178
    }
   },
   "ml": {
-   "mes": {
+   "m3": {
     "eerr": {
      "lineas": [
       {
@@ -2045,245 +3186,280 @@
       "v": 14
      }
     ],
-    "dias": [
+    "puntos": [
      {
       "d": 1,
       "ml": 21530917,
       "tn": 0,
       "v": 21530917,
-      "ordenes": 464
+      "ordenes": 464,
+      "etiqueta": "1"
      },
      {
       "d": 2,
       "ml": 22259880,
       "tn": 0,
       "v": 22259880,
-      "ordenes": 484
+      "ordenes": 484,
+      "etiqueta": "2"
      },
      {
       "d": 3,
       "ml": 17891331,
       "tn": 0,
       "v": 17891331,
-      "ordenes": 389
+      "ordenes": 389,
+      "etiqueta": "3"
      },
      {
       "d": 4,
       "ml": 10884911,
       "tn": 0,
       "v": 10884911,
-      "ordenes": 254
+      "ordenes": 254,
+      "etiqueta": "4"
      },
      {
       "d": 5,
       "ml": 11478083,
       "tn": 0,
       "v": 11478083,
-      "ordenes": 257
+      "ordenes": 257,
+      "etiqueta": "5"
      },
      {
       "d": 6,
       "ml": 21714164,
       "tn": 0,
       "v": 21714164,
-      "ordenes": 482
+      "ordenes": 482,
+      "etiqueta": "6"
      },
      {
       "d": 7,
       "ml": 16231796,
       "tn": 0,
       "v": 16231796,
-      "ordenes": 326
+      "ordenes": 326,
+      "etiqueta": "7"
      },
      {
       "d": 8,
       "ml": 14937236,
       "tn": 0,
       "v": 14937236,
-      "ordenes": 332
+      "ordenes": 332,
+      "etiqueta": "8"
      },
      {
       "d": 9,
       "ml": 17281016,
       "tn": 0,
       "v": 17281016,
-      "ordenes": 351
+      "ordenes": 351,
+      "etiqueta": "9"
      },
      {
       "d": 10,
       "ml": 22737183,
       "tn": 0,
       "v": 22737183,
-      "ordenes": 546
+      "ordenes": 546,
+      "etiqueta": "10"
      },
      {
       "d": 11,
       "ml": 15279585,
       "tn": 0,
       "v": 15279585,
-      "ordenes": 327
+      "ordenes": 327,
+      "etiqueta": "11"
      },
      {
       "d": 12,
       "ml": 13826333,
       "tn": 0,
       "v": 13826333,
-      "ordenes": 334
+      "ordenes": 334,
+      "etiqueta": "12"
      },
      {
       "d": 13,
       "ml": 25422272,
       "tn": 0,
       "v": 25422272,
-      "ordenes": 583
+      "ordenes": 583,
+      "etiqueta": "13"
      },
      {
       "d": 14,
       "ml": 21927085,
       "tn": 0,
       "v": 21927085,
-      "ordenes": 493
+      "ordenes": 493,
+      "etiqueta": "14"
      },
      {
       "d": 15,
       "ml": 11778864,
       "tn": 0,
       "v": 11778864,
-      "ordenes": 257
+      "ordenes": 257,
+      "etiqueta": "15"
      },
      {
       "d": 16,
       "ml": 13096836,
       "tn": 0,
       "v": 13096836,
-      "ordenes": 313
+      "ordenes": 313,
+      "etiqueta": "16"
      },
      {
       "d": 17,
       "ml": 15687369,
       "tn": 0,
       "v": 15687369,
-      "ordenes": 320
+      "ordenes": 320,
+      "etiqueta": "17"
      },
      {
       "d": 18,
       "ml": 10387095,
       "tn": 0,
       "v": 10387095,
-      "ordenes": 239
+      "ordenes": 239,
+      "etiqueta": "18"
      },
      {
       "d": 19,
       "ml": 8912090,
       "tn": 0,
       "v": 8912090,
-      "ordenes": 198
+      "ordenes": 198,
+      "etiqueta": "19"
      },
      {
       "d": 20,
       "ml": 15876839,
       "tn": 0,
       "v": 15876839,
-      "ordenes": 329
+      "ordenes": 329,
+      "etiqueta": "20"
      },
      {
       "d": 21,
       "ml": 17032952,
       "tn": 0,
       "v": 17032952,
-      "ordenes": 365
+      "ordenes": 365,
+      "etiqueta": "21"
      },
      {
       "d": 22,
       "ml": 20084570,
       "tn": 0,
       "v": 20084570,
-      "ordenes": 420
+      "ordenes": 420,
+      "etiqueta": "22"
      },
      {
       "d": 23,
       "ml": 16372190,
       "tn": 0,
       "v": 16372190,
-      "ordenes": 359
+      "ordenes": 359,
+      "etiqueta": "23"
      },
      {
       "d": 24,
       "ml": 15823382,
       "tn": 0,
       "v": 15823382,
-      "ordenes": 337
+      "ordenes": 337,
+      "etiqueta": "24"
      },
      {
       "d": 25,
       "ml": 10329865,
       "tn": 0,
       "v": 10329865,
-      "ordenes": 230
+      "ordenes": 230,
+      "etiqueta": "25"
      },
      {
       "d": 26,
       "ml": 8983931,
       "tn": 0,
       "v": 8983931,
-      "ordenes": 205
+      "ordenes": 205,
+      "etiqueta": "26"
      },
      {
       "d": 27,
       "ml": 15191028,
       "tn": 0,
       "v": 15191028,
-      "ordenes": 383
+      "ordenes": 383,
+      "etiqueta": "27"
      },
      {
       "d": 28,
       "ml": 17640884,
       "tn": 0,
       "v": 17640884,
-      "ordenes": 399
+      "ordenes": 399,
+      "etiqueta": "28"
      },
      {
       "d": 29,
       "ml": 15497512,
       "tn": 0,
       "v": 15497512,
-      "ordenes": 367
+      "ordenes": 367,
+      "etiqueta": "29"
      },
      {
       "d": 30,
       "ml": 13208078,
       "tn": 0,
       "v": 13208078,
-      "ordenes": 321
+      "ordenes": 321,
+      "etiqueta": "30"
      },
      {
       "d": 31,
       "ml": 14695292,
       "tn": 0,
       "v": 14695292,
-      "ordenes": 352
+      "ordenes": 352,
+      "etiqueta": "31"
      }
+    ],
+    "granularidad": "dia",
+    "meses": [
+     "2026-07"
     ],
     "neto": 386038783
    },
-   "q1": {
+   "m6": {
     "eerr": {
      "lineas": [
       {
        "c": "Ventas brutas",
-       "v": 265180655.43801633,
-       "pct": 97.4,
+       "v": 494000567.3223138,
+       "pct": 97.2,
        "tipo": "normal"
       },
       {
        "c": "Bonificaciones de plataforma",
-       "v": 7570109.297520662,
-       "pct": 2.8,
+       "v": 14648273.760330578,
+       "pct": 2.9,
        "tipo": "normal"
       },
       {
        "c": "Anulaciones y reembolsos",
-       "v": -401299.69421487604,
+       "v": -633986.0991735538,
        "pct": -0.1,
        "tipo": "normal"
       },
@@ -2295,863 +3471,83 @@
       },
       {
        "c": "Ventas netas",
-       "v": 272349465.0413221,
+       "v": 508014854.9834708,
        "pct": 100,
        "tipo": "total"
       },
       {
        "c": "Costo de la mercadería",
-       "v": -121655485.74000002,
-       "pct": -44.7,
+       "v": -225844259.09000024,
+       "pct": -44.5,
        "tipo": "gasto"
       },
       {
        "c": "Margen bruto",
-       "v": 150693979.3013221,
-       "pct": 55.3,
+       "v": 282170595.8934705,
+       "pct": 55.5,
        "tipo": "destacado"
       },
       {
        "c": "Comisiones de plataforma",
-       "v": -47602110.57851241,
-       "pct": -17.5,
-       "tipo": "gasto"
-      },
-      {
-       "c": "Envíos (neto de lo cobrado)",
-       "v": -15383678.834710741,
-       "pct": -5.6,
-       "tipo": "gasto"
-      },
-      {
-       "c": "Impuestos de plataforma",
-       "v": -3007893.082644628,
-       "pct": -1.1,
-       "tipo": "gasto"
-      },
-      {
-       "c": "Resultado de contribución",
-       "v": 84700296.80545433,
-       "pct": 31.1,
-       "tipo": "destacado"
-      }
-     ],
-     "ordenes": 5879,
-     "unidades": 6455,
-     "ticket": 46325.814771444486,
-     "netoLiquidado": 206049091.01652902,
-     "canceladas": 374,
-     "cobertura": 96.7,
-     "sinCosto": [
-      {
-       "sku": "GZB-002R",
-       "facturacion": 1778999,
-       "lineas": 10
-      },
-      {
-       "sku": "VP-001N",
-       "facturacion": 741000,
-       "lineas": 35
-      },
-      {
-       "sku": "VP-001B",
-       "facturacion": 490010,
-       "lineas": 25
-      },
-      {
-       "sku": "VP-002B",
-       "facturacion": 266500,
-       "lineas": 16
-      },
-      {
-       "sku": "VP-002N",
-       "facturacion": 101956,
-       "lineas": 6
-      }
-     ],
-     "faltan": [
-      "Marketing y publicidad",
-      "Estructura y sueldos",
-      "Impuestos propios (IIBB, IVA)",
-      "Amortizaciones",
-      "Resultados financieros"
-     ]
-    },
-    "gastos": [
-     {
-      "n": "Costo de la mercadería",
-      "v": 44.7
-     },
-     {
-      "n": "Comisiones de plataforma",
-      "v": 17.5
-     },
-     {
-      "n": "Envíos y logística",
-      "v": 5.6
-     },
-     {
-      "n": "Impuestos de plataforma",
-      "v": 1.1
-     }
-    ],
-    "productos": [
-     {
-      "sku": "MC-002",
-      "n": "Máquina de Coser MC-002 Mini 12 Puntadas con Pedal y Luz LED",
-      "v": 25963173,
-      "u": 563
-     },
-     {
-      "sku": "ESC-001",
-      "n": "Escalera Naku ESC-001 de Aluminio Multipropósito 12 Escalones - 8 Posiciones",
-      "v": 24618017,
-      "u": 230
-     },
-     {
-      "sku": "SP-446",
-      "n": "Soporte Articulado Naku SP-446 de Pared Para TV de 32\" a 75\"",
-      "v": 23384248,
-      "u": 505
-     },
-     {
-      "sku": "SS-1032M",
-      "n": "Soporte Hidráulico Monitor 13-32\" VESA 75x100",
-      "v": 18644298,
-      "u": 463
-     },
-     {
-      "sku": "SS-C024D",
-      "n": "Soporte Doble Monitor Hidráulico SS-C024D 13-32\"",
-      "v": 14638075,
-      "u": 214
-     },
-     {
-      "sku": "SH-446",
-      "n": "Soporte Articulado Naku SH-446 de Pared Para TV de 32\" a 75\"",
-      "v": 10387209,
-      "u": 238
-     },
-     {
-      "sku": "SE-446",
-      "n": "Soporte Articulado Naku SE-446 de Pared Para TV de 20\" a 75\"",
-      "v": 9791377,
-      "u": 248
-     },
-     {
-      "sku": "SH-443XWL",
-      "n": "Soporte Articulado Naku SH-443XWL de Pared Para TV de 32\" a 80\"",
-      "v": 9341554,
-      "u": 146
-     },
-     {
-      "sku": "SM-C012",
-      "n": "Soporte Brazo Articulado Naku SM-C012 de Mesa Para Monitor de 13\" a 32\"",
-      "v": 8631855,
-      "u": 335
-     },
-     {
-      "sku": "SM-C024",
-      "n": "Soporte Articulado Naku SM-C024 de Mesa Para Monitores de 13\" a 32\"",
-      "v": 6801446,
-      "u": 188
-     }
-    ],
-    "familias": [
-     {
-      "n": "Móviles con Brazo",
-      "v": 24.5
-     },
-     {
-      "n": "Monitor",
-      "v": 20.5
-     },
-     {
-      "n": "Herramientas y equipamiento",
-      "v": 12.5
-     },
-     {
-      "n": "Máquinas de coser",
-      "v": 9.8
-     },
-     {
-      "n": "Comercio",
-      "v": 6.2
-     },
-     {
-      "n": "Escritorios ergonómicos",
-      "v": 5.5
-     },
-     {
-      "n": "Organización de ropa",
-      "v": 4.7
-     },
-     {
-      "n": "Sin familia asignada",
-      "v": 2.3
-     },
-     {
-      "n": "Exterior y aire libre",
-      "v": 2.3
-     },
-     {
-      "n": "Rack y Stand TV",
-      "v": 2.1
-     },
-     {
-      "n": "Resto de familias",
-      "v": 9.7
-     }
-    ],
-    "provincias": [
-     {
-      "n": "Buenos Aires",
-      "v": 50.7
-     },
-     {
-      "n": "Capital Federal",
-      "v": 16.2
-     },
-     {
-      "n": "Córdoba",
-      "v": 7.2
-     },
-     {
-      "n": "Santa Fe",
-      "v": 6.2
-     },
-     {
-      "n": "Mendoza",
-      "v": 3
-     },
-     {
-      "n": "Neuquén",
-      "v": 2.3
-     },
-     {
-      "n": "Resto del país",
-      "v": 14.5
-     }
-    ],
-    "envios": [
-     {
-      "n": "Flex",
-      "v": 3169
-     },
-     {
-      "n": "Full",
-      "v": 1292
-     },
-     {
-      "n": "Colecta",
-      "v": 1196
-     },
-     {
-      "n": "Retiro/Acuerdo",
-      "v": 3
-     }
-    ],
-    "dias": [
-     {
-      "d": 1,
-      "ml": 21530917,
-      "tn": 0,
-      "v": 21530917,
-      "ordenes": 464
-     },
-     {
-      "d": 2,
-      "ml": 22259880,
-      "tn": 0,
-      "v": 22259880,
-      "ordenes": 484
-     },
-     {
-      "d": 3,
-      "ml": 17891331,
-      "tn": 0,
-      "v": 17891331,
-      "ordenes": 389
-     },
-     {
-      "d": 4,
-      "ml": 10884911,
-      "tn": 0,
-      "v": 10884911,
-      "ordenes": 254
-     },
-     {
-      "d": 5,
-      "ml": 11478083,
-      "tn": 0,
-      "v": 11478083,
-      "ordenes": 257
-     },
-     {
-      "d": 6,
-      "ml": 21714164,
-      "tn": 0,
-      "v": 21714164,
-      "ordenes": 482
-     },
-     {
-      "d": 7,
-      "ml": 16231796,
-      "tn": 0,
-      "v": 16231796,
-      "ordenes": 326
-     },
-     {
-      "d": 8,
-      "ml": 14937236,
-      "tn": 0,
-      "v": 14937236,
-      "ordenes": 332
-     },
-     {
-      "d": 9,
-      "ml": 17281016,
-      "tn": 0,
-      "v": 17281016,
-      "ordenes": 351
-     },
-     {
-      "d": 10,
-      "ml": 22737183,
-      "tn": 0,
-      "v": 22737183,
-      "ordenes": 546
-     },
-     {
-      "d": 11,
-      "ml": 15279585,
-      "tn": 0,
-      "v": 15279585,
-      "ordenes": 327
-     },
-     {
-      "d": 12,
-      "ml": 13826333,
-      "tn": 0,
-      "v": 13826333,
-      "ordenes": 334
-     },
-     {
-      "d": 13,
-      "ml": 25422272,
-      "tn": 0,
-      "v": 25422272,
-      "ordenes": 583
-     },
-     {
-      "d": 14,
-      "ml": 21927085,
-      "tn": 0,
-      "v": 21927085,
-      "ordenes": 493
-     },
-     {
-      "d": 15,
-      "ml": 11778864,
-      "tn": 0,
-      "v": 11778864,
-      "ordenes": 257
-     }
-    ],
-    "neto": 206049091
-   },
-   "q2": {
-    "eerr": {
-     "lineas": [
-      {
-       "c": "Ventas brutas",
-       "v": 228819911.88429752,
-       "pct": 97.1,
-       "tipo": "normal"
-      },
-      {
-       "c": "Bonificaciones de plataforma",
-       "v": 7078164.4628099175,
-       "pct": 3,
-       "tipo": "normal"
-      },
-      {
-       "c": "Anulaciones y reembolsos",
-       "v": -232686.40495867768,
-       "pct": -0.1,
-       "tipo": "normal"
-      },
-      {
-       "c": "Descuentos y cupones",
-       "v": 0,
-       "pct": 0,
-       "tipo": "normal"
-      },
-      {
-       "c": "Ventas netas",
-       "v": 235665389.94214877,
-       "pct": 100,
-       "tipo": "total"
-      },
-      {
-       "c": "Costo de la mercadería",
-       "v": -104188773.35000014,
-       "pct": -44.2,
-       "tipo": "gasto"
-      },
-      {
-       "c": "Margen bruto",
-       "v": 131476616.59214863,
-       "pct": 55.8,
-       "tipo": "destacado"
-      },
-      {
-       "c": "Comisiones de plataforma",
-       "v": -40430806.31404958,
-       "pct": -17.2,
-       "tipo": "gasto"
-      },
-      {
-       "c": "Envíos (neto de lo cobrado)",
-       "v": -12242089.256198343,
-       "pct": -5.2,
-       "tipo": "gasto"
-      },
-      {
-       "c": "Impuestos de plataforma",
-       "v": -2648906.628099176,
-       "pct": -1.1,
-       "tipo": "gasto"
-      },
-      {
-       "c": "Resultado de contribución",
-       "v": 76154814.39380154,
-       "pct": 32.3,
-       "tipo": "destacado"
-      }
-     ],
-     "ordenes": 5137,
-     "unidades": 5689,
-     "ticket": 45876.073572542104,
-     "netoLiquidado": 179989691.55371898,
-     "canceladas": 256,
-     "cobertura": 96.3,
-     "sinCosto": [
-      {
-       "sku": "GZB-002R",
-       "facturacion": 4451972,
-       "lineas": 28
-      },
-      {
-       "sku": "VP-001N",
-       "facturacion": 418000,
-       "lineas": 19
-      },
-      {
-       "sku": "VP-001B",
-       "facturacion": 245860,
-       "lineas": 14
-      },
-      {
-       "sku": "GZB-002 R",
-       "facturacion": 158999,
-       "lineas": 1
-      },
-      {
-       "sku": "VP-002N",
-       "facturacion": 41000,
-       "lineas": 2
-      },
-      {
-       "sku": "VP-002B",
-       "facturacion": 20500,
-       "lineas": 2
-      }
-     ],
-     "faltan": [
-      "Marketing y publicidad",
-      "Estructura y sueldos",
-      "Impuestos propios (IIBB, IVA)",
-      "Amortizaciones",
-      "Resultados financieros"
-     ]
-    },
-    "gastos": [
-     {
-      "n": "Costo de la mercadería",
-      "v": 44.2
-     },
-     {
-      "n": "Comisiones de plataforma",
-      "v": 17.2
-     },
-     {
-      "n": "Envíos y logística",
-      "v": 5.2
-     },
-     {
-      "n": "Impuestos de plataforma",
-      "v": 1.1
-     }
-    ],
-    "productos": [
-     {
-      "sku": "SP-446",
-      "n": "Soporte Articulado Naku SP-446 de Pared Para TV de 32\" a 75\"",
-      "v": 24096822,
-      "u": 529
-     },
-     {
-      "sku": "SS-1032M",
-      "n": "Soporte Hidráulico Monitor 13-32\" VESA 75x100",
-      "v": 21187617,
-      "u": 555
-     },
-     {
-      "sku": "SS-C024D",
-      "n": "Soporte Doble Monitor Hidráulico SS-C024D 13-32\"",
-      "v": 14582889,
-      "u": 217
-     },
-     {
-      "sku": "ESC-001",
-      "n": "Escalera Naku ESC-001 de Aluminio Multipropósito 12 Escalones - 8 Posiciones",
-      "v": 9239669,
-      "u": 87
-     },
-     {
-      "sku": "MC-002",
-      "n": "Máquina de Coser MC-002 Mini 12 Puntadas con Pedal y Luz LED",
-      "v": 8700821,
-      "u": 188
-     },
-     {
-      "sku": "SH-446",
-      "n": "Soporte Articulado Naku SH-446 de Pared Para TV de 32\" a 75\"",
-      "v": 8504092,
-      "u": 191
-     },
-     {
-      "sku": "SM-C024",
-      "n": "Soporte Articulado Naku SM-C024 de Mesa Para Monitores de 13\" a 32\"",
-      "v": 8307187,
-      "u": 231
-     },
-     {
-      "sku": "SH-443XWL",
-      "n": "Soporte Articulado Naku SH-443XWL de Pared Para TV de 32\" a 80\"",
-      "v": 7588336,
-      "u": 116
-     },
-     {
-      "sku": "SM-C012",
-      "n": "Soporte Brazo Articulado Naku SM-C012 de Mesa Para Monitor de 13\" a 32\"",
-      "v": 5520972,
-      "u": 209
-     },
-     {
-      "sku": "SH-443",
-      "n": "Soporte Articulado Naku SH-443 de Pared Para TV de 32\" a 75\"",
-      "v": 4789502,
-      "u": 186
-     }
-    ],
-    "familias": [
-     {
-      "n": "Móviles con Brazo",
-      "v": 26
-     },
-     {
-      "n": "Monitor",
-      "v": 24.8
-     },
-     {
-      "n": "Comercio",
-      "v": 6.7
-     },
-     {
-      "n": "Herramientas y equipamiento",
-      "v": 5.6
-     },
-     {
-      "n": "Exterior y aire libre",
-      "v": 5.5
-     },
-     {
-      "n": "Escritorios ergonómicos",
-      "v": 5.4
-     },
-     {
-      "n": "Organización de ropa",
-      "v": 4.9
-     },
-     {
-      "n": "Máquinas de coser",
-      "v": 3.9
-     },
-     {
-      "n": "Rack y Stand TV",
-      "v": 3
-     },
-     {
-      "n": "Organizadores multiuso",
-      "v": 2.7
-     },
-     {
-      "n": "Resto de familias",
-      "v": 11.6
-     }
-    ],
-    "provincias": [
-     {
-      "n": "Buenos Aires",
-      "v": 48.4
-     },
-     {
-      "n": "Capital Federal",
-      "v": 19.6
-     },
-     {
-      "n": "Córdoba",
-      "v": 7.3
-     },
-     {
-      "n": "Santa Fe",
-      "v": 6.4
-     },
-     {
-      "n": "Mendoza",
-      "v": 3
-     },
-     {
-      "n": "Entre Ríos",
-      "v": 2
-     },
-     {
-      "n": "Resto del país",
-      "v": 13.3
-     }
-    ],
-    "envios": [
-     {
-      "n": "Flex",
-      "v": 2853
-     },
-     {
-      "n": "Full",
-      "v": 1233
-     },
-     {
-      "n": "Colecta",
-      "v": 907
-     },
-     {
-      "n": "Retiro/Acuerdo",
-      "v": 11
-     }
-    ],
-    "dias": [
-     {
-      "d": 16,
-      "ml": 13096836,
-      "tn": 0,
-      "v": 13096836,
-      "ordenes": 313
-     },
-     {
-      "d": 17,
-      "ml": 15687369,
-      "tn": 0,
-      "v": 15687369,
-      "ordenes": 320
-     },
-     {
-      "d": 18,
-      "ml": 10387095,
-      "tn": 0,
-      "v": 10387095,
-      "ordenes": 239
-     },
-     {
-      "d": 19,
-      "ml": 8912090,
-      "tn": 0,
-      "v": 8912090,
-      "ordenes": 198
-     },
-     {
-      "d": 20,
-      "ml": 15876839,
-      "tn": 0,
-      "v": 15876839,
-      "ordenes": 329
-     },
-     {
-      "d": 21,
-      "ml": 17032952,
-      "tn": 0,
-      "v": 17032952,
-      "ordenes": 365
-     },
-     {
-      "d": 22,
-      "ml": 20084570,
-      "tn": 0,
-      "v": 20084570,
-      "ordenes": 420
-     },
-     {
-      "d": 23,
-      "ml": 16372190,
-      "tn": 0,
-      "v": 16372190,
-      "ordenes": 359
-     },
-     {
-      "d": 24,
-      "ml": 15823382,
-      "tn": 0,
-      "v": 15823382,
-      "ordenes": 337
-     },
-     {
-      "d": 25,
-      "ml": 10329865,
-      "tn": 0,
-      "v": 10329865,
-      "ordenes": 230
-     },
-     {
-      "d": 26,
-      "ml": 8983931,
-      "tn": 0,
-      "v": 8983931,
-      "ordenes": 205
-     },
-     {
-      "d": 27,
-      "ml": 15191028,
-      "tn": 0,
-      "v": 15191028,
-      "ordenes": 383
-     },
-     {
-      "d": 28,
-      "ml": 17640884,
-      "tn": 0,
-      "v": 17640884,
-      "ordenes": 399
-     },
-     {
-      "d": 29,
-      "ml": 15497512,
-      "tn": 0,
-      "v": 15497512,
-      "ordenes": 367
-     },
-     {
-      "d": 30,
-      "ml": 13208078,
-      "tn": 0,
-      "v": 13208078,
-      "ordenes": 321
-     },
-     {
-      "d": 31,
-      "ml": 14695292,
-      "tn": 0,
-      "v": 14695292,
-      "ordenes": 352
-     }
-    ],
-    "neto": 179989692
-   },
-   "u7": {
-    "eerr": {
-     "lineas": [
-      {
-       "c": "Ventas brutas",
-       "v": 95546589.27272727,
-       "pct": 96.4,
-       "tipo": "normal"
-      },
-      {
-       "c": "Bonificaciones de plataforma",
-       "v": 3553104.9586776863,
-       "pct": 3.6,
-       "tipo": "normal"
-      },
-      {
-       "c": "Anulaciones y reembolsos",
-       "v": -23111.636363636364,
-       "pct": 0,
-       "tipo": "normal"
-      },
-      {
-       "c": "Descuentos y cupones",
-       "v": 0,
-       "pct": 0,
-       "tipo": "normal"
-      },
-      {
-       "c": "Ventas netas",
-       "v": 99076582.5950413,
-       "pct": 100,
-       "tipo": "total"
-      },
-      {
-       "c": "Costo de la mercadería",
-       "v": -43366236.250000075,
-       "pct": -43.8,
-       "tipo": "gasto"
-      },
-      {
-       "c": "Margen bruto",
-       "v": 55710346.34504123,
-       "pct": 56.2,
-       "tipo": "destacado"
-      },
-      {
-       "c": "Comisiones de plataforma",
-       "v": -17120580.17355371,
+       "v": -88032916.89256199,
        "pct": -17.3,
        "tipo": "gasto"
       },
       {
        "c": "Envíos (neto de lo cobrado)",
-       "v": -3967095.8677685945,
-       "pct": -4,
+       "v": -27625768.090909097,
+       "pct": -5.4,
        "tipo": "gasto"
       },
       {
        "c": "Impuestos de plataforma",
-       "v": -1090230.5289256212,
+       "v": -5656799.710743805,
        "pct": -1.1,
        "tipo": "gasto"
       },
       {
        "c": "Resultado de contribución",
-       "v": 33532439.774793312,
-       "pct": 33.8,
+       "v": 160855111.19925565,
+       "pct": 31.7,
        "tipo": "destacado"
       }
      ],
-     "ordenes": 2257,
-     "unidades": 2501,
-     "ticket": 43897.46681215831,
-     "netoLiquidado": 76756954.95867766,
-     "canceladas": 92,
-     "cobertura": 95.5,
+     "ordenes": 11016,
+     "unidades": 12144,
+     "ticket": 46116.09068477404,
+     "netoLiquidado": 386038782.570248,
+     "canceladas": 630,
+     "cobertura": 96.5,
      "sinCosto": [
       {
        "sku": "GZB-002R",
-       "facturacion": 2861982,
+       "facturacion": 6230971,
+       "lineas": 38
+      },
+      {
+       "sku": "VP-001N",
+       "facturacion": 1159000,
+       "lineas": 54
+      },
+      {
+       "sku": "VP-001B",
+       "facturacion": 735870,
+       "lineas": 39
+      },
+      {
+       "sku": "VP-002B",
+       "facturacion": 287000,
        "lineas": 18
       },
       {
        "sku": "GZB-002 R",
        "facturacion": 158999,
        "lineas": 1
+      },
+      {
+       "sku": "VP-002N",
+       "facturacion": 142956,
+       "lineas": 8
       }
      ],
      "faltan": [
@@ -3165,7 +3561,7 @@
     "gastos": [
      {
       "n": "Costo de la mercadería",
-      "v": 43.8
+      "v": 44.5
      },
      {
       "n": "Comisiones de plataforma",
@@ -3173,7 +3569,7 @@
      },
      {
       "n": "Envíos y logística",
-      "v": 4
+      "v": 5.4
      },
      {
       "n": "Impuestos de plataforma",
@@ -3182,216 +3578,2057 @@
     ],
     "productos": [
      {
-      "sku": "SS-1032M",
-      "n": "Soporte Hidráulico Monitor 13-32\" VESA 75x100",
-      "v": 8570785,
-      "u": 224
-     },
-     {
       "sku": "SP-446",
       "n": "Soporte Articulado Naku SP-446 de Pared Para TV de 32\" a 75\"",
-      "v": 8526171,
-      "u": 187
+      "v": 47481070,
+      "u": 1034
      },
      {
-      "sku": "SH-446",
-      "n": "Soporte Articulado Naku SH-446 de Pared Para TV de 32\" a 75\"",
-      "v": 7720543,
-      "u": 173
+      "sku": "SS-1032M",
+      "n": "Soporte Hidráulico Monitor 13-32\" VESA 75x100",
+      "v": 39831915,
+      "u": 1018
      },
      {
-      "sku": "SS-C024D",
-      "n": "Soporte Doble Monitor Hidráulico SS-C024D 13-32\"",
-      "v": 6431945,
-      "u": 96
-     },
-     {
-      "sku": "SH-443XWL",
-      "n": "Soporte Articulado Naku SH-443XWL de Pared Para TV de 32\" a 80\"",
-      "v": 3512354,
-      "u": 53
-     },
-     {
-      "sku": "SM-C024",
-      "n": "Soporte Articulado Naku SM-C024 de Mesa Para Monitores de 13\" a 32\"",
-      "v": 3226364,
-      "u": 88
-     },
-     {
-      "sku": "GZB-002R",
-      "n": "Gazebo Con Paredes Impermeable 3x3 Plegable Naku Alta Calidad Rojo",
-      "v": 2365274,
-      "u": 18
-     },
-     {
-      "sku": "SM-C012",
-      "n": "Soporte Brazo Articulado Naku SM-C012 de Mesa Para Monitor de 13\" a 32\"",
-      "v": 2277025,
-      "u": 87
+      "sku": "MC-002",
+      "n": "Máquina de Coser MC-002 Mini 12 Puntadas con Pedal y Luz LED",
+      "v": 34663994,
+      "u": 751
      },
      {
       "sku": "ESC-001",
       "n": "Escalera Naku ESC-001 de Aluminio Multipropósito 12 Escalones - 8 Posiciones",
-      "v": 2133884,
-      "u": 20
+      "v": 33857686,
+      "u": 317
      },
      {
-      "sku": "SB-200",
-      "n": "Selladora Cortadora SB-200 20cm Regulador Repuesto",
-      "v": 2000000,
-      "u": 131
+      "sku": "SS-C024D",
+      "n": "Soporte Doble Monitor Hidráulico SS-C024D 13-32\"",
+      "v": 29220965,
+      "u": 431
+     },
+     {
+      "sku": "SH-446",
+      "n": "Soporte Articulado Naku SH-446 de Pared Para TV de 32\" a 75\"",
+      "v": 18891301,
+      "u": 429
+     },
+     {
+      "sku": "SH-443XWL",
+      "n": "Soporte Articulado Naku SH-443XWL de Pared Para TV de 32\" a 80\"",
+      "v": 16929890,
+      "u": 262
+     },
+     {
+      "sku": "SM-C024",
+      "n": "Soporte Articulado Naku SM-C024 de Mesa Para Monitores de 13\" a 32\"",
+      "v": 15108633,
+      "u": 419
+     },
+     {
+      "sku": "SM-C012",
+      "n": "Soporte Brazo Articulado Naku SM-C012 de Mesa Para Monitor de 13\" a 32\"",
+      "v": 14152827,
+      "u": 544
+     },
+     {
+      "sku": "SE-446",
+      "n": "Soporte Articulado Naku SE-446 de Pared Para TV de 20\" a 75\"",
+      "v": 13905633,
+      "u": 356
      }
     ],
     "familias": [
      {
-      "n": "Monitor",
-      "v": 24.7
-     },
-     {
       "n": "Móviles con Brazo",
-      "v": 24.3
+      "v": 25.2
      },
      {
-      "n": "Comercio",
-      "v": 7.3
-     },
-     {
-      "n": "Exterior y aire libre",
-      "v": 6.2
-     },
-     {
-      "n": "Organizadores multiuso",
-      "v": 5.3
-     },
-     {
-      "n": "Organización de ropa",
-      "v": 4.4
+      "n": "Monitor",
+      "v": 22.5
      },
      {
       "n": "Herramientas y equipamiento",
-      "v": 4
+      "v": 9.3
      },
      {
-      "n": "Rack y Stand TV",
-      "v": 3.7
+      "n": "Máquinas de coser",
+      "v": 7.1
+     },
+     {
+      "n": "Comercio",
+      "v": 6.4
      },
      {
       "n": "Escritorios ergonómicos",
-      "v": 3.3
+      "v": 5.4
      },
      {
-      "n": "GZB",
-      "v": 2.6
+      "n": "Organización de ropa",
+      "v": 4.8
+     },
+     {
+      "n": "Exterior y aire libre",
+      "v": 3.8
+     },
+     {
+      "n": "Rack y Stand TV",
+      "v": 2.5
+     },
+     {
+      "n": "Sin familia asignada",
+      "v": 2
      },
      {
       "n": "Resto de familias",
-      "v": 14.1
+      "v": 11.1
      }
     ],
     "provincias": [
      {
       "n": "Buenos Aires",
-      "v": 51.3
+      "v": 49.6
      },
      {
       "n": "Capital Federal",
-      "v": 20.6
+      "v": 17.7
      },
      {
       "n": "Córdoba",
-      "v": 7.4
+      "v": 7.3
      },
      {
       "n": "Santa Fe",
-      "v": 5.5
+      "v": 6.3
      },
      {
       "n": "Mendoza",
-      "v": 2.5
+      "v": 3
      },
      {
       "n": "Neuquén",
-      "v": 2
+      "v": 2.1
      },
      {
       "n": "Resto del país",
-      "v": 10.7
+      "v": 13.9
      }
     ],
     "envios": [
      {
       "n": "Flex",
-      "v": 1386
-     },
-     {
-      "n": "Colecta",
-      "v": 424
+      "v": 6022
      },
      {
       "n": "Full",
-      "v": 375
+      "v": 2525
+     },
+     {
+      "n": "Colecta",
+      "v": 2103
      },
      {
       "n": "Retiro/Acuerdo",
-      "v": 6
+      "v": 14
      }
     ],
-    "dias": [
+    "puntos": [
+     {
+      "d": 1,
+      "ml": 21530917,
+      "tn": 0,
+      "v": 21530917,
+      "ordenes": 464,
+      "etiqueta": "1"
+     },
+     {
+      "d": 2,
+      "ml": 22259880,
+      "tn": 0,
+      "v": 22259880,
+      "ordenes": 484,
+      "etiqueta": "2"
+     },
+     {
+      "d": 3,
+      "ml": 17891331,
+      "tn": 0,
+      "v": 17891331,
+      "ordenes": 389,
+      "etiqueta": "3"
+     },
+     {
+      "d": 4,
+      "ml": 10884911,
+      "tn": 0,
+      "v": 10884911,
+      "ordenes": 254,
+      "etiqueta": "4"
+     },
+     {
+      "d": 5,
+      "ml": 11478083,
+      "tn": 0,
+      "v": 11478083,
+      "ordenes": 257,
+      "etiqueta": "5"
+     },
+     {
+      "d": 6,
+      "ml": 21714164,
+      "tn": 0,
+      "v": 21714164,
+      "ordenes": 482,
+      "etiqueta": "6"
+     },
+     {
+      "d": 7,
+      "ml": 16231796,
+      "tn": 0,
+      "v": 16231796,
+      "ordenes": 326,
+      "etiqueta": "7"
+     },
+     {
+      "d": 8,
+      "ml": 14937236,
+      "tn": 0,
+      "v": 14937236,
+      "ordenes": 332,
+      "etiqueta": "8"
+     },
+     {
+      "d": 9,
+      "ml": 17281016,
+      "tn": 0,
+      "v": 17281016,
+      "ordenes": 351,
+      "etiqueta": "9"
+     },
+     {
+      "d": 10,
+      "ml": 22737183,
+      "tn": 0,
+      "v": 22737183,
+      "ordenes": 546,
+      "etiqueta": "10"
+     },
+     {
+      "d": 11,
+      "ml": 15279585,
+      "tn": 0,
+      "v": 15279585,
+      "ordenes": 327,
+      "etiqueta": "11"
+     },
+     {
+      "d": 12,
+      "ml": 13826333,
+      "tn": 0,
+      "v": 13826333,
+      "ordenes": 334,
+      "etiqueta": "12"
+     },
+     {
+      "d": 13,
+      "ml": 25422272,
+      "tn": 0,
+      "v": 25422272,
+      "ordenes": 583,
+      "etiqueta": "13"
+     },
+     {
+      "d": 14,
+      "ml": 21927085,
+      "tn": 0,
+      "v": 21927085,
+      "ordenes": 493,
+      "etiqueta": "14"
+     },
+     {
+      "d": 15,
+      "ml": 11778864,
+      "tn": 0,
+      "v": 11778864,
+      "ordenes": 257,
+      "etiqueta": "15"
+     },
+     {
+      "d": 16,
+      "ml": 13096836,
+      "tn": 0,
+      "v": 13096836,
+      "ordenes": 313,
+      "etiqueta": "16"
+     },
+     {
+      "d": 17,
+      "ml": 15687369,
+      "tn": 0,
+      "v": 15687369,
+      "ordenes": 320,
+      "etiqueta": "17"
+     },
+     {
+      "d": 18,
+      "ml": 10387095,
+      "tn": 0,
+      "v": 10387095,
+      "ordenes": 239,
+      "etiqueta": "18"
+     },
+     {
+      "d": 19,
+      "ml": 8912090,
+      "tn": 0,
+      "v": 8912090,
+      "ordenes": 198,
+      "etiqueta": "19"
+     },
+     {
+      "d": 20,
+      "ml": 15876839,
+      "tn": 0,
+      "v": 15876839,
+      "ordenes": 329,
+      "etiqueta": "20"
+     },
+     {
+      "d": 21,
+      "ml": 17032952,
+      "tn": 0,
+      "v": 17032952,
+      "ordenes": 365,
+      "etiqueta": "21"
+     },
+     {
+      "d": 22,
+      "ml": 20084570,
+      "tn": 0,
+      "v": 20084570,
+      "ordenes": 420,
+      "etiqueta": "22"
+     },
+     {
+      "d": 23,
+      "ml": 16372190,
+      "tn": 0,
+      "v": 16372190,
+      "ordenes": 359,
+      "etiqueta": "23"
+     },
+     {
+      "d": 24,
+      "ml": 15823382,
+      "tn": 0,
+      "v": 15823382,
+      "ordenes": 337,
+      "etiqueta": "24"
+     },
      {
       "d": 25,
       "ml": 10329865,
       "tn": 0,
       "v": 10329865,
-      "ordenes": 230
+      "ordenes": 230,
+      "etiqueta": "25"
      },
      {
       "d": 26,
       "ml": 8983931,
       "tn": 0,
       "v": 8983931,
-      "ordenes": 205
+      "ordenes": 205,
+      "etiqueta": "26"
      },
      {
       "d": 27,
       "ml": 15191028,
       "tn": 0,
       "v": 15191028,
-      "ordenes": 383
+      "ordenes": 383,
+      "etiqueta": "27"
      },
      {
       "d": 28,
       "ml": 17640884,
       "tn": 0,
       "v": 17640884,
-      "ordenes": 399
+      "ordenes": 399,
+      "etiqueta": "28"
      },
      {
       "d": 29,
       "ml": 15497512,
       "tn": 0,
       "v": 15497512,
-      "ordenes": 367
+      "ordenes": 367,
+      "etiqueta": "29"
      },
      {
       "d": 30,
       "ml": 13208078,
       "tn": 0,
       "v": 13208078,
-      "ordenes": 321
+      "ordenes": 321,
+      "etiqueta": "30"
      },
      {
       "d": 31,
       "ml": 14695292,
       "tn": 0,
       "v": 14695292,
-      "ordenes": 352
+      "ordenes": 352,
+      "etiqueta": "31"
      }
     ],
-    "neto": 76756955
+    "granularidad": "dia",
+    "meses": [
+     "2026-07"
+    ],
+    "neto": 386038783
+   },
+   "anio": {
+    "eerr": {
+     "lineas": [
+      {
+       "c": "Ventas brutas",
+       "v": 494000567.3223138,
+       "pct": 97.2,
+       "tipo": "normal"
+      },
+      {
+       "c": "Bonificaciones de plataforma",
+       "v": 14648273.760330578,
+       "pct": 2.9,
+       "tipo": "normal"
+      },
+      {
+       "c": "Anulaciones y reembolsos",
+       "v": -633986.0991735538,
+       "pct": -0.1,
+       "tipo": "normal"
+      },
+      {
+       "c": "Descuentos y cupones",
+       "v": 0,
+       "pct": 0,
+       "tipo": "normal"
+      },
+      {
+       "c": "Ventas netas",
+       "v": 508014854.9834708,
+       "pct": 100,
+       "tipo": "total"
+      },
+      {
+       "c": "Costo de la mercadería",
+       "v": -225844259.09000024,
+       "pct": -44.5,
+       "tipo": "gasto"
+      },
+      {
+       "c": "Margen bruto",
+       "v": 282170595.8934705,
+       "pct": 55.5,
+       "tipo": "destacado"
+      },
+      {
+       "c": "Comisiones de plataforma",
+       "v": -88032916.89256199,
+       "pct": -17.3,
+       "tipo": "gasto"
+      },
+      {
+       "c": "Envíos (neto de lo cobrado)",
+       "v": -27625768.090909097,
+       "pct": -5.4,
+       "tipo": "gasto"
+      },
+      {
+       "c": "Impuestos de plataforma",
+       "v": -5656799.710743805,
+       "pct": -1.1,
+       "tipo": "gasto"
+      },
+      {
+       "c": "Resultado de contribución",
+       "v": 160855111.19925565,
+       "pct": 31.7,
+       "tipo": "destacado"
+      }
+     ],
+     "ordenes": 11016,
+     "unidades": 12144,
+     "ticket": 46116.09068477404,
+     "netoLiquidado": 386038782.570248,
+     "canceladas": 630,
+     "cobertura": 96.5,
+     "sinCosto": [
+      {
+       "sku": "GZB-002R",
+       "facturacion": 6230971,
+       "lineas": 38
+      },
+      {
+       "sku": "VP-001N",
+       "facturacion": 1159000,
+       "lineas": 54
+      },
+      {
+       "sku": "VP-001B",
+       "facturacion": 735870,
+       "lineas": 39
+      },
+      {
+       "sku": "VP-002B",
+       "facturacion": 287000,
+       "lineas": 18
+      },
+      {
+       "sku": "GZB-002 R",
+       "facturacion": 158999,
+       "lineas": 1
+      },
+      {
+       "sku": "VP-002N",
+       "facturacion": 142956,
+       "lineas": 8
+      }
+     ],
+     "faltan": [
+      "Marketing y publicidad",
+      "Estructura y sueldos",
+      "Impuestos propios (IIBB, IVA)",
+      "Amortizaciones",
+      "Resultados financieros"
+     ]
+    },
+    "gastos": [
+     {
+      "n": "Costo de la mercadería",
+      "v": 44.5
+     },
+     {
+      "n": "Comisiones de plataforma",
+      "v": 17.3
+     },
+     {
+      "n": "Envíos y logística",
+      "v": 5.4
+     },
+     {
+      "n": "Impuestos de plataforma",
+      "v": 1.1
+     }
+    ],
+    "productos": [
+     {
+      "sku": "SP-446",
+      "n": "Soporte Articulado Naku SP-446 de Pared Para TV de 32\" a 75\"",
+      "v": 47481070,
+      "u": 1034
+     },
+     {
+      "sku": "SS-1032M",
+      "n": "Soporte Hidráulico Monitor 13-32\" VESA 75x100",
+      "v": 39831915,
+      "u": 1018
+     },
+     {
+      "sku": "MC-002",
+      "n": "Máquina de Coser MC-002 Mini 12 Puntadas con Pedal y Luz LED",
+      "v": 34663994,
+      "u": 751
+     },
+     {
+      "sku": "ESC-001",
+      "n": "Escalera Naku ESC-001 de Aluminio Multipropósito 12 Escalones - 8 Posiciones",
+      "v": 33857686,
+      "u": 317
+     },
+     {
+      "sku": "SS-C024D",
+      "n": "Soporte Doble Monitor Hidráulico SS-C024D 13-32\"",
+      "v": 29220965,
+      "u": 431
+     },
+     {
+      "sku": "SH-446",
+      "n": "Soporte Articulado Naku SH-446 de Pared Para TV de 32\" a 75\"",
+      "v": 18891301,
+      "u": 429
+     },
+     {
+      "sku": "SH-443XWL",
+      "n": "Soporte Articulado Naku SH-443XWL de Pared Para TV de 32\" a 80\"",
+      "v": 16929890,
+      "u": 262
+     },
+     {
+      "sku": "SM-C024",
+      "n": "Soporte Articulado Naku SM-C024 de Mesa Para Monitores de 13\" a 32\"",
+      "v": 15108633,
+      "u": 419
+     },
+     {
+      "sku": "SM-C012",
+      "n": "Soporte Brazo Articulado Naku SM-C012 de Mesa Para Monitor de 13\" a 32\"",
+      "v": 14152827,
+      "u": 544
+     },
+     {
+      "sku": "SE-446",
+      "n": "Soporte Articulado Naku SE-446 de Pared Para TV de 20\" a 75\"",
+      "v": 13905633,
+      "u": 356
+     }
+    ],
+    "familias": [
+     {
+      "n": "Móviles con Brazo",
+      "v": 25.2
+     },
+     {
+      "n": "Monitor",
+      "v": 22.5
+     },
+     {
+      "n": "Herramientas y equipamiento",
+      "v": 9.3
+     },
+     {
+      "n": "Máquinas de coser",
+      "v": 7.1
+     },
+     {
+      "n": "Comercio",
+      "v": 6.4
+     },
+     {
+      "n": "Escritorios ergonómicos",
+      "v": 5.4
+     },
+     {
+      "n": "Organización de ropa",
+      "v": 4.8
+     },
+     {
+      "n": "Exterior y aire libre",
+      "v": 3.8
+     },
+     {
+      "n": "Rack y Stand TV",
+      "v": 2.5
+     },
+     {
+      "n": "Sin familia asignada",
+      "v": 2
+     },
+     {
+      "n": "Resto de familias",
+      "v": 11.1
+     }
+    ],
+    "provincias": [
+     {
+      "n": "Buenos Aires",
+      "v": 49.6
+     },
+     {
+      "n": "Capital Federal",
+      "v": 17.7
+     },
+     {
+      "n": "Córdoba",
+      "v": 7.3
+     },
+     {
+      "n": "Santa Fe",
+      "v": 6.3
+     },
+     {
+      "n": "Mendoza",
+      "v": 3
+     },
+     {
+      "n": "Neuquén",
+      "v": 2.1
+     },
+     {
+      "n": "Resto del país",
+      "v": 13.9
+     }
+    ],
+    "envios": [
+     {
+      "n": "Flex",
+      "v": 6022
+     },
+     {
+      "n": "Full",
+      "v": 2525
+     },
+     {
+      "n": "Colecta",
+      "v": 2103
+     },
+     {
+      "n": "Retiro/Acuerdo",
+      "v": 14
+     }
+    ],
+    "puntos": [
+     {
+      "d": 1,
+      "ml": 21530917,
+      "tn": 0,
+      "v": 21530917,
+      "ordenes": 464,
+      "etiqueta": "1"
+     },
+     {
+      "d": 2,
+      "ml": 22259880,
+      "tn": 0,
+      "v": 22259880,
+      "ordenes": 484,
+      "etiqueta": "2"
+     },
+     {
+      "d": 3,
+      "ml": 17891331,
+      "tn": 0,
+      "v": 17891331,
+      "ordenes": 389,
+      "etiqueta": "3"
+     },
+     {
+      "d": 4,
+      "ml": 10884911,
+      "tn": 0,
+      "v": 10884911,
+      "ordenes": 254,
+      "etiqueta": "4"
+     },
+     {
+      "d": 5,
+      "ml": 11478083,
+      "tn": 0,
+      "v": 11478083,
+      "ordenes": 257,
+      "etiqueta": "5"
+     },
+     {
+      "d": 6,
+      "ml": 21714164,
+      "tn": 0,
+      "v": 21714164,
+      "ordenes": 482,
+      "etiqueta": "6"
+     },
+     {
+      "d": 7,
+      "ml": 16231796,
+      "tn": 0,
+      "v": 16231796,
+      "ordenes": 326,
+      "etiqueta": "7"
+     },
+     {
+      "d": 8,
+      "ml": 14937236,
+      "tn": 0,
+      "v": 14937236,
+      "ordenes": 332,
+      "etiqueta": "8"
+     },
+     {
+      "d": 9,
+      "ml": 17281016,
+      "tn": 0,
+      "v": 17281016,
+      "ordenes": 351,
+      "etiqueta": "9"
+     },
+     {
+      "d": 10,
+      "ml": 22737183,
+      "tn": 0,
+      "v": 22737183,
+      "ordenes": 546,
+      "etiqueta": "10"
+     },
+     {
+      "d": 11,
+      "ml": 15279585,
+      "tn": 0,
+      "v": 15279585,
+      "ordenes": 327,
+      "etiqueta": "11"
+     },
+     {
+      "d": 12,
+      "ml": 13826333,
+      "tn": 0,
+      "v": 13826333,
+      "ordenes": 334,
+      "etiqueta": "12"
+     },
+     {
+      "d": 13,
+      "ml": 25422272,
+      "tn": 0,
+      "v": 25422272,
+      "ordenes": 583,
+      "etiqueta": "13"
+     },
+     {
+      "d": 14,
+      "ml": 21927085,
+      "tn": 0,
+      "v": 21927085,
+      "ordenes": 493,
+      "etiqueta": "14"
+     },
+     {
+      "d": 15,
+      "ml": 11778864,
+      "tn": 0,
+      "v": 11778864,
+      "ordenes": 257,
+      "etiqueta": "15"
+     },
+     {
+      "d": 16,
+      "ml": 13096836,
+      "tn": 0,
+      "v": 13096836,
+      "ordenes": 313,
+      "etiqueta": "16"
+     },
+     {
+      "d": 17,
+      "ml": 15687369,
+      "tn": 0,
+      "v": 15687369,
+      "ordenes": 320,
+      "etiqueta": "17"
+     },
+     {
+      "d": 18,
+      "ml": 10387095,
+      "tn": 0,
+      "v": 10387095,
+      "ordenes": 239,
+      "etiqueta": "18"
+     },
+     {
+      "d": 19,
+      "ml": 8912090,
+      "tn": 0,
+      "v": 8912090,
+      "ordenes": 198,
+      "etiqueta": "19"
+     },
+     {
+      "d": 20,
+      "ml": 15876839,
+      "tn": 0,
+      "v": 15876839,
+      "ordenes": 329,
+      "etiqueta": "20"
+     },
+     {
+      "d": 21,
+      "ml": 17032952,
+      "tn": 0,
+      "v": 17032952,
+      "ordenes": 365,
+      "etiqueta": "21"
+     },
+     {
+      "d": 22,
+      "ml": 20084570,
+      "tn": 0,
+      "v": 20084570,
+      "ordenes": 420,
+      "etiqueta": "22"
+     },
+     {
+      "d": 23,
+      "ml": 16372190,
+      "tn": 0,
+      "v": 16372190,
+      "ordenes": 359,
+      "etiqueta": "23"
+     },
+     {
+      "d": 24,
+      "ml": 15823382,
+      "tn": 0,
+      "v": 15823382,
+      "ordenes": 337,
+      "etiqueta": "24"
+     },
+     {
+      "d": 25,
+      "ml": 10329865,
+      "tn": 0,
+      "v": 10329865,
+      "ordenes": 230,
+      "etiqueta": "25"
+     },
+     {
+      "d": 26,
+      "ml": 8983931,
+      "tn": 0,
+      "v": 8983931,
+      "ordenes": 205,
+      "etiqueta": "26"
+     },
+     {
+      "d": 27,
+      "ml": 15191028,
+      "tn": 0,
+      "v": 15191028,
+      "ordenes": 383,
+      "etiqueta": "27"
+     },
+     {
+      "d": 28,
+      "ml": 17640884,
+      "tn": 0,
+      "v": 17640884,
+      "ordenes": 399,
+      "etiqueta": "28"
+     },
+     {
+      "d": 29,
+      "ml": 15497512,
+      "tn": 0,
+      "v": 15497512,
+      "ordenes": 367,
+      "etiqueta": "29"
+     },
+     {
+      "d": 30,
+      "ml": 13208078,
+      "tn": 0,
+      "v": 13208078,
+      "ordenes": 321,
+      "etiqueta": "30"
+     },
+     {
+      "d": 31,
+      "ml": 14695292,
+      "tn": 0,
+      "v": 14695292,
+      "ordenes": 352,
+      "etiqueta": "31"
+     }
+    ],
+    "granularidad": "dia",
+    "meses": [
+     "2026-07"
+    ],
+    "neto": 386038783
+   },
+   "rango": {
+    "eerr": {
+     "lineas": [
+      {
+       "c": "Ventas brutas",
+       "v": 494000567.3223138,
+       "pct": 97.2,
+       "tipo": "normal"
+      },
+      {
+       "c": "Bonificaciones de plataforma",
+       "v": 14648273.760330578,
+       "pct": 2.9,
+       "tipo": "normal"
+      },
+      {
+       "c": "Anulaciones y reembolsos",
+       "v": -633986.0991735538,
+       "pct": -0.1,
+       "tipo": "normal"
+      },
+      {
+       "c": "Descuentos y cupones",
+       "v": 0,
+       "pct": 0,
+       "tipo": "normal"
+      },
+      {
+       "c": "Ventas netas",
+       "v": 508014854.9834708,
+       "pct": 100,
+       "tipo": "total"
+      },
+      {
+       "c": "Costo de la mercadería",
+       "v": -225844259.09000024,
+       "pct": -44.5,
+       "tipo": "gasto"
+      },
+      {
+       "c": "Margen bruto",
+       "v": 282170595.8934705,
+       "pct": 55.5,
+       "tipo": "destacado"
+      },
+      {
+       "c": "Comisiones de plataforma",
+       "v": -88032916.89256199,
+       "pct": -17.3,
+       "tipo": "gasto"
+      },
+      {
+       "c": "Envíos (neto de lo cobrado)",
+       "v": -27625768.090909097,
+       "pct": -5.4,
+       "tipo": "gasto"
+      },
+      {
+       "c": "Impuestos de plataforma",
+       "v": -5656799.710743805,
+       "pct": -1.1,
+       "tipo": "gasto"
+      },
+      {
+       "c": "Resultado de contribución",
+       "v": 160855111.19925565,
+       "pct": 31.7,
+       "tipo": "destacado"
+      }
+     ],
+     "ordenes": 11016,
+     "unidades": 12144,
+     "ticket": 46116.09068477404,
+     "netoLiquidado": 386038782.570248,
+     "canceladas": 630,
+     "cobertura": 96.5,
+     "sinCosto": [
+      {
+       "sku": "GZB-002R",
+       "facturacion": 6230971,
+       "lineas": 38
+      },
+      {
+       "sku": "VP-001N",
+       "facturacion": 1159000,
+       "lineas": 54
+      },
+      {
+       "sku": "VP-001B",
+       "facturacion": 735870,
+       "lineas": 39
+      },
+      {
+       "sku": "VP-002B",
+       "facturacion": 287000,
+       "lineas": 18
+      },
+      {
+       "sku": "GZB-002 R",
+       "facturacion": 158999,
+       "lineas": 1
+      },
+      {
+       "sku": "VP-002N",
+       "facturacion": 142956,
+       "lineas": 8
+      }
+     ],
+     "faltan": [
+      "Marketing y publicidad",
+      "Estructura y sueldos",
+      "Impuestos propios (IIBB, IVA)",
+      "Amortizaciones",
+      "Resultados financieros"
+     ]
+    },
+    "gastos": [
+     {
+      "n": "Costo de la mercadería",
+      "v": 44.5
+     },
+     {
+      "n": "Comisiones de plataforma",
+      "v": 17.3
+     },
+     {
+      "n": "Envíos y logística",
+      "v": 5.4
+     },
+     {
+      "n": "Impuestos de plataforma",
+      "v": 1.1
+     }
+    ],
+    "productos": [
+     {
+      "sku": "SP-446",
+      "n": "Soporte Articulado Naku SP-446 de Pared Para TV de 32\" a 75\"",
+      "v": 47481070,
+      "u": 1034
+     },
+     {
+      "sku": "SS-1032M",
+      "n": "Soporte Hidráulico Monitor 13-32\" VESA 75x100",
+      "v": 39831915,
+      "u": 1018
+     },
+     {
+      "sku": "MC-002",
+      "n": "Máquina de Coser MC-002 Mini 12 Puntadas con Pedal y Luz LED",
+      "v": 34663994,
+      "u": 751
+     },
+     {
+      "sku": "ESC-001",
+      "n": "Escalera Naku ESC-001 de Aluminio Multipropósito 12 Escalones - 8 Posiciones",
+      "v": 33857686,
+      "u": 317
+     },
+     {
+      "sku": "SS-C024D",
+      "n": "Soporte Doble Monitor Hidráulico SS-C024D 13-32\"",
+      "v": 29220965,
+      "u": 431
+     },
+     {
+      "sku": "SH-446",
+      "n": "Soporte Articulado Naku SH-446 de Pared Para TV de 32\" a 75\"",
+      "v": 18891301,
+      "u": 429
+     },
+     {
+      "sku": "SH-443XWL",
+      "n": "Soporte Articulado Naku SH-443XWL de Pared Para TV de 32\" a 80\"",
+      "v": 16929890,
+      "u": 262
+     },
+     {
+      "sku": "SM-C024",
+      "n": "Soporte Articulado Naku SM-C024 de Mesa Para Monitores de 13\" a 32\"",
+      "v": 15108633,
+      "u": 419
+     },
+     {
+      "sku": "SM-C012",
+      "n": "Soporte Brazo Articulado Naku SM-C012 de Mesa Para Monitor de 13\" a 32\"",
+      "v": 14152827,
+      "u": 544
+     },
+     {
+      "sku": "SE-446",
+      "n": "Soporte Articulado Naku SE-446 de Pared Para TV de 20\" a 75\"",
+      "v": 13905633,
+      "u": 356
+     }
+    ],
+    "familias": [
+     {
+      "n": "Móviles con Brazo",
+      "v": 25.2
+     },
+     {
+      "n": "Monitor",
+      "v": 22.5
+     },
+     {
+      "n": "Herramientas y equipamiento",
+      "v": 9.3
+     },
+     {
+      "n": "Máquinas de coser",
+      "v": 7.1
+     },
+     {
+      "n": "Comercio",
+      "v": 6.4
+     },
+     {
+      "n": "Escritorios ergonómicos",
+      "v": 5.4
+     },
+     {
+      "n": "Organización de ropa",
+      "v": 4.8
+     },
+     {
+      "n": "Exterior y aire libre",
+      "v": 3.8
+     },
+     {
+      "n": "Rack y Stand TV",
+      "v": 2.5
+     },
+     {
+      "n": "Sin familia asignada",
+      "v": 2
+     },
+     {
+      "n": "Resto de familias",
+      "v": 11.1
+     }
+    ],
+    "provincias": [
+     {
+      "n": "Buenos Aires",
+      "v": 49.6
+     },
+     {
+      "n": "Capital Federal",
+      "v": 17.7
+     },
+     {
+      "n": "Córdoba",
+      "v": 7.3
+     },
+     {
+      "n": "Santa Fe",
+      "v": 6.3
+     },
+     {
+      "n": "Mendoza",
+      "v": 3
+     },
+     {
+      "n": "Neuquén",
+      "v": 2.1
+     },
+     {
+      "n": "Resto del país",
+      "v": 13.9
+     }
+    ],
+    "envios": [
+     {
+      "n": "Flex",
+      "v": 6022
+     },
+     {
+      "n": "Full",
+      "v": 2525
+     },
+     {
+      "n": "Colecta",
+      "v": 2103
+     },
+     {
+      "n": "Retiro/Acuerdo",
+      "v": 14
+     }
+    ],
+    "puntos": [
+     {
+      "d": 1,
+      "ml": 21530917,
+      "tn": 0,
+      "v": 21530917,
+      "ordenes": 464,
+      "etiqueta": "1"
+     },
+     {
+      "d": 2,
+      "ml": 22259880,
+      "tn": 0,
+      "v": 22259880,
+      "ordenes": 484,
+      "etiqueta": "2"
+     },
+     {
+      "d": 3,
+      "ml": 17891331,
+      "tn": 0,
+      "v": 17891331,
+      "ordenes": 389,
+      "etiqueta": "3"
+     },
+     {
+      "d": 4,
+      "ml": 10884911,
+      "tn": 0,
+      "v": 10884911,
+      "ordenes": 254,
+      "etiqueta": "4"
+     },
+     {
+      "d": 5,
+      "ml": 11478083,
+      "tn": 0,
+      "v": 11478083,
+      "ordenes": 257,
+      "etiqueta": "5"
+     },
+     {
+      "d": 6,
+      "ml": 21714164,
+      "tn": 0,
+      "v": 21714164,
+      "ordenes": 482,
+      "etiqueta": "6"
+     },
+     {
+      "d": 7,
+      "ml": 16231796,
+      "tn": 0,
+      "v": 16231796,
+      "ordenes": 326,
+      "etiqueta": "7"
+     },
+     {
+      "d": 8,
+      "ml": 14937236,
+      "tn": 0,
+      "v": 14937236,
+      "ordenes": 332,
+      "etiqueta": "8"
+     },
+     {
+      "d": 9,
+      "ml": 17281016,
+      "tn": 0,
+      "v": 17281016,
+      "ordenes": 351,
+      "etiqueta": "9"
+     },
+     {
+      "d": 10,
+      "ml": 22737183,
+      "tn": 0,
+      "v": 22737183,
+      "ordenes": 546,
+      "etiqueta": "10"
+     },
+     {
+      "d": 11,
+      "ml": 15279585,
+      "tn": 0,
+      "v": 15279585,
+      "ordenes": 327,
+      "etiqueta": "11"
+     },
+     {
+      "d": 12,
+      "ml": 13826333,
+      "tn": 0,
+      "v": 13826333,
+      "ordenes": 334,
+      "etiqueta": "12"
+     },
+     {
+      "d": 13,
+      "ml": 25422272,
+      "tn": 0,
+      "v": 25422272,
+      "ordenes": 583,
+      "etiqueta": "13"
+     },
+     {
+      "d": 14,
+      "ml": 21927085,
+      "tn": 0,
+      "v": 21927085,
+      "ordenes": 493,
+      "etiqueta": "14"
+     },
+     {
+      "d": 15,
+      "ml": 11778864,
+      "tn": 0,
+      "v": 11778864,
+      "ordenes": 257,
+      "etiqueta": "15"
+     },
+     {
+      "d": 16,
+      "ml": 13096836,
+      "tn": 0,
+      "v": 13096836,
+      "ordenes": 313,
+      "etiqueta": "16"
+     },
+     {
+      "d": 17,
+      "ml": 15687369,
+      "tn": 0,
+      "v": 15687369,
+      "ordenes": 320,
+      "etiqueta": "17"
+     },
+     {
+      "d": 18,
+      "ml": 10387095,
+      "tn": 0,
+      "v": 10387095,
+      "ordenes": 239,
+      "etiqueta": "18"
+     },
+     {
+      "d": 19,
+      "ml": 8912090,
+      "tn": 0,
+      "v": 8912090,
+      "ordenes": 198,
+      "etiqueta": "19"
+     },
+     {
+      "d": 20,
+      "ml": 15876839,
+      "tn": 0,
+      "v": 15876839,
+      "ordenes": 329,
+      "etiqueta": "20"
+     },
+     {
+      "d": 21,
+      "ml": 17032952,
+      "tn": 0,
+      "v": 17032952,
+      "ordenes": 365,
+      "etiqueta": "21"
+     },
+     {
+      "d": 22,
+      "ml": 20084570,
+      "tn": 0,
+      "v": 20084570,
+      "ordenes": 420,
+      "etiqueta": "22"
+     },
+     {
+      "d": 23,
+      "ml": 16372190,
+      "tn": 0,
+      "v": 16372190,
+      "ordenes": 359,
+      "etiqueta": "23"
+     },
+     {
+      "d": 24,
+      "ml": 15823382,
+      "tn": 0,
+      "v": 15823382,
+      "ordenes": 337,
+      "etiqueta": "24"
+     },
+     {
+      "d": 25,
+      "ml": 10329865,
+      "tn": 0,
+      "v": 10329865,
+      "ordenes": 230,
+      "etiqueta": "25"
+     },
+     {
+      "d": 26,
+      "ml": 8983931,
+      "tn": 0,
+      "v": 8983931,
+      "ordenes": 205,
+      "etiqueta": "26"
+     },
+     {
+      "d": 27,
+      "ml": 15191028,
+      "tn": 0,
+      "v": 15191028,
+      "ordenes": 383,
+      "etiqueta": "27"
+     },
+     {
+      "d": 28,
+      "ml": 17640884,
+      "tn": 0,
+      "v": 17640884,
+      "ordenes": 399,
+      "etiqueta": "28"
+     },
+     {
+      "d": 29,
+      "ml": 15497512,
+      "tn": 0,
+      "v": 15497512,
+      "ordenes": 367,
+      "etiqueta": "29"
+     },
+     {
+      "d": 30,
+      "ml": 13208078,
+      "tn": 0,
+      "v": 13208078,
+      "ordenes": 321,
+      "etiqueta": "30"
+     },
+     {
+      "d": 31,
+      "ml": 14695292,
+      "tn": 0,
+      "v": 14695292,
+      "ordenes": 352,
+      "etiqueta": "31"
+     }
+    ],
+    "granularidad": "dia",
+    "meses": [
+     "2026-07"
+    ],
+    "neto": 386038783
+   },
+   "mes:2026-07": {
+    "eerr": {
+     "lineas": [
+      {
+       "c": "Ventas brutas",
+       "v": 494000567.3223138,
+       "pct": 97.2,
+       "tipo": "normal"
+      },
+      {
+       "c": "Bonificaciones de plataforma",
+       "v": 14648273.760330578,
+       "pct": 2.9,
+       "tipo": "normal"
+      },
+      {
+       "c": "Anulaciones y reembolsos",
+       "v": -633986.0991735538,
+       "pct": -0.1,
+       "tipo": "normal"
+      },
+      {
+       "c": "Descuentos y cupones",
+       "v": 0,
+       "pct": 0,
+       "tipo": "normal"
+      },
+      {
+       "c": "Ventas netas",
+       "v": 508014854.9834708,
+       "pct": 100,
+       "tipo": "total"
+      },
+      {
+       "c": "Costo de la mercadería",
+       "v": -225844259.09000024,
+       "pct": -44.5,
+       "tipo": "gasto"
+      },
+      {
+       "c": "Margen bruto",
+       "v": 282170595.8934705,
+       "pct": 55.5,
+       "tipo": "destacado"
+      },
+      {
+       "c": "Comisiones de plataforma",
+       "v": -88032916.89256199,
+       "pct": -17.3,
+       "tipo": "gasto"
+      },
+      {
+       "c": "Envíos (neto de lo cobrado)",
+       "v": -27625768.090909097,
+       "pct": -5.4,
+       "tipo": "gasto"
+      },
+      {
+       "c": "Impuestos de plataforma",
+       "v": -5656799.710743805,
+       "pct": -1.1,
+       "tipo": "gasto"
+      },
+      {
+       "c": "Resultado de contribución",
+       "v": 160855111.19925565,
+       "pct": 31.7,
+       "tipo": "destacado"
+      }
+     ],
+     "ordenes": 11016,
+     "unidades": 12144,
+     "ticket": 46116.09068477404,
+     "netoLiquidado": 386038782.570248,
+     "canceladas": 630,
+     "cobertura": 96.5,
+     "sinCosto": [
+      {
+       "sku": "GZB-002R",
+       "facturacion": 6230971,
+       "lineas": 38
+      },
+      {
+       "sku": "VP-001N",
+       "facturacion": 1159000,
+       "lineas": 54
+      },
+      {
+       "sku": "VP-001B",
+       "facturacion": 735870,
+       "lineas": 39
+      },
+      {
+       "sku": "VP-002B",
+       "facturacion": 287000,
+       "lineas": 18
+      },
+      {
+       "sku": "GZB-002 R",
+       "facturacion": 158999,
+       "lineas": 1
+      },
+      {
+       "sku": "VP-002N",
+       "facturacion": 142956,
+       "lineas": 8
+      }
+     ],
+     "faltan": [
+      "Marketing y publicidad",
+      "Estructura y sueldos",
+      "Impuestos propios (IIBB, IVA)",
+      "Amortizaciones",
+      "Resultados financieros"
+     ]
+    },
+    "gastos": [
+     {
+      "n": "Costo de la mercadería",
+      "v": 44.5
+     },
+     {
+      "n": "Comisiones de plataforma",
+      "v": 17.3
+     },
+     {
+      "n": "Envíos y logística",
+      "v": 5.4
+     },
+     {
+      "n": "Impuestos de plataforma",
+      "v": 1.1
+     }
+    ],
+    "productos": [
+     {
+      "sku": "SP-446",
+      "n": "Soporte Articulado Naku SP-446 de Pared Para TV de 32\" a 75\"",
+      "v": 47481070,
+      "u": 1034
+     },
+     {
+      "sku": "SS-1032M",
+      "n": "Soporte Hidráulico Monitor 13-32\" VESA 75x100",
+      "v": 39831915,
+      "u": 1018
+     },
+     {
+      "sku": "MC-002",
+      "n": "Máquina de Coser MC-002 Mini 12 Puntadas con Pedal y Luz LED",
+      "v": 34663994,
+      "u": 751
+     },
+     {
+      "sku": "ESC-001",
+      "n": "Escalera Naku ESC-001 de Aluminio Multipropósito 12 Escalones - 8 Posiciones",
+      "v": 33857686,
+      "u": 317
+     },
+     {
+      "sku": "SS-C024D",
+      "n": "Soporte Doble Monitor Hidráulico SS-C024D 13-32\"",
+      "v": 29220965,
+      "u": 431
+     },
+     {
+      "sku": "SH-446",
+      "n": "Soporte Articulado Naku SH-446 de Pared Para TV de 32\" a 75\"",
+      "v": 18891301,
+      "u": 429
+     },
+     {
+      "sku": "SH-443XWL",
+      "n": "Soporte Articulado Naku SH-443XWL de Pared Para TV de 32\" a 80\"",
+      "v": 16929890,
+      "u": 262
+     },
+     {
+      "sku": "SM-C024",
+      "n": "Soporte Articulado Naku SM-C024 de Mesa Para Monitores de 13\" a 32\"",
+      "v": 15108633,
+      "u": 419
+     },
+     {
+      "sku": "SM-C012",
+      "n": "Soporte Brazo Articulado Naku SM-C012 de Mesa Para Monitor de 13\" a 32\"",
+      "v": 14152827,
+      "u": 544
+     },
+     {
+      "sku": "SE-446",
+      "n": "Soporte Articulado Naku SE-446 de Pared Para TV de 20\" a 75\"",
+      "v": 13905633,
+      "u": 356
+     }
+    ],
+    "familias": [
+     {
+      "n": "Móviles con Brazo",
+      "v": 25.2
+     },
+     {
+      "n": "Monitor",
+      "v": 22.5
+     },
+     {
+      "n": "Herramientas y equipamiento",
+      "v": 9.3
+     },
+     {
+      "n": "Máquinas de coser",
+      "v": 7.1
+     },
+     {
+      "n": "Comercio",
+      "v": 6.4
+     },
+     {
+      "n": "Escritorios ergonómicos",
+      "v": 5.4
+     },
+     {
+      "n": "Organización de ropa",
+      "v": 4.8
+     },
+     {
+      "n": "Exterior y aire libre",
+      "v": 3.8
+     },
+     {
+      "n": "Rack y Stand TV",
+      "v": 2.5
+     },
+     {
+      "n": "Sin familia asignada",
+      "v": 2
+     },
+     {
+      "n": "Resto de familias",
+      "v": 11.1
+     }
+    ],
+    "provincias": [
+     {
+      "n": "Buenos Aires",
+      "v": 49.6
+     },
+     {
+      "n": "Capital Federal",
+      "v": 17.7
+     },
+     {
+      "n": "Córdoba",
+      "v": 7.3
+     },
+     {
+      "n": "Santa Fe",
+      "v": 6.3
+     },
+     {
+      "n": "Mendoza",
+      "v": 3
+     },
+     {
+      "n": "Neuquén",
+      "v": 2.1
+     },
+     {
+      "n": "Resto del país",
+      "v": 13.9
+     }
+    ],
+    "envios": [
+     {
+      "n": "Flex",
+      "v": 6022
+     },
+     {
+      "n": "Full",
+      "v": 2525
+     },
+     {
+      "n": "Colecta",
+      "v": 2103
+     },
+     {
+      "n": "Retiro/Acuerdo",
+      "v": 14
+     }
+    ],
+    "puntos": [
+     {
+      "d": 1,
+      "ml": 21530917,
+      "tn": 0,
+      "v": 21530917,
+      "ordenes": 464,
+      "etiqueta": "1"
+     },
+     {
+      "d": 2,
+      "ml": 22259880,
+      "tn": 0,
+      "v": 22259880,
+      "ordenes": 484,
+      "etiqueta": "2"
+     },
+     {
+      "d": 3,
+      "ml": 17891331,
+      "tn": 0,
+      "v": 17891331,
+      "ordenes": 389,
+      "etiqueta": "3"
+     },
+     {
+      "d": 4,
+      "ml": 10884911,
+      "tn": 0,
+      "v": 10884911,
+      "ordenes": 254,
+      "etiqueta": "4"
+     },
+     {
+      "d": 5,
+      "ml": 11478083,
+      "tn": 0,
+      "v": 11478083,
+      "ordenes": 257,
+      "etiqueta": "5"
+     },
+     {
+      "d": 6,
+      "ml": 21714164,
+      "tn": 0,
+      "v": 21714164,
+      "ordenes": 482,
+      "etiqueta": "6"
+     },
+     {
+      "d": 7,
+      "ml": 16231796,
+      "tn": 0,
+      "v": 16231796,
+      "ordenes": 326,
+      "etiqueta": "7"
+     },
+     {
+      "d": 8,
+      "ml": 14937236,
+      "tn": 0,
+      "v": 14937236,
+      "ordenes": 332,
+      "etiqueta": "8"
+     },
+     {
+      "d": 9,
+      "ml": 17281016,
+      "tn": 0,
+      "v": 17281016,
+      "ordenes": 351,
+      "etiqueta": "9"
+     },
+     {
+      "d": 10,
+      "ml": 22737183,
+      "tn": 0,
+      "v": 22737183,
+      "ordenes": 546,
+      "etiqueta": "10"
+     },
+     {
+      "d": 11,
+      "ml": 15279585,
+      "tn": 0,
+      "v": 15279585,
+      "ordenes": 327,
+      "etiqueta": "11"
+     },
+     {
+      "d": 12,
+      "ml": 13826333,
+      "tn": 0,
+      "v": 13826333,
+      "ordenes": 334,
+      "etiqueta": "12"
+     },
+     {
+      "d": 13,
+      "ml": 25422272,
+      "tn": 0,
+      "v": 25422272,
+      "ordenes": 583,
+      "etiqueta": "13"
+     },
+     {
+      "d": 14,
+      "ml": 21927085,
+      "tn": 0,
+      "v": 21927085,
+      "ordenes": 493,
+      "etiqueta": "14"
+     },
+     {
+      "d": 15,
+      "ml": 11778864,
+      "tn": 0,
+      "v": 11778864,
+      "ordenes": 257,
+      "etiqueta": "15"
+     },
+     {
+      "d": 16,
+      "ml": 13096836,
+      "tn": 0,
+      "v": 13096836,
+      "ordenes": 313,
+      "etiqueta": "16"
+     },
+     {
+      "d": 17,
+      "ml": 15687369,
+      "tn": 0,
+      "v": 15687369,
+      "ordenes": 320,
+      "etiqueta": "17"
+     },
+     {
+      "d": 18,
+      "ml": 10387095,
+      "tn": 0,
+      "v": 10387095,
+      "ordenes": 239,
+      "etiqueta": "18"
+     },
+     {
+      "d": 19,
+      "ml": 8912090,
+      "tn": 0,
+      "v": 8912090,
+      "ordenes": 198,
+      "etiqueta": "19"
+     },
+     {
+      "d": 20,
+      "ml": 15876839,
+      "tn": 0,
+      "v": 15876839,
+      "ordenes": 329,
+      "etiqueta": "20"
+     },
+     {
+      "d": 21,
+      "ml": 17032952,
+      "tn": 0,
+      "v": 17032952,
+      "ordenes": 365,
+      "etiqueta": "21"
+     },
+     {
+      "d": 22,
+      "ml": 20084570,
+      "tn": 0,
+      "v": 20084570,
+      "ordenes": 420,
+      "etiqueta": "22"
+     },
+     {
+      "d": 23,
+      "ml": 16372190,
+      "tn": 0,
+      "v": 16372190,
+      "ordenes": 359,
+      "etiqueta": "23"
+     },
+     {
+      "d": 24,
+      "ml": 15823382,
+      "tn": 0,
+      "v": 15823382,
+      "ordenes": 337,
+      "etiqueta": "24"
+     },
+     {
+      "d": 25,
+      "ml": 10329865,
+      "tn": 0,
+      "v": 10329865,
+      "ordenes": 230,
+      "etiqueta": "25"
+     },
+     {
+      "d": 26,
+      "ml": 8983931,
+      "tn": 0,
+      "v": 8983931,
+      "ordenes": 205,
+      "etiqueta": "26"
+     },
+     {
+      "d": 27,
+      "ml": 15191028,
+      "tn": 0,
+      "v": 15191028,
+      "ordenes": 383,
+      "etiqueta": "27"
+     },
+     {
+      "d": 28,
+      "ml": 17640884,
+      "tn": 0,
+      "v": 17640884,
+      "ordenes": 399,
+      "etiqueta": "28"
+     },
+     {
+      "d": 29,
+      "ml": 15497512,
+      "tn": 0,
+      "v": 15497512,
+      "ordenes": 367,
+      "etiqueta": "29"
+     },
+     {
+      "d": 30,
+      "ml": 13208078,
+      "tn": 0,
+      "v": 13208078,
+      "ordenes": 321,
+      "etiqueta": "30"
+     },
+     {
+      "d": 31,
+      "ml": 14695292,
+      "tn": 0,
+      "v": 14695292,
+      "ordenes": 352,
+      "etiqueta": "31"
+     }
+    ],
+    "granularidad": "dia",
+    "meses": [
+     "2026-07"
+    ],
+    "neto": 386038783
    }
   },
   "tn": {
-   "mes": {
+   "m3": {
     "eerr": {
      "lineas": [
       {
@@ -3657,234 +5894,269 @@
       "v": 52
      }
     ],
-    "dias": [
+    "puntos": [
      {
       "d": 1,
       "ml": 0,
       "tn": 1209115,
       "v": 1209115,
-      "ordenes": 19
+      "ordenes": 19,
+      "etiqueta": "1"
      },
      {
       "d": 2,
       "ml": 0,
       "tn": 1376437,
       "v": 1376437,
-      "ordenes": 14
+      "ordenes": 14,
+      "etiqueta": "2"
      },
      {
       "d": 3,
       "ml": 0,
       "tn": 1244536,
       "v": 1244536,
-      "ordenes": 14
+      "ordenes": 14,
+      "etiqueta": "3"
      },
      {
       "d": 4,
       "ml": 0,
       "tn": 932224,
       "v": 932224,
-      "ordenes": 11
+      "ordenes": 11,
+      "etiqueta": "4"
      },
      {
       "d": 5,
       "ml": 0,
       "tn": 830825,
       "v": 830825,
-      "ordenes": 11
+      "ordenes": 11,
+      "etiqueta": "5"
      },
      {
       "d": 6,
       "ml": 0,
       "tn": 805368,
       "v": 805368,
-      "ordenes": 14
+      "ordenes": 14,
+      "etiqueta": "6"
      },
      {
       "d": 7,
       "ml": 0,
       "tn": 818702,
       "v": 818702,
-      "ordenes": 13
+      "ordenes": 13,
+      "etiqueta": "7"
      },
      {
       "d": 8,
       "ml": 0,
       "tn": 928133,
       "v": 928133,
-      "ordenes": 18
+      "ordenes": 18,
+      "etiqueta": "8"
      },
      {
       "d": 9,
       "ml": 0,
       "tn": 324793,
       "v": 324793,
-      "ordenes": 9
+      "ordenes": 9,
+      "etiqueta": "9"
      },
      {
       "d": 10,
       "ml": 0,
       "tn": 1737510,
       "v": 1737510,
-      "ordenes": 17
+      "ordenes": 17,
+      "etiqueta": "10"
      },
      {
       "d": 11,
       "ml": 0,
       "tn": 586691,
       "v": 586691,
-      "ordenes": 9
+      "ordenes": 9,
+      "etiqueta": "11"
      },
      {
       "d": 12,
       "ml": 0,
       "tn": 714459,
       "v": 714459,
-      "ordenes": 10
+      "ordenes": 10,
+      "etiqueta": "12"
      },
      {
       "d": 13,
       "ml": 0,
       "tn": 1444947,
       "v": 1444947,
-      "ordenes": 23
+      "ordenes": 23,
+      "etiqueta": "13"
      },
      {
       "d": 14,
       "ml": 0,
       "tn": 969237,
       "v": 969237,
-      "ordenes": 11
+      "ordenes": 11,
+      "etiqueta": "14"
      },
      {
       "d": 15,
       "ml": 0,
       "tn": 1436067,
       "v": 1436067,
-      "ordenes": 16
+      "ordenes": 16,
+      "etiqueta": "15"
      },
      {
       "d": 16,
       "ml": 0,
       "tn": 1576852,
       "v": 1576852,
-      "ordenes": 14
+      "ordenes": 14,
+      "etiqueta": "16"
      },
      {
       "d": 17,
       "ml": 0,
       "tn": 571483,
       "v": 571483,
-      "ordenes": 6
+      "ordenes": 6,
+      "etiqueta": "17"
      },
      {
       "d": 18,
       "ml": 0,
       "tn": 234707,
       "v": 234707,
-      "ordenes": 4
+      "ordenes": 4,
+      "etiqueta": "18"
      },
      {
       "d": 19,
       "ml": 0,
       "tn": 67272,
       "v": 67272,
-      "ordenes": 1
+      "ordenes": 1,
+      "etiqueta": "19"
      },
      {
       "d": 20,
       "ml": 0,
       "tn": 1940736,
       "v": 1940736,
-      "ordenes": 16
+      "ordenes": 16,
+      "etiqueta": "20"
      },
      {
       "d": 21,
       "ml": 0,
       "tn": 672349,
       "v": 672349,
-      "ordenes": 12
+      "ordenes": 12,
+      "etiqueta": "21"
      },
      {
       "d": 22,
       "ml": 0,
       "tn": 693220,
       "v": 693220,
-      "ordenes": 7
+      "ordenes": 7,
+      "etiqueta": "22"
      },
      {
       "d": 23,
       "ml": 0,
       "tn": 1168008,
       "v": 1168008,
-      "ordenes": 12
+      "ordenes": 12,
+      "etiqueta": "23"
      },
      {
       "d": 24,
       "ml": 0,
       "tn": 507332,
       "v": 507332,
-      "ordenes": 7
+      "ordenes": 7,
+      "etiqueta": "24"
      },
      {
       "d": 25,
       "ml": 0,
       "tn": 1054950,
       "v": 1054950,
-      "ordenes": 12
+      "ordenes": 12,
+      "etiqueta": "25"
      },
      {
       "d": 26,
       "ml": 0,
       "tn": 507844,
       "v": 507844,
-      "ordenes": 6
+      "ordenes": 6,
+      "etiqueta": "26"
      },
      {
       "d": 27,
       "ml": 0,
       "tn": 647517,
       "v": 647517,
-      "ordenes": 10
+      "ordenes": 10,
+      "etiqueta": "27"
      },
      {
       "d": 28,
       "ml": 0,
       "tn": 1756026,
       "v": 1756026,
-      "ordenes": 13
+      "ordenes": 13,
+      "etiqueta": "28"
      },
      {
       "d": 29,
       "ml": 0,
       "tn": 807508,
       "v": 807508,
-      "ordenes": 12
+      "ordenes": 12,
+      "etiqueta": "29"
      },
      {
       "d": 30,
       "ml": 0,
       "tn": 716756,
       "v": 716756,
-      "ordenes": 10
+      "ordenes": 10,
+      "etiqueta": "30"
      },
      {
       "d": 31,
       "ml": 0,
       "tn": 956022,
       "v": 956022,
-      "ordenes": 18
+      "ordenes": 18,
+      "etiqueta": "31"
      }
+    ],
+    "granularidad": "dia",
+    "meses": [
+     "2026-07"
     ],
     "neto": 25129396
    },
-   "q1": {
+   "m6": {
     "eerr": {
      "lineas": [
       {
        "c": "Ventas brutas",
-       "v": 17544665.2892562,
-       "pct": 110.8,
+       "v": 33380424.79338843,
+       "pct": 111.1,
        "tipo": "normal"
       },
       {
@@ -3901,32 +6173,32 @@
       },
       {
        "c": "Descuentos y cupones",
-       "v": -1715764.5619834715,
-       "pct": -10.8,
+       "v": -3334618.925619835,
+       "pct": -11.1,
        "tipo": "normal"
       },
       {
        "c": "Ventas netas",
-       "v": 15828900.727272728,
+       "v": 30045805.867768593,
        "pct": 100,
        "tipo": "total"
       },
       {
        "c": "Costo de la mercadería",
-       "v": -7424361.219999999,
-       "pct": -46.9,
+       "v": -14140243.674999997,
+       "pct": -47.1,
        "tipo": "gasto"
       },
       {
        "c": "Margen bruto",
-       "v": 8404539.50727273,
-       "pct": 53.1,
+       "v": 15905562.192768596,
+       "pct": 52.9,
        "tipo": "destacado"
       },
       {
        "c": "Comisiones de plataforma",
-       "v": -1244307.743801653,
-       "pct": -7.9,
+       "v": -2238147.785123967,
+       "pct": -7.4,
        "tipo": "gasto"
       },
       {
@@ -3937,23 +6209,23 @@
       },
       {
        "c": "Impuestos de plataforma",
-       "v": -122165.50413223139,
+       "v": -232624.26446280986,
        "pct": -0.8,
        "tipo": "gasto"
       },
       {
        "c": "Resultado de contribución",
-       "v": 7038066.259338845,
-       "pct": 44.5,
+       "v": 13434790.14318182,
+       "pct": 44.7,
        "tipo": "destacado"
       }
      ],
-     "ordenes": 209,
-     "unidades": 238,
-     "ticket": 75736.36711613745,
-     "netoLiquidado": 13259653.652892562,
-     "canceladas": 3,
-     "cobertura": 99.6,
+     "ordenes": 369,
+     "unidades": 430,
+     "ticket": 81424.9481511344,
+     "netoLiquidado": 25129395.570247933,
+     "canceladas": 4,
+     "cobertura": 99.8,
      "sinCosto": [
       {
        "sku": "SP-46B",
@@ -3977,11 +6249,11 @@
     "gastos": [
      {
       "n": "Costo de la mercadería",
-      "v": 46.9
+      "v": 47.1
      },
      {
       "n": "Comisiones de plataforma",
-      "v": 7.9
+      "v": 7.4
      },
      {
       "n": "Envíos y logística",
@@ -3994,643 +6266,419 @@
     ],
     "productos": [
      {
-      "sku": "SH-443XWL",
-      "n": "Soporte Articulado Naku SH-443XWL de Pared Para TV de 32\" a 80\"",
-      "v": 1804936,
-      "u": 28
-     },
-     {
       "sku": "22D-BEL NEGRO (MODELO ELECTRICO)",
       "n": "Escritorio Eléctrico Sit-Stand 135x60 Negro",
-      "v": 1561979,
-      "u": 6
+      "v": 3904946,
+      "u": 15
+     },
+     {
+      "sku": "SH-443XWL",
+      "n": "Soporte Articulado Naku SH-443XWL de Pared Para TV de 32\" a 80\"",
+      "v": 3294173,
+      "u": 51
+     },
+     {
+      "sku": "22D-BEL MADERA (MODELO ELECTRICO)",
+      "n": "Escritorio Eléctrico Sit-Stand 135x60 Madera",
+      "v": 3123957,
+      "u": 12
      },
      {
       "sku": "SP-446",
       "n": "Soporte Articulado Naku SP-446 de Pared Para TV de 32\" a 75\"",
-      "v": 1545455,
-      "u": 34
-     },
-     {
-      "sku": "22D-BEL MADERA (MODELO ELECTRICO)",
-      "n": "Escritorio Eléctrico Sit-Stand 135x60 Madera",
-      "v": 1301649,
-      "u": 5
-     },
-     {
-      "sku": "MP-001-NEGRA",
-      "n": "Mesa Plegable Picnic 180x70 cm (Negro)",
-      "v": 773554,
-      "u": 12
+      "v": 2090909,
+      "u": 46
      },
      {
       "sku": "22D-BEL/ST",
       "n": "Estructura Eléctrica Regulable 135x60 cm - Sit-Stand Automatico (SIN TABLA)",
-      "v": 619832,
-      "u": 3
-     },
-     {
-      "sku": "SS-C024D",
-      "n": "Soporte Doble Monitor Hidráulico SS-C024D 13-32\"",
-      "v": 605447,
-      "u": 9
-     },
-     {
-      "sku": "SS-1032M",
-      "n": "Soporte Hidráulico Monitor 13-32\" VESA 75x100",
-      "v": 570236,
-      "u": 15
-     },
-     {
-      "sku": "MP-001",
-      "n": "Mesa Plegable Picnic 180x70 cm",
-      "v": 550413,
-      "u": 9
+      "v": 1652886,
+      "u": 8
      },
      {
       "sku": "SE-446",
       "n": "Soporte Articulado Naku SE-446 de Pared Para TV de 20\" a 75\"",
-      "v": 504948,
-      "u": 13
-     }
-    ],
-    "familias": [
-     {
-      "n": "Móviles con Brazo",
-      "v": 30.1
+      "v": 1087580,
+      "u": 28
      },
      {
-      "n": "Escritorios ergonómicos",
-      "v": 29.4
-     },
-     {
-      "n": "Monitor",
-      "v": 12.3
-     },
-     {
-      "n": "Exterior y aire libre",
-      "v": 7.3
-     },
-     {
-      "n": "MP",
-      "v": 5
-     },
-     {
-      "n": "Rack y Stand TV",
-      "v": 2.7
-     },
-     {
-      "n": "Techo",
-      "v": 2.7
-     },
-     {
-      "n": "Organización de ropa",
-      "v": 2.3
-     },
-     {
-      "n": "Organizadores multiuso",
-      "v": 1.9
-     },
-     {
-      "n": "Herramientas y equipamiento",
-      "v": 1.6
-     },
-     {
-      "n": "Resto de familias",
-      "v": 4.7
-     }
-    ],
-    "provincias": [
-     {
-      "n": "Gran Buenos Aires",
-      "v": 28
-     },
-     {
-      "n": "Capital Federal",
-      "v": 14.1
-     },
-     {
-      "n": "Córdoba",
-      "v": 12.3
-     },
-     {
-      "n": "Buenos Aires",
-      "v": 11.6
-     },
-     {
-      "n": "Santa Fe",
-      "v": 4.9
-     },
-     {
-      "n": "Mendoza",
-      "v": 3.7
-     },
-     {
-      "n": "Resto del país",
-      "v": 25.4
-     }
-    ],
-    "envios": [
-     {
-      "n": "Envío a domicilio",
-      "v": 94
-     },
-     {
-      "n": "Correo/Andreani",
-      "v": 83
-     },
-     {
-      "n": "Retiro/Acuerdo",
-      "v": 32
-     }
-    ],
-    "dias": [
-     {
-      "d": 1,
-      "ml": 0,
-      "tn": 1209115,
-      "v": 1209115,
-      "ordenes": 19
-     },
-     {
-      "d": 2,
-      "ml": 0,
-      "tn": 1376437,
-      "v": 1376437,
-      "ordenes": 14
-     },
-     {
-      "d": 3,
-      "ml": 0,
-      "tn": 1244536,
-      "v": 1244536,
-      "ordenes": 14
-     },
-     {
-      "d": 4,
-      "ml": 0,
-      "tn": 932224,
-      "v": 932224,
-      "ordenes": 11
-     },
-     {
-      "d": 5,
-      "ml": 0,
-      "tn": 830825,
-      "v": 830825,
-      "ordenes": 11
-     },
-     {
-      "d": 6,
-      "ml": 0,
-      "tn": 805368,
-      "v": 805368,
-      "ordenes": 14
-     },
-     {
-      "d": 7,
-      "ml": 0,
-      "tn": 818702,
-      "v": 818702,
-      "ordenes": 13
-     },
-     {
-      "d": 8,
-      "ml": 0,
-      "tn": 928133,
-      "v": 928133,
-      "ordenes": 18
-     },
-     {
-      "d": 9,
-      "ml": 0,
-      "tn": 324793,
-      "v": 324793,
-      "ordenes": 9
-     },
-     {
-      "d": 10,
-      "ml": 0,
-      "tn": 1737510,
-      "v": 1737510,
-      "ordenes": 17
-     },
-     {
-      "d": 11,
-      "ml": 0,
-      "tn": 586691,
-      "v": 586691,
-      "ordenes": 9
-     },
-     {
-      "d": 12,
-      "ml": 0,
-      "tn": 714459,
-      "v": 714459,
-      "ordenes": 10
-     },
-     {
-      "d": 13,
-      "ml": 0,
-      "tn": 1444947,
-      "v": 1444947,
-      "ordenes": 23
-     },
-     {
-      "d": 14,
-      "ml": 0,
-      "tn": 969237,
-      "v": 969237,
-      "ordenes": 11
-     },
-     {
-      "d": 15,
-      "ml": 0,
-      "tn": 1436067,
-      "v": 1436067,
-      "ordenes": 16
-     }
-    ],
-    "neto": 13259654
-   },
-   "q2": {
-    "eerr": {
-     "lineas": [
-      {
-       "c": "Ventas brutas",
-       "v": 15835759.504132232,
-       "pct": 111.4,
-       "tipo": "normal"
-      },
-      {
-       "c": "Bonificaciones de plataforma",
-       "v": 0,
-       "pct": 0,
-       "tipo": "normal"
-      },
-      {
-       "c": "Anulaciones y reembolsos",
-       "v": 0,
-       "pct": 0,
-       "tipo": "normal"
-      },
-      {
-       "c": "Descuentos y cupones",
-       "v": -1618854.3636363638,
-       "pct": -11.4,
-       "tipo": "normal"
-      },
-      {
-       "c": "Ventas netas",
-       "v": 14216905.140495868,
-       "pct": 100,
-       "tipo": "total"
-      },
-      {
-       "c": "Costo de la mercadería",
-       "v": -6715882.455,
-       "pct": -47.2,
-       "tipo": "gasto"
-      },
-      {
-       "c": "Margen bruto",
-       "v": 7501022.685495868,
-       "pct": 52.8,
-       "tipo": "destacado"
-      },
-      {
-       "c": "Comisiones de plataforma",
-       "v": -993840.0413223142,
-       "pct": -7,
-       "tipo": "gasto"
-      },
-      {
-       "c": "Envíos (neto de lo cobrado)",
-       "v": 0,
-       "pct": 0,
-       "tipo": "gasto"
-      },
-      {
-       "c": "Impuestos de plataforma",
-       "v": -110458.76033057852,
-       "pct": -0.8,
-       "tipo": "gasto"
-      },
-      {
-       "c": "Resultado de contribución",
-       "v": 6396723.883842976,
-       "pct": 45,
-       "tipo": "destacado"
-      }
-     ],
-     "ordenes": 160,
-     "unidades": 192,
-     "ticket": 88855.65712809918,
-     "netoLiquidado": 11869741.917355374,
-     "canceladas": 1,
-     "cobertura": 100,
-     "sinCosto": [],
-     "faltan": [
-      "Marketing y publicidad",
-      "Estructura y sueldos",
-      "Impuestos propios (IIBB, IVA)",
-      "Amortizaciones",
-      "Resultados financieros"
-     ]
-    },
-    "gastos": [
-     {
-      "n": "Costo de la mercadería",
-      "v": 47.2
-     },
-     {
-      "n": "Comisiones de plataforma",
-      "v": 7
-     },
-     {
-      "n": "Envíos y logística",
-      "v": 0
-     },
-     {
-      "n": "Impuestos de plataforma",
-      "v": 0.8
-     }
-    ],
-    "productos": [
-     {
-      "sku": "22D-BEL NEGRO (MODELO ELECTRICO)",
-      "n": "Escritorio Eléctrico Sit-Stand 135x60 Negro",
-      "v": 2342968,
-      "u": 9
-     },
-     {
-      "sku": "22D-BEL MADERA (MODELO ELECTRICO)",
-      "n": "Escritorio Eléctrico Sit-Stand 135x60 Madera",
-      "v": 1822308,
-      "u": 7
-     },
-     {
-      "sku": "SH-443XWL",
-      "n": "Soporte Articulado Naku SH-443XWL de Pared Para TV de 32\" a 80\"",
-      "v": 1489237,
-      "u": 23
-     },
-     {
-      "sku": "22D-BEL/ST",
-      "n": "Estructura Eléctrica Regulable 135x60 cm - Sit-Stand Automatico (SIN TABLA)",
-      "v": 1033054,
-      "u": 5
+      "sku": "SS-1032M",
+      "n": "Soporte Hidráulico Monitor 13-32\" VESA 75x100",
+      "v": 988408,
+      "u": 26
      },
      {
       "sku": "ORG-007",
       "n": "Estantería Plegable 4 niveles con Ruedas Naku ORG-007",
-      "v": 654536,
-      "u": 11
+      "v": 952053,
+      "u": 16
      },
      {
-      "sku": "SE-446",
-      "n": "Soporte Articulado Naku SE-446 de Pared Para TV de 20\" a 75\"",
-      "v": 582632,
-      "u": 15
-     },
-     {
-      "sku": "SP-446",
-      "n": "Soporte Articulado Naku SP-446 de Pared Para TV de 32\" a 75\"",
-      "v": 545455,
+      "sku": "SS-C024D",
+      "n": "Soporte Doble Monitor Hidráulico SS-C024D 13-32\"",
+      "v": 807263,
       "u": 12
-     },
-     {
-      "sku": "22D-B MADERA",
-      "n": "Escritorio Regulable Manual 135x60 cm - Sit-Stand con Manivela Madera",
-      "v": 454544,
-      "u": 2
-     },
-     {
-      "sku": "SS-1032M",
-      "n": "Soporte Hidráulico Monitor 13-32\" VESA 75x100",
-      "v": 418173,
-      "u": 11
      },
      {
       "sku": "CE-3",
       "n": "Cama Elástica Naku CE-03 con Red de Seguridad 3.66m de Diámetro",
-      "v": 413223,
-      "u": 1
+      "v": 785124,
+      "u": 2
      }
     ],
     "familias": [
      {
       "n": "Escritorios ergonómicos",
-      "v": 44.2
+      "v": 36.5
      },
      {
       "n": "Móviles con Brazo",
-      "v": 24.7
+      "v": 27.5
      },
      {
       "n": "Monitor",
-      "v": 7.9
-     },
-     {
-      "n": "Organizadores multiuso",
-      "v": 7.8
+      "v": 10.2
      },
      {
       "n": "Exterior y aire libre",
-      "v": 5.6
+      "v": 6.5
+     },
+     {
+      "n": "Organizadores multiuso",
+      "v": 4.7
+     },
+     {
+      "n": "MP",
+      "v": 2.6
      },
      {
       "n": "Organización de ropa",
-      "v": 2.8
+      "v": 2.5
+     },
+     {
+      "n": "Techo",
+      "v": 1.9
      },
      {
       "n": "Herramientas y equipamiento",
       "v": 1.7
      },
      {
-      "n": "Fijos con inclinación",
-      "v": 1.2
-     },
-     {
-      "n": "Techo",
-      "v": 1.1
-     },
-     {
-      "n": "Comercio",
-      "v": 0.9
+      "n": "Rack y Stand TV",
+      "v": 1.4
      },
      {
       "n": "Resto de familias",
-      "v": 2.1
+      "v": 4.4
      }
     ],
     "provincias": [
      {
       "n": "Gran Buenos Aires",
-      "v": 27.1
+      "v": 27.6
      },
      {
       "n": "Capital Federal",
-      "v": 21.7
-     },
-     {
-      "n": "Santa Fe",
-      "v": 14.5
+      "v": 17.7
      },
      {
       "n": "Buenos Aires",
-      "v": 11.1
+      "v": 11.4
      },
      {
       "n": "Córdoba",
-      "v": 9.9
+      "v": 11.2
+     },
+     {
+      "n": "Santa Fe",
+      "v": 9.5
      },
      {
       "n": "Mendoza",
-      "v": 4.6
+      "v": 4.1
      },
      {
       "n": "Resto del país",
-      "v": 11.1
+      "v": 18.6
      }
     ],
     "envios": [
      {
       "n": "Envío a domicilio",
-      "v": 85
+      "v": 179
      },
      {
       "n": "Correo/Andreani",
-      "v": 55
+      "v": 138
      },
      {
       "n": "Retiro/Acuerdo",
-      "v": 20
+      "v": 52
      }
     ],
-    "dias": [
+    "puntos": [
+     {
+      "d": 1,
+      "ml": 0,
+      "tn": 1209115,
+      "v": 1209115,
+      "ordenes": 19,
+      "etiqueta": "1"
+     },
+     {
+      "d": 2,
+      "ml": 0,
+      "tn": 1376437,
+      "v": 1376437,
+      "ordenes": 14,
+      "etiqueta": "2"
+     },
+     {
+      "d": 3,
+      "ml": 0,
+      "tn": 1244536,
+      "v": 1244536,
+      "ordenes": 14,
+      "etiqueta": "3"
+     },
+     {
+      "d": 4,
+      "ml": 0,
+      "tn": 932224,
+      "v": 932224,
+      "ordenes": 11,
+      "etiqueta": "4"
+     },
+     {
+      "d": 5,
+      "ml": 0,
+      "tn": 830825,
+      "v": 830825,
+      "ordenes": 11,
+      "etiqueta": "5"
+     },
+     {
+      "d": 6,
+      "ml": 0,
+      "tn": 805368,
+      "v": 805368,
+      "ordenes": 14,
+      "etiqueta": "6"
+     },
+     {
+      "d": 7,
+      "ml": 0,
+      "tn": 818702,
+      "v": 818702,
+      "ordenes": 13,
+      "etiqueta": "7"
+     },
+     {
+      "d": 8,
+      "ml": 0,
+      "tn": 928133,
+      "v": 928133,
+      "ordenes": 18,
+      "etiqueta": "8"
+     },
+     {
+      "d": 9,
+      "ml": 0,
+      "tn": 324793,
+      "v": 324793,
+      "ordenes": 9,
+      "etiqueta": "9"
+     },
+     {
+      "d": 10,
+      "ml": 0,
+      "tn": 1737510,
+      "v": 1737510,
+      "ordenes": 17,
+      "etiqueta": "10"
+     },
+     {
+      "d": 11,
+      "ml": 0,
+      "tn": 586691,
+      "v": 586691,
+      "ordenes": 9,
+      "etiqueta": "11"
+     },
+     {
+      "d": 12,
+      "ml": 0,
+      "tn": 714459,
+      "v": 714459,
+      "ordenes": 10,
+      "etiqueta": "12"
+     },
+     {
+      "d": 13,
+      "ml": 0,
+      "tn": 1444947,
+      "v": 1444947,
+      "ordenes": 23,
+      "etiqueta": "13"
+     },
+     {
+      "d": 14,
+      "ml": 0,
+      "tn": 969237,
+      "v": 969237,
+      "ordenes": 11,
+      "etiqueta": "14"
+     },
+     {
+      "d": 15,
+      "ml": 0,
+      "tn": 1436067,
+      "v": 1436067,
+      "ordenes": 16,
+      "etiqueta": "15"
+     },
      {
       "d": 16,
       "ml": 0,
       "tn": 1576852,
       "v": 1576852,
-      "ordenes": 14
+      "ordenes": 14,
+      "etiqueta": "16"
      },
      {
       "d": 17,
       "ml": 0,
       "tn": 571483,
       "v": 571483,
-      "ordenes": 6
+      "ordenes": 6,
+      "etiqueta": "17"
      },
      {
       "d": 18,
       "ml": 0,
       "tn": 234707,
       "v": 234707,
-      "ordenes": 4
+      "ordenes": 4,
+      "etiqueta": "18"
      },
      {
       "d": 19,
       "ml": 0,
       "tn": 67272,
       "v": 67272,
-      "ordenes": 1
+      "ordenes": 1,
+      "etiqueta": "19"
      },
      {
       "d": 20,
       "ml": 0,
       "tn": 1940736,
       "v": 1940736,
-      "ordenes": 16
+      "ordenes": 16,
+      "etiqueta": "20"
      },
      {
       "d": 21,
       "ml": 0,
       "tn": 672349,
       "v": 672349,
-      "ordenes": 12
+      "ordenes": 12,
+      "etiqueta": "21"
      },
      {
       "d": 22,
       "ml": 0,
       "tn": 693220,
       "v": 693220,
-      "ordenes": 7
+      "ordenes": 7,
+      "etiqueta": "22"
      },
      {
       "d": 23,
       "ml": 0,
       "tn": 1168008,
       "v": 1168008,
-      "ordenes": 12
+      "ordenes": 12,
+      "etiqueta": "23"
      },
      {
       "d": 24,
       "ml": 0,
       "tn": 507332,
       "v": 507332,
-      "ordenes": 7
+      "ordenes": 7,
+      "etiqueta": "24"
      },
      {
       "d": 25,
       "ml": 0,
       "tn": 1054950,
       "v": 1054950,
-      "ordenes": 12
+      "ordenes": 12,
+      "etiqueta": "25"
      },
      {
       "d": 26,
       "ml": 0,
       "tn": 507844,
       "v": 507844,
-      "ordenes": 6
+      "ordenes": 6,
+      "etiqueta": "26"
      },
      {
       "d": 27,
       "ml": 0,
       "tn": 647517,
       "v": 647517,
-      "ordenes": 10
+      "ordenes": 10,
+      "etiqueta": "27"
      },
      {
       "d": 28,
       "ml": 0,
       "tn": 1756026,
       "v": 1756026,
-      "ordenes": 13
+      "ordenes": 13,
+      "etiqueta": "28"
      },
      {
       "d": 29,
       "ml": 0,
       "tn": 807508,
       "v": 807508,
-      "ordenes": 12
+      "ordenes": 12,
+      "etiqueta": "29"
      },
      {
       "d": 30,
       "ml": 0,
       "tn": 716756,
       "v": 716756,
-      "ordenes": 10
+      "ordenes": 10,
+      "etiqueta": "30"
      },
      {
       "d": 31,
       "ml": 0,
       "tn": 956022,
       "v": 956022,
-      "ordenes": 18
+      "ordenes": 18,
+      "etiqueta": "31"
      }
     ],
-    "neto": 11869742
+    "granularidad": "dia",
+    "meses": [
+     "2026-07"
+    ],
+    "neto": 25129396
    },
-   "u7": {
+   "anio": {
     "eerr": {
      "lineas": [
       {
        "c": "Ventas brutas",
-       "v": 7390891.73553719,
-       "pct": 112,
+       "v": 33380424.79338843,
+       "pct": 111.1,
        "tipo": "normal"
       },
       {
@@ -4647,32 +6695,32 @@
       },
       {
        "c": "Descuentos y cupones",
-       "v": -789467.0413223141,
-       "pct": -12,
+       "v": -3334618.925619835,
+       "pct": -11.1,
        "tipo": "normal"
       },
       {
        "c": "Ventas netas",
-       "v": 6601424.694214876,
+       "v": 30045805.867768593,
        "pct": 100,
        "tipo": "total"
       },
       {
        "c": "Costo de la mercadería",
-       "v": -3055951.645,
-       "pct": -46.3,
+       "v": -14140243.674999997,
+       "pct": -47.1,
        "tipo": "gasto"
       },
       {
        "c": "Margen bruto",
-       "v": 3545473.049214876,
-       "pct": 53.7,
+       "v": 15905562.192768596,
+       "pct": 52.9,
        "tipo": "destacado"
       },
       {
        "c": "Comisiones de plataforma",
-       "v": -348444.80991735536,
-       "pct": -5.3,
+       "v": -2238147.785123967,
+       "pct": -7.4,
        "tipo": "gasto"
       },
       {
@@ -4683,24 +6731,35 @@
       },
       {
        "c": "Impuestos de plataforma",
-       "v": -49822.70247933885,
+       "v": -232624.26446280986,
        "pct": -0.8,
        "tipo": "gasto"
       },
       {
        "c": "Resultado de contribución",
-       "v": 3147205.5368181816,
-       "pct": 47.7,
+       "v": 13434790.14318182,
+       "pct": 44.7,
        "tipo": "destacado"
       }
      ],
-     "ordenes": 81,
-     "unidades": 98,
-     "ticket": 81499.07029894908,
-     "netoLiquidado": 5260566.570247934,
-     "canceladas": 1,
-     "cobertura": 100,
-     "sinCosto": [],
+     "ordenes": 369,
+     "unidades": 430,
+     "ticket": 81424.9481511344,
+     "netoLiquidado": 25129395.570247933,
+     "canceladas": 4,
+     "cobertura": 99.8,
+     "sinCosto": [
+      {
+       "sku": "SP-46B",
+       "facturacion": 62697,
+       "lineas": 1
+      },
+      {
+       "sku": "S-504A",
+       "facturacion": 30800,
+       "lineas": 1
+      }
+     ],
      "faltan": [
       "Marketing y publicidad",
       "Estructura y sueldos",
@@ -4712,11 +6771,11 @@
     "gastos": [
      {
       "n": "Costo de la mercadería",
-      "v": 46.3
+      "v": 47.1
      },
      {
       "n": "Comisiones de plataforma",
-      "v": 5.3
+      "v": 7.4
      },
      {
       "n": "Envíos y logística",
@@ -4729,275 +6788,1502 @@
     ],
     "productos": [
      {
-      "sku": "22D-BEL MADERA (MODELO ELECTRICO)",
-      "n": "Escritorio Eléctrico Sit-Stand 135x60 Madera",
-      "v": 1041319,
-      "u": 4
+      "sku": "22D-BEL NEGRO (MODELO ELECTRICO)",
+      "n": "Escritorio Eléctrico Sit-Stand 135x60 Negro",
+      "v": 3904946,
+      "u": 15
      },
      {
       "sku": "SH-443XWL",
       "n": "Soporte Articulado Naku SH-443XWL de Pared Para TV de 32\" a 80\"",
-      "v": 522307,
-      "u": 8
+      "v": 3294173,
+      "u": 51
      },
      {
-      "sku": "ORG-007",
-      "n": "Estantería Plegable 4 niveles con Ruedas Naku ORG-007",
-      "v": 416523,
-      "u": 7
-     },
-     {
-      "sku": "CE-3",
-      "n": "Cama Elástica Naku CE-03 con Red de Seguridad 3.66m de Diámetro",
-      "v": 413223,
-      "u": 1
-     },
-     {
-      "sku": "SE-446",
-      "n": "Soporte Articulado Naku SE-446 de Pared Para TV de 20\" a 75\"",
-      "v": 349579,
-      "u": 9
+      "sku": "22D-BEL MADERA (MODELO ELECTRICO)",
+      "n": "Escritorio Eléctrico Sit-Stand 135x60 Madera",
+      "v": 3123957,
+      "u": 12
      },
      {
       "sku": "SP-446",
       "n": "Soporte Articulado Naku SP-446 de Pared Para TV de 32\" a 75\"",
-      "v": 318182,
-      "u": 7
+      "v": 2090909,
+      "u": 46
      },
      {
-      "sku": "22D-BEL NEGRO (MODELO ELECTRICO)",
-      "n": "Escritorio Eléctrico Sit-Stand 135x60 Negro",
-      "v": 260330,
-      "u": 1
+      "sku": "22D-BEL/ST",
+      "n": "Estructura Eléctrica Regulable 135x60 cm - Sit-Stand Automatico (SIN TABLA)",
+      "v": 1652886,
+      "u": 8
      },
      {
-      "sku": "22D-BEL BLANCO (MODELO ELECTRICO)",
-      "n": "Escritorio Eléctrico Sit-Stand 135x60 Blanco",
-      "v": 260330,
-      "u": 1
+      "sku": "SE-446",
+      "n": "Soporte Articulado Naku SE-446 de Pared Para TV de 20\" a 75\"",
+      "v": 1087580,
+      "u": 28
      },
      {
-      "sku": "SE-466",
-      "n": "Soporte Articulado Naku SE-466 de Pared Para TV de 32\" a 85",
-      "v": 247929,
-      "u": 6
+      "sku": "SS-1032M",
+      "n": "Soporte Hidráulico Monitor 13-32\" VESA 75x100",
+      "v": 988408,
+      "u": 26
      },
      {
-      "sku": "ZAP-003",
-      "n": "Organizador Zapatero Giratorio Naku ZAP-003 Melamina Blanco",
-      "v": 235537,
-      "u": 1
+      "sku": "ORG-007",
+      "n": "Estantería Plegable 4 niveles con Ruedas Naku ORG-007",
+      "v": 952053,
+      "u": 16
+     },
+     {
+      "sku": "SS-C024D",
+      "n": "Soporte Doble Monitor Hidráulico SS-C024D 13-32\"",
+      "v": 807263,
+      "u": 12
+     },
+     {
+      "sku": "CE-3",
+      "n": "Cama Elástica Naku CE-03 con Red de Seguridad 3.66m de Diámetro",
+      "v": 785124,
+      "u": 2
      }
     ],
     "familias": [
      {
       "n": "Escritorios ergonómicos",
-      "v": 31
+      "v": 36.5
      },
      {
       "n": "Móviles con Brazo",
-      "v": 25
-     },
-     {
-      "n": "Organizadores multiuso",
-      "v": 13
-     },
-     {
-      "n": "Exterior y aire libre",
-      "v": 12.1
+      "v": 27.5
      },
      {
       "n": "Monitor",
-      "v": 6.7
+      "v": 10.2
+     },
+     {
+      "n": "Exterior y aire libre",
+      "v": 6.5
+     },
+     {
+      "n": "Organizadores multiuso",
+      "v": 4.7
+     },
+     {
+      "n": "MP",
+      "v": 2.6
      },
      {
       "n": "Organización de ropa",
-      "v": 3.9
-     },
-     {
-      "n": "Herramientas y equipamiento",
-      "v": 3.7
-     },
-     {
-      "n": "Fijos con inclinación",
-      "v": 1.3
-     },
-     {
-      "n": "Comercio",
-      "v": 1
+      "v": 2.5
      },
      {
       "n": "Techo",
-      "v": 0.8
+      "v": 1.9
+     },
+     {
+      "n": "Herramientas y equipamiento",
+      "v": 1.7
+     },
+     {
+      "n": "Rack y Stand TV",
+      "v": 1.4
      },
      {
       "n": "Resto de familias",
-      "v": 1.5
+      "v": 4.4
      }
     ],
     "provincias": [
      {
-      "n": "Buenos Aires",
-      "v": 19.7
-     },
-     {
-      "n": "Santa Fe",
-      "v": 19.6
+      "n": "Gran Buenos Aires",
+      "v": 27.6
      },
      {
       "n": "Capital Federal",
-      "v": 19.4
-     },
-     {
-      "n": "Gran Buenos Aires",
       "v": 17.7
      },
      {
+      "n": "Buenos Aires",
+      "v": 11.4
+     },
+     {
       "n": "Córdoba",
-      "v": 7.8
+      "v": 11.2
+     },
+     {
+      "n": "Santa Fe",
+      "v": 9.5
      },
      {
       "n": "Mendoza",
-      "v": 7
+      "v": 4.1
      },
      {
       "n": "Resto del país",
-      "v": 8.9
+      "v": 18.6
      }
     ],
     "envios": [
      {
       "n": "Envío a domicilio",
-      "v": 39
+      "v": 179
      },
      {
       "n": "Correo/Andreani",
-      "v": 31
+      "v": 138
      },
      {
       "n": "Retiro/Acuerdo",
-      "v": 11
+      "v": 52
      }
     ],
-    "dias": [
+    "puntos": [
+     {
+      "d": 1,
+      "ml": 0,
+      "tn": 1209115,
+      "v": 1209115,
+      "ordenes": 19,
+      "etiqueta": "1"
+     },
+     {
+      "d": 2,
+      "ml": 0,
+      "tn": 1376437,
+      "v": 1376437,
+      "ordenes": 14,
+      "etiqueta": "2"
+     },
+     {
+      "d": 3,
+      "ml": 0,
+      "tn": 1244536,
+      "v": 1244536,
+      "ordenes": 14,
+      "etiqueta": "3"
+     },
+     {
+      "d": 4,
+      "ml": 0,
+      "tn": 932224,
+      "v": 932224,
+      "ordenes": 11,
+      "etiqueta": "4"
+     },
+     {
+      "d": 5,
+      "ml": 0,
+      "tn": 830825,
+      "v": 830825,
+      "ordenes": 11,
+      "etiqueta": "5"
+     },
+     {
+      "d": 6,
+      "ml": 0,
+      "tn": 805368,
+      "v": 805368,
+      "ordenes": 14,
+      "etiqueta": "6"
+     },
+     {
+      "d": 7,
+      "ml": 0,
+      "tn": 818702,
+      "v": 818702,
+      "ordenes": 13,
+      "etiqueta": "7"
+     },
+     {
+      "d": 8,
+      "ml": 0,
+      "tn": 928133,
+      "v": 928133,
+      "ordenes": 18,
+      "etiqueta": "8"
+     },
+     {
+      "d": 9,
+      "ml": 0,
+      "tn": 324793,
+      "v": 324793,
+      "ordenes": 9,
+      "etiqueta": "9"
+     },
+     {
+      "d": 10,
+      "ml": 0,
+      "tn": 1737510,
+      "v": 1737510,
+      "ordenes": 17,
+      "etiqueta": "10"
+     },
+     {
+      "d": 11,
+      "ml": 0,
+      "tn": 586691,
+      "v": 586691,
+      "ordenes": 9,
+      "etiqueta": "11"
+     },
+     {
+      "d": 12,
+      "ml": 0,
+      "tn": 714459,
+      "v": 714459,
+      "ordenes": 10,
+      "etiqueta": "12"
+     },
+     {
+      "d": 13,
+      "ml": 0,
+      "tn": 1444947,
+      "v": 1444947,
+      "ordenes": 23,
+      "etiqueta": "13"
+     },
+     {
+      "d": 14,
+      "ml": 0,
+      "tn": 969237,
+      "v": 969237,
+      "ordenes": 11,
+      "etiqueta": "14"
+     },
+     {
+      "d": 15,
+      "ml": 0,
+      "tn": 1436067,
+      "v": 1436067,
+      "ordenes": 16,
+      "etiqueta": "15"
+     },
+     {
+      "d": 16,
+      "ml": 0,
+      "tn": 1576852,
+      "v": 1576852,
+      "ordenes": 14,
+      "etiqueta": "16"
+     },
+     {
+      "d": 17,
+      "ml": 0,
+      "tn": 571483,
+      "v": 571483,
+      "ordenes": 6,
+      "etiqueta": "17"
+     },
+     {
+      "d": 18,
+      "ml": 0,
+      "tn": 234707,
+      "v": 234707,
+      "ordenes": 4,
+      "etiqueta": "18"
+     },
+     {
+      "d": 19,
+      "ml": 0,
+      "tn": 67272,
+      "v": 67272,
+      "ordenes": 1,
+      "etiqueta": "19"
+     },
+     {
+      "d": 20,
+      "ml": 0,
+      "tn": 1940736,
+      "v": 1940736,
+      "ordenes": 16,
+      "etiqueta": "20"
+     },
+     {
+      "d": 21,
+      "ml": 0,
+      "tn": 672349,
+      "v": 672349,
+      "ordenes": 12,
+      "etiqueta": "21"
+     },
+     {
+      "d": 22,
+      "ml": 0,
+      "tn": 693220,
+      "v": 693220,
+      "ordenes": 7,
+      "etiqueta": "22"
+     },
+     {
+      "d": 23,
+      "ml": 0,
+      "tn": 1168008,
+      "v": 1168008,
+      "ordenes": 12,
+      "etiqueta": "23"
+     },
+     {
+      "d": 24,
+      "ml": 0,
+      "tn": 507332,
+      "v": 507332,
+      "ordenes": 7,
+      "etiqueta": "24"
+     },
      {
       "d": 25,
       "ml": 0,
       "tn": 1054950,
       "v": 1054950,
-      "ordenes": 12
+      "ordenes": 12,
+      "etiqueta": "25"
      },
      {
       "d": 26,
       "ml": 0,
       "tn": 507844,
       "v": 507844,
-      "ordenes": 6
+      "ordenes": 6,
+      "etiqueta": "26"
      },
      {
       "d": 27,
       "ml": 0,
       "tn": 647517,
       "v": 647517,
-      "ordenes": 10
+      "ordenes": 10,
+      "etiqueta": "27"
      },
      {
       "d": 28,
       "ml": 0,
       "tn": 1756026,
       "v": 1756026,
-      "ordenes": 13
+      "ordenes": 13,
+      "etiqueta": "28"
      },
      {
       "d": 29,
       "ml": 0,
       "tn": 807508,
       "v": 807508,
-      "ordenes": 12
+      "ordenes": 12,
+      "etiqueta": "29"
      },
      {
       "d": 30,
       "ml": 0,
       "tn": 716756,
       "v": 716756,
-      "ordenes": 10
+      "ordenes": 10,
+      "etiqueta": "30"
      },
      {
       "d": 31,
       "ml": 0,
       "tn": 956022,
       "v": 956022,
-      "ordenes": 18
+      "ordenes": 18,
+      "etiqueta": "31"
      }
     ],
-    "neto": 5260567
+    "granularidad": "dia",
+    "meses": [
+     "2026-07"
+    ],
+    "neto": 25129396
+   },
+   "rango": {
+    "eerr": {
+     "lineas": [
+      {
+       "c": "Ventas brutas",
+       "v": 33380424.79338843,
+       "pct": 111.1,
+       "tipo": "normal"
+      },
+      {
+       "c": "Bonificaciones de plataforma",
+       "v": 0,
+       "pct": 0,
+       "tipo": "normal"
+      },
+      {
+       "c": "Anulaciones y reembolsos",
+       "v": 0,
+       "pct": 0,
+       "tipo": "normal"
+      },
+      {
+       "c": "Descuentos y cupones",
+       "v": -3334618.925619835,
+       "pct": -11.1,
+       "tipo": "normal"
+      },
+      {
+       "c": "Ventas netas",
+       "v": 30045805.867768593,
+       "pct": 100,
+       "tipo": "total"
+      },
+      {
+       "c": "Costo de la mercadería",
+       "v": -14140243.674999997,
+       "pct": -47.1,
+       "tipo": "gasto"
+      },
+      {
+       "c": "Margen bruto",
+       "v": 15905562.192768596,
+       "pct": 52.9,
+       "tipo": "destacado"
+      },
+      {
+       "c": "Comisiones de plataforma",
+       "v": -2238147.785123967,
+       "pct": -7.4,
+       "tipo": "gasto"
+      },
+      {
+       "c": "Envíos (neto de lo cobrado)",
+       "v": 0,
+       "pct": 0,
+       "tipo": "gasto"
+      },
+      {
+       "c": "Impuestos de plataforma",
+       "v": -232624.26446280986,
+       "pct": -0.8,
+       "tipo": "gasto"
+      },
+      {
+       "c": "Resultado de contribución",
+       "v": 13434790.14318182,
+       "pct": 44.7,
+       "tipo": "destacado"
+      }
+     ],
+     "ordenes": 369,
+     "unidades": 430,
+     "ticket": 81424.9481511344,
+     "netoLiquidado": 25129395.570247933,
+     "canceladas": 4,
+     "cobertura": 99.8,
+     "sinCosto": [
+      {
+       "sku": "SP-46B",
+       "facturacion": 62697,
+       "lineas": 1
+      },
+      {
+       "sku": "S-504A",
+       "facturacion": 30800,
+       "lineas": 1
+      }
+     ],
+     "faltan": [
+      "Marketing y publicidad",
+      "Estructura y sueldos",
+      "Impuestos propios (IIBB, IVA)",
+      "Amortizaciones",
+      "Resultados financieros"
+     ]
+    },
+    "gastos": [
+     {
+      "n": "Costo de la mercadería",
+      "v": 47.1
+     },
+     {
+      "n": "Comisiones de plataforma",
+      "v": 7.4
+     },
+     {
+      "n": "Envíos y logística",
+      "v": 0
+     },
+     {
+      "n": "Impuestos de plataforma",
+      "v": 0.8
+     }
+    ],
+    "productos": [
+     {
+      "sku": "22D-BEL NEGRO (MODELO ELECTRICO)",
+      "n": "Escritorio Eléctrico Sit-Stand 135x60 Negro",
+      "v": 3904946,
+      "u": 15
+     },
+     {
+      "sku": "SH-443XWL",
+      "n": "Soporte Articulado Naku SH-443XWL de Pared Para TV de 32\" a 80\"",
+      "v": 3294173,
+      "u": 51
+     },
+     {
+      "sku": "22D-BEL MADERA (MODELO ELECTRICO)",
+      "n": "Escritorio Eléctrico Sit-Stand 135x60 Madera",
+      "v": 3123957,
+      "u": 12
+     },
+     {
+      "sku": "SP-446",
+      "n": "Soporte Articulado Naku SP-446 de Pared Para TV de 32\" a 75\"",
+      "v": 2090909,
+      "u": 46
+     },
+     {
+      "sku": "22D-BEL/ST",
+      "n": "Estructura Eléctrica Regulable 135x60 cm - Sit-Stand Automatico (SIN TABLA)",
+      "v": 1652886,
+      "u": 8
+     },
+     {
+      "sku": "SE-446",
+      "n": "Soporte Articulado Naku SE-446 de Pared Para TV de 20\" a 75\"",
+      "v": 1087580,
+      "u": 28
+     },
+     {
+      "sku": "SS-1032M",
+      "n": "Soporte Hidráulico Monitor 13-32\" VESA 75x100",
+      "v": 988408,
+      "u": 26
+     },
+     {
+      "sku": "ORG-007",
+      "n": "Estantería Plegable 4 niveles con Ruedas Naku ORG-007",
+      "v": 952053,
+      "u": 16
+     },
+     {
+      "sku": "SS-C024D",
+      "n": "Soporte Doble Monitor Hidráulico SS-C024D 13-32\"",
+      "v": 807263,
+      "u": 12
+     },
+     {
+      "sku": "CE-3",
+      "n": "Cama Elástica Naku CE-03 con Red de Seguridad 3.66m de Diámetro",
+      "v": 785124,
+      "u": 2
+     }
+    ],
+    "familias": [
+     {
+      "n": "Escritorios ergonómicos",
+      "v": 36.5
+     },
+     {
+      "n": "Móviles con Brazo",
+      "v": 27.5
+     },
+     {
+      "n": "Monitor",
+      "v": 10.2
+     },
+     {
+      "n": "Exterior y aire libre",
+      "v": 6.5
+     },
+     {
+      "n": "Organizadores multiuso",
+      "v": 4.7
+     },
+     {
+      "n": "MP",
+      "v": 2.6
+     },
+     {
+      "n": "Organización de ropa",
+      "v": 2.5
+     },
+     {
+      "n": "Techo",
+      "v": 1.9
+     },
+     {
+      "n": "Herramientas y equipamiento",
+      "v": 1.7
+     },
+     {
+      "n": "Rack y Stand TV",
+      "v": 1.4
+     },
+     {
+      "n": "Resto de familias",
+      "v": 4.4
+     }
+    ],
+    "provincias": [
+     {
+      "n": "Gran Buenos Aires",
+      "v": 27.6
+     },
+     {
+      "n": "Capital Federal",
+      "v": 17.7
+     },
+     {
+      "n": "Buenos Aires",
+      "v": 11.4
+     },
+     {
+      "n": "Córdoba",
+      "v": 11.2
+     },
+     {
+      "n": "Santa Fe",
+      "v": 9.5
+     },
+     {
+      "n": "Mendoza",
+      "v": 4.1
+     },
+     {
+      "n": "Resto del país",
+      "v": 18.6
+     }
+    ],
+    "envios": [
+     {
+      "n": "Envío a domicilio",
+      "v": 179
+     },
+     {
+      "n": "Correo/Andreani",
+      "v": 138
+     },
+     {
+      "n": "Retiro/Acuerdo",
+      "v": 52
+     }
+    ],
+    "puntos": [
+     {
+      "d": 1,
+      "ml": 0,
+      "tn": 1209115,
+      "v": 1209115,
+      "ordenes": 19,
+      "etiqueta": "1"
+     },
+     {
+      "d": 2,
+      "ml": 0,
+      "tn": 1376437,
+      "v": 1376437,
+      "ordenes": 14,
+      "etiqueta": "2"
+     },
+     {
+      "d": 3,
+      "ml": 0,
+      "tn": 1244536,
+      "v": 1244536,
+      "ordenes": 14,
+      "etiqueta": "3"
+     },
+     {
+      "d": 4,
+      "ml": 0,
+      "tn": 932224,
+      "v": 932224,
+      "ordenes": 11,
+      "etiqueta": "4"
+     },
+     {
+      "d": 5,
+      "ml": 0,
+      "tn": 830825,
+      "v": 830825,
+      "ordenes": 11,
+      "etiqueta": "5"
+     },
+     {
+      "d": 6,
+      "ml": 0,
+      "tn": 805368,
+      "v": 805368,
+      "ordenes": 14,
+      "etiqueta": "6"
+     },
+     {
+      "d": 7,
+      "ml": 0,
+      "tn": 818702,
+      "v": 818702,
+      "ordenes": 13,
+      "etiqueta": "7"
+     },
+     {
+      "d": 8,
+      "ml": 0,
+      "tn": 928133,
+      "v": 928133,
+      "ordenes": 18,
+      "etiqueta": "8"
+     },
+     {
+      "d": 9,
+      "ml": 0,
+      "tn": 324793,
+      "v": 324793,
+      "ordenes": 9,
+      "etiqueta": "9"
+     },
+     {
+      "d": 10,
+      "ml": 0,
+      "tn": 1737510,
+      "v": 1737510,
+      "ordenes": 17,
+      "etiqueta": "10"
+     },
+     {
+      "d": 11,
+      "ml": 0,
+      "tn": 586691,
+      "v": 586691,
+      "ordenes": 9,
+      "etiqueta": "11"
+     },
+     {
+      "d": 12,
+      "ml": 0,
+      "tn": 714459,
+      "v": 714459,
+      "ordenes": 10,
+      "etiqueta": "12"
+     },
+     {
+      "d": 13,
+      "ml": 0,
+      "tn": 1444947,
+      "v": 1444947,
+      "ordenes": 23,
+      "etiqueta": "13"
+     },
+     {
+      "d": 14,
+      "ml": 0,
+      "tn": 969237,
+      "v": 969237,
+      "ordenes": 11,
+      "etiqueta": "14"
+     },
+     {
+      "d": 15,
+      "ml": 0,
+      "tn": 1436067,
+      "v": 1436067,
+      "ordenes": 16,
+      "etiqueta": "15"
+     },
+     {
+      "d": 16,
+      "ml": 0,
+      "tn": 1576852,
+      "v": 1576852,
+      "ordenes": 14,
+      "etiqueta": "16"
+     },
+     {
+      "d": 17,
+      "ml": 0,
+      "tn": 571483,
+      "v": 571483,
+      "ordenes": 6,
+      "etiqueta": "17"
+     },
+     {
+      "d": 18,
+      "ml": 0,
+      "tn": 234707,
+      "v": 234707,
+      "ordenes": 4,
+      "etiqueta": "18"
+     },
+     {
+      "d": 19,
+      "ml": 0,
+      "tn": 67272,
+      "v": 67272,
+      "ordenes": 1,
+      "etiqueta": "19"
+     },
+     {
+      "d": 20,
+      "ml": 0,
+      "tn": 1940736,
+      "v": 1940736,
+      "ordenes": 16,
+      "etiqueta": "20"
+     },
+     {
+      "d": 21,
+      "ml": 0,
+      "tn": 672349,
+      "v": 672349,
+      "ordenes": 12,
+      "etiqueta": "21"
+     },
+     {
+      "d": 22,
+      "ml": 0,
+      "tn": 693220,
+      "v": 693220,
+      "ordenes": 7,
+      "etiqueta": "22"
+     },
+     {
+      "d": 23,
+      "ml": 0,
+      "tn": 1168008,
+      "v": 1168008,
+      "ordenes": 12,
+      "etiqueta": "23"
+     },
+     {
+      "d": 24,
+      "ml": 0,
+      "tn": 507332,
+      "v": 507332,
+      "ordenes": 7,
+      "etiqueta": "24"
+     },
+     {
+      "d": 25,
+      "ml": 0,
+      "tn": 1054950,
+      "v": 1054950,
+      "ordenes": 12,
+      "etiqueta": "25"
+     },
+     {
+      "d": 26,
+      "ml": 0,
+      "tn": 507844,
+      "v": 507844,
+      "ordenes": 6,
+      "etiqueta": "26"
+     },
+     {
+      "d": 27,
+      "ml": 0,
+      "tn": 647517,
+      "v": 647517,
+      "ordenes": 10,
+      "etiqueta": "27"
+     },
+     {
+      "d": 28,
+      "ml": 0,
+      "tn": 1756026,
+      "v": 1756026,
+      "ordenes": 13,
+      "etiqueta": "28"
+     },
+     {
+      "d": 29,
+      "ml": 0,
+      "tn": 807508,
+      "v": 807508,
+      "ordenes": 12,
+      "etiqueta": "29"
+     },
+     {
+      "d": 30,
+      "ml": 0,
+      "tn": 716756,
+      "v": 716756,
+      "ordenes": 10,
+      "etiqueta": "30"
+     },
+     {
+      "d": 31,
+      "ml": 0,
+      "tn": 956022,
+      "v": 956022,
+      "ordenes": 18,
+      "etiqueta": "31"
+     }
+    ],
+    "granularidad": "dia",
+    "meses": [
+     "2026-07"
+    ],
+    "neto": 25129396
+   },
+   "mes:2026-07": {
+    "eerr": {
+     "lineas": [
+      {
+       "c": "Ventas brutas",
+       "v": 33380424.79338843,
+       "pct": 111.1,
+       "tipo": "normal"
+      },
+      {
+       "c": "Bonificaciones de plataforma",
+       "v": 0,
+       "pct": 0,
+       "tipo": "normal"
+      },
+      {
+       "c": "Anulaciones y reembolsos",
+       "v": 0,
+       "pct": 0,
+       "tipo": "normal"
+      },
+      {
+       "c": "Descuentos y cupones",
+       "v": -3334618.925619835,
+       "pct": -11.1,
+       "tipo": "normal"
+      },
+      {
+       "c": "Ventas netas",
+       "v": 30045805.867768593,
+       "pct": 100,
+       "tipo": "total"
+      },
+      {
+       "c": "Costo de la mercadería",
+       "v": -14140243.674999997,
+       "pct": -47.1,
+       "tipo": "gasto"
+      },
+      {
+       "c": "Margen bruto",
+       "v": 15905562.192768596,
+       "pct": 52.9,
+       "tipo": "destacado"
+      },
+      {
+       "c": "Comisiones de plataforma",
+       "v": -2238147.785123967,
+       "pct": -7.4,
+       "tipo": "gasto"
+      },
+      {
+       "c": "Envíos (neto de lo cobrado)",
+       "v": 0,
+       "pct": 0,
+       "tipo": "gasto"
+      },
+      {
+       "c": "Impuestos de plataforma",
+       "v": -232624.26446280986,
+       "pct": -0.8,
+       "tipo": "gasto"
+      },
+      {
+       "c": "Resultado de contribución",
+       "v": 13434790.14318182,
+       "pct": 44.7,
+       "tipo": "destacado"
+      }
+     ],
+     "ordenes": 369,
+     "unidades": 430,
+     "ticket": 81424.9481511344,
+     "netoLiquidado": 25129395.570247933,
+     "canceladas": 4,
+     "cobertura": 99.8,
+     "sinCosto": [
+      {
+       "sku": "SP-46B",
+       "facturacion": 62697,
+       "lineas": 1
+      },
+      {
+       "sku": "S-504A",
+       "facturacion": 30800,
+       "lineas": 1
+      }
+     ],
+     "faltan": [
+      "Marketing y publicidad",
+      "Estructura y sueldos",
+      "Impuestos propios (IIBB, IVA)",
+      "Amortizaciones",
+      "Resultados financieros"
+     ]
+    },
+    "gastos": [
+     {
+      "n": "Costo de la mercadería",
+      "v": 47.1
+     },
+     {
+      "n": "Comisiones de plataforma",
+      "v": 7.4
+     },
+     {
+      "n": "Envíos y logística",
+      "v": 0
+     },
+     {
+      "n": "Impuestos de plataforma",
+      "v": 0.8
+     }
+    ],
+    "productos": [
+     {
+      "sku": "22D-BEL NEGRO (MODELO ELECTRICO)",
+      "n": "Escritorio Eléctrico Sit-Stand 135x60 Negro",
+      "v": 3904946,
+      "u": 15
+     },
+     {
+      "sku": "SH-443XWL",
+      "n": "Soporte Articulado Naku SH-443XWL de Pared Para TV de 32\" a 80\"",
+      "v": 3294173,
+      "u": 51
+     },
+     {
+      "sku": "22D-BEL MADERA (MODELO ELECTRICO)",
+      "n": "Escritorio Eléctrico Sit-Stand 135x60 Madera",
+      "v": 3123957,
+      "u": 12
+     },
+     {
+      "sku": "SP-446",
+      "n": "Soporte Articulado Naku SP-446 de Pared Para TV de 32\" a 75\"",
+      "v": 2090909,
+      "u": 46
+     },
+     {
+      "sku": "22D-BEL/ST",
+      "n": "Estructura Eléctrica Regulable 135x60 cm - Sit-Stand Automatico (SIN TABLA)",
+      "v": 1652886,
+      "u": 8
+     },
+     {
+      "sku": "SE-446",
+      "n": "Soporte Articulado Naku SE-446 de Pared Para TV de 20\" a 75\"",
+      "v": 1087580,
+      "u": 28
+     },
+     {
+      "sku": "SS-1032M",
+      "n": "Soporte Hidráulico Monitor 13-32\" VESA 75x100",
+      "v": 988408,
+      "u": 26
+     },
+     {
+      "sku": "ORG-007",
+      "n": "Estantería Plegable 4 niveles con Ruedas Naku ORG-007",
+      "v": 952053,
+      "u": 16
+     },
+     {
+      "sku": "SS-C024D",
+      "n": "Soporte Doble Monitor Hidráulico SS-C024D 13-32\"",
+      "v": 807263,
+      "u": 12
+     },
+     {
+      "sku": "CE-3",
+      "n": "Cama Elástica Naku CE-03 con Red de Seguridad 3.66m de Diámetro",
+      "v": 785124,
+      "u": 2
+     }
+    ],
+    "familias": [
+     {
+      "n": "Escritorios ergonómicos",
+      "v": 36.5
+     },
+     {
+      "n": "Móviles con Brazo",
+      "v": 27.5
+     },
+     {
+      "n": "Monitor",
+      "v": 10.2
+     },
+     {
+      "n": "Exterior y aire libre",
+      "v": 6.5
+     },
+     {
+      "n": "Organizadores multiuso",
+      "v": 4.7
+     },
+     {
+      "n": "MP",
+      "v": 2.6
+     },
+     {
+      "n": "Organización de ropa",
+      "v": 2.5
+     },
+     {
+      "n": "Techo",
+      "v": 1.9
+     },
+     {
+      "n": "Herramientas y equipamiento",
+      "v": 1.7
+     },
+     {
+      "n": "Rack y Stand TV",
+      "v": 1.4
+     },
+     {
+      "n": "Resto de familias",
+      "v": 4.4
+     }
+    ],
+    "provincias": [
+     {
+      "n": "Gran Buenos Aires",
+      "v": 27.6
+     },
+     {
+      "n": "Capital Federal",
+      "v": 17.7
+     },
+     {
+      "n": "Buenos Aires",
+      "v": 11.4
+     },
+     {
+      "n": "Córdoba",
+      "v": 11.2
+     },
+     {
+      "n": "Santa Fe",
+      "v": 9.5
+     },
+     {
+      "n": "Mendoza",
+      "v": 4.1
+     },
+     {
+      "n": "Resto del país",
+      "v": 18.6
+     }
+    ],
+    "envios": [
+     {
+      "n": "Envío a domicilio",
+      "v": 179
+     },
+     {
+      "n": "Correo/Andreani",
+      "v": 138
+     },
+     {
+      "n": "Retiro/Acuerdo",
+      "v": 52
+     }
+    ],
+    "puntos": [
+     {
+      "d": 1,
+      "ml": 0,
+      "tn": 1209115,
+      "v": 1209115,
+      "ordenes": 19,
+      "etiqueta": "1"
+     },
+     {
+      "d": 2,
+      "ml": 0,
+      "tn": 1376437,
+      "v": 1376437,
+      "ordenes": 14,
+      "etiqueta": "2"
+     },
+     {
+      "d": 3,
+      "ml": 0,
+      "tn": 1244536,
+      "v": 1244536,
+      "ordenes": 14,
+      "etiqueta": "3"
+     },
+     {
+      "d": 4,
+      "ml": 0,
+      "tn": 932224,
+      "v": 932224,
+      "ordenes": 11,
+      "etiqueta": "4"
+     },
+     {
+      "d": 5,
+      "ml": 0,
+      "tn": 830825,
+      "v": 830825,
+      "ordenes": 11,
+      "etiqueta": "5"
+     },
+     {
+      "d": 6,
+      "ml": 0,
+      "tn": 805368,
+      "v": 805368,
+      "ordenes": 14,
+      "etiqueta": "6"
+     },
+     {
+      "d": 7,
+      "ml": 0,
+      "tn": 818702,
+      "v": 818702,
+      "ordenes": 13,
+      "etiqueta": "7"
+     },
+     {
+      "d": 8,
+      "ml": 0,
+      "tn": 928133,
+      "v": 928133,
+      "ordenes": 18,
+      "etiqueta": "8"
+     },
+     {
+      "d": 9,
+      "ml": 0,
+      "tn": 324793,
+      "v": 324793,
+      "ordenes": 9,
+      "etiqueta": "9"
+     },
+     {
+      "d": 10,
+      "ml": 0,
+      "tn": 1737510,
+      "v": 1737510,
+      "ordenes": 17,
+      "etiqueta": "10"
+     },
+     {
+      "d": 11,
+      "ml": 0,
+      "tn": 586691,
+      "v": 586691,
+      "ordenes": 9,
+      "etiqueta": "11"
+     },
+     {
+      "d": 12,
+      "ml": 0,
+      "tn": 714459,
+      "v": 714459,
+      "ordenes": 10,
+      "etiqueta": "12"
+     },
+     {
+      "d": 13,
+      "ml": 0,
+      "tn": 1444947,
+      "v": 1444947,
+      "ordenes": 23,
+      "etiqueta": "13"
+     },
+     {
+      "d": 14,
+      "ml": 0,
+      "tn": 969237,
+      "v": 969237,
+      "ordenes": 11,
+      "etiqueta": "14"
+     },
+     {
+      "d": 15,
+      "ml": 0,
+      "tn": 1436067,
+      "v": 1436067,
+      "ordenes": 16,
+      "etiqueta": "15"
+     },
+     {
+      "d": 16,
+      "ml": 0,
+      "tn": 1576852,
+      "v": 1576852,
+      "ordenes": 14,
+      "etiqueta": "16"
+     },
+     {
+      "d": 17,
+      "ml": 0,
+      "tn": 571483,
+      "v": 571483,
+      "ordenes": 6,
+      "etiqueta": "17"
+     },
+     {
+      "d": 18,
+      "ml": 0,
+      "tn": 234707,
+      "v": 234707,
+      "ordenes": 4,
+      "etiqueta": "18"
+     },
+     {
+      "d": 19,
+      "ml": 0,
+      "tn": 67272,
+      "v": 67272,
+      "ordenes": 1,
+      "etiqueta": "19"
+     },
+     {
+      "d": 20,
+      "ml": 0,
+      "tn": 1940736,
+      "v": 1940736,
+      "ordenes": 16,
+      "etiqueta": "20"
+     },
+     {
+      "d": 21,
+      "ml": 0,
+      "tn": 672349,
+      "v": 672349,
+      "ordenes": 12,
+      "etiqueta": "21"
+     },
+     {
+      "d": 22,
+      "ml": 0,
+      "tn": 693220,
+      "v": 693220,
+      "ordenes": 7,
+      "etiqueta": "22"
+     },
+     {
+      "d": 23,
+      "ml": 0,
+      "tn": 1168008,
+      "v": 1168008,
+      "ordenes": 12,
+      "etiqueta": "23"
+     },
+     {
+      "d": 24,
+      "ml": 0,
+      "tn": 507332,
+      "v": 507332,
+      "ordenes": 7,
+      "etiqueta": "24"
+     },
+     {
+      "d": 25,
+      "ml": 0,
+      "tn": 1054950,
+      "v": 1054950,
+      "ordenes": 12,
+      "etiqueta": "25"
+     },
+     {
+      "d": 26,
+      "ml": 0,
+      "tn": 507844,
+      "v": 507844,
+      "ordenes": 6,
+      "etiqueta": "26"
+     },
+     {
+      "d": 27,
+      "ml": 0,
+      "tn": 647517,
+      "v": 647517,
+      "ordenes": 10,
+      "etiqueta": "27"
+     },
+     {
+      "d": 28,
+      "ml": 0,
+      "tn": 1756026,
+      "v": 1756026,
+      "ordenes": 13,
+      "etiqueta": "28"
+     },
+     {
+      "d": 29,
+      "ml": 0,
+      "tn": 807508,
+      "v": 807508,
+      "ordenes": 12,
+      "etiqueta": "29"
+     },
+     {
+      "d": 30,
+      "ml": 0,
+      "tn": 716756,
+      "v": 716756,
+      "ordenes": 10,
+      "etiqueta": "30"
+     },
+     {
+      "d": 31,
+      "ml": 0,
+      "tn": 956022,
+      "v": 956022,
+      "ordenes": 18,
+      "etiqueta": "31"
+     }
+    ],
+    "granularidad": "dia",
+    "meses": [
+     "2026-07"
+    ],
+    "neto": 25129396
    }
   }
  },
  "periodos": [
   {
-   "id": "mes",
-   "n": "Todo julio",
-   "desde": 1,
-   "hasta": 31,
-   "dentroDelMes": true,
-   "disponible": true,
-   "faltan": 0
-  },
-  {
-   "id": "q1",
-   "n": "1ª quincena",
-   "desde": 1,
-   "hasta": 15,
-   "dentroDelMes": true,
-   "disponible": true,
-   "faltan": 0
-  },
-  {
-   "id": "q2",
-   "n": "2ª quincena",
-   "desde": 16,
-   "hasta": 31,
-   "dentroDelMes": true,
-   "disponible": true,
-   "faltan": 0
-  },
-  {
-   "id": "u7",
-   "n": "Últimos 7 días",
-   "desde": 25,
-   "hasta": 31,
-   "dentroDelMes": true,
-   "disponible": true,
-   "faltan": 0
-  },
-  {
    "id": "m3",
    "n": "Últimos 3 meses",
-   "meses": 3,
-   "disponible": false,
-   "faltan": 2
+   "faltan": 2,
+   "libre": false,
+   "meses": [
+    "2026-07"
+   ],
+   "pide": 3,
+   "disponible": true
   },
   {
    "id": "m6",
    "n": "Últimos 6 meses",
-   "meses": 6,
-   "disponible": false,
-   "faltan": 5
+   "faltan": 5,
+   "libre": false,
+   "meses": [
+    "2026-07"
+   ],
+   "pide": 6,
+   "disponible": true
   },
   {
    "id": "anio",
    "n": "Este año",
-   "meses": 12,
-   "disponible": false,
-   "faltan": 11
+   "faltan": 6,
+   "libre": false,
+   "meses": [
+    "2026-07"
+   ],
+   "pide": 7,
+   "disponible": true
   },
   {
-   "id": "todo",
-   "n": "Todo el histórico",
-   "meses": 999,
-   "disponible": false,
-   "faltan": 11
+   "id": "rango",
+   "n": "Rango",
+   "faltan": 0,
+   "libre": true,
+   "meses": [
+    "2026-07"
+   ],
+   "pide": 0,
+   "disponible": true
   }
  ],
  "canales": [

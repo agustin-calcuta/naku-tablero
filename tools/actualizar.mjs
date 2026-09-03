@@ -6,12 +6,16 @@
 //   1. baja las planillas de Google (costos y central de atención)
 //   2. procesa los exports de los canales que haya en el directorio de datos
 //   3. regenera docs/data/direccion.json
-//   4. si cambió, lo commitea y lo publica
+//   4. si cambió: lo sube a la base (lo ven todos al instante) y lo commitea
 //
-// Después de eso, GitHub Pages redeploya solo en un minuto. Nadie toca el HTML.
+// Los dos pasos del final no son lo mismo y hacen falta los dos: la base es lo
+// que lee el tablero, y el commit deja la copia de respaldo que se usa si la
+// base no contesta. El botón "Actualizar datos" del navegador hace sólo el
+// primero, y está bien: el respaldo se actualiza la próxima vez que corra esto.
 //
-//   npm run actualizar -- --sin-publicar    regenera y no toca git
+//   npm run actualizar -- --sin-publicar    regenera y no toca ni la base ni git
 //   NAKU_DATA="/ruta" npm run actualizar    datos en otro lado
+//   NAKU_CLAVE="naku-…"                     clave para subir a la base
 
 import { execFileSync, spawnSync } from 'node:child_process';
 import fs from 'node:fs';
@@ -49,10 +53,15 @@ if (antes && sinFecha(antes) === sinFecha(despues)) {
 }
 
 const datos = JSON.parse(despues);
+// Los períodos dependen de cuántos meses haya cargados: se informa el primero
+// que tenga datos, no uno fijo que puede no existir.
+const periodo = (datos.periodos || []).find((x) => x.disponible) || { id: 'm3', n: '—' };
+const eerr = ((datos.vistas.todos || {})[periodo.id] || {}).eerr || { lineas: [], ordenes: 0 };
 paso(2, 'Novedades');
 console.log(`   mes cerrado    ${datos.mesCerrado.largo}`);
-console.log(`   órdenes        ${datos.vistas.todos.mes.eerr.ordenes.toLocaleString('es-AR')}`);
-const linea = (c) => (datos.vistas.todos.mes.eerr.lineas.find((l) => l.c === c) || {}).pct;
+console.log(`   período        ${periodo.n}`);
+console.log(`   órdenes        ${eerr.ordenes.toLocaleString('es-AR')}`);
+const linea = (c) => (eerr.lineas.find((l) => l.c === c) || {}).pct;
 console.log(`   margen bruto   ${linea('Margen bruto')}%`);
 console.log(`   contribución   ${linea('Resultado de contribución')}%`);
 if (datos.clientes) {
@@ -65,12 +74,42 @@ for (const [k, v] of Object.entries(datos.fuentes.origen || {})) {
 }
 
 if (!publicar) {
-  console.log('\n✓ Listo (--sin-publicar): el JSON quedó actualizado sin tocar git.');
+  console.log('\n✓ Listo (--sin-publicar): el JSON quedó actualizado sin subirlo a ningún lado.');
   process.exit(0);
 }
 
-/* ---------------------------------------------------------------- 4: publicar */
-paso(3, 'Publicando');
+/* ------------------------------------------------ 4a: a la base (lo que se ve) */
+paso(3, 'Subiendo a la base');
+
+const API = 'https://br-wispy-lake-ayf0dl28-tablero.compute.c-5.us-east-2.aws.neon.tech';
+const clave = process.env.NAKU_CLAVE || '';
+if (!clave) {
+  console.log('   sin NAKU_CLAVE: no subo nada. El tablero va a seguir mostrando lo anterior.');
+  console.log('   (exportála en tu ~/.zshrc: export NAKU_CLAVE="naku-…")');
+} else {
+  try {
+    const r = await fetch(`${API}/`, {
+      method: 'PUT',
+      headers: {
+        'content-type': 'application/json',
+        'x-naku-clave': clave,
+        'x-naku-quien': process.env.USER || 'consola',
+      },
+      body: despues,
+      signal: AbortSignal.timeout(60000),
+    });
+    const j = await r.json().catch(() => ({}));
+    if (r.status === 401) salir('la clave de NAKU_CLAVE no es la que espera la base');
+    if (!r.ok || !j.ok) salir(`la base rechazó la publicación: ${j.error || r.status}`);
+    console.log(`   ✓ publicado — ya lo ve cualquiera que abra el tablero`);
+  } catch (e) {
+    // Que falle la base no tiene por qué frenar el commit: son dos cosas distintas.
+    console.log(`   ⚠ no pude subirlo a la base (${e.message}). Sigo con el commit.`);
+  }
+}
+
+/* -------------------------------------------- 4b: al repositorio (el respaldo) */
+paso(4, 'Commiteando el respaldo');
 
 let rama;
 try {
@@ -107,5 +146,5 @@ for (let intento = 1; intento <= 4 && !empujado; intento++) {
 }
 if (!empujado) salir('el commit quedó hecho pero el push falló. Reintentá con: git push');
 
-console.log('\n✓ Publicado. GitHub Pages actualiza el tablero en un minuto:');
+console.log('\n✓ Listo:');
 console.log('  https://agustin-calcuta.github.io/naku-tablero/direccion.html');

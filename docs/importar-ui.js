@@ -6,8 +6,10 @@
    build —es el mismo motor, ver tools/build-importer.mjs—, así que los números
    coinciden con los publicados.
 
-   Lo que se carga acá se ve sólo acá. Para que lo vean los demás hay que
-   publicar el archivo que deja el botón "Bajar los datos".
+   Los archivos no salen de esta computadora: se leen acá y lo único que sale
+   es el resultado, cuando se toca "Publicar para todos". Eso lo guarda en la
+   base (ver neon/api/) y a partir de ahí lo ve cualquiera que abra el tablero.
+   Publicar pide una clave; leer, no.
    ============================================================ */
 (function () {
   const $ = (id) => document.getElementById(id);
@@ -245,7 +247,9 @@
       const mb = e.lineas.find((l) => l.c === 'Margen bruto');
       estado(`Listo: ${D.mesCerrado.largo}, ${e.ordenes.toLocaleString('es-AR')} órdenes, `
         + `margen bruto ${String(mb.pct).replace('.', ',')}%.`, 'bien');
+      $('impPublicar').hidden = false;
       $('impBajar').hidden = false;
+      pedirClaveSiHace();
       $('impCerrarPie').textContent = 'Ver el tablero';
     } catch (err) {
       estado(err.message || String(err), 'mal');
@@ -256,6 +260,69 @@
 
   /** Deja respirar al navegador para que se vea el cartel de progreso. */
   const pausa = () => new Promise((r) => setTimeout(r, 16));
+
+  /* ------------------------------------------------------------- publicar
+     La clave y el nombre viven en este navegador. La clave no está en la
+     página: sin ella se puede mirar el tablero, no cambiarlo. */
+  const recordado = (k) => { try { return localStorage.getItem('naku.' + k) || ''; } catch { return ''; } };
+  const recordar = (k, v) => { try { localStorage.setItem('naku.' + k, v); } catch { /* modo privado */ } };
+
+  function pedirClaveSiHace() {
+    $('impClaveInput').value = recordado('clave');
+    $('impQuienInput').value = recordado('quien');
+    $('impClave').classList.toggle('pide', !$('impClaveInput').value || !$('impQuienInput').value);
+  }
+
+  async function publicar() {
+    if (!ultimoJson) return;
+    const clave = $('impClaveInput').value.trim() || recordado('clave');
+    const quien = $('impQuienInput').value.trim() || recordado('quien');
+    if (!clave) {
+      $('impClave').classList.add('pide');
+      $('impClaveInput').focus();
+      estado('Falta la clave para publicar.', 'mal');
+      return;
+    }
+
+    $('impPublicar').disabled = true;
+    estado('Publicando…');
+    try {
+      const r = await fetch(window.NakuAPI + '/', {
+        method: 'PUT',
+        headers: {
+          'content-type': 'application/json',
+          'x-naku-clave': clave,
+          'x-naku-quien': quien,
+        },
+        body: JSON.stringify(ultimoJson),
+        signal: AbortSignal.timeout(60000),
+      });
+      const j = await r.json().catch(() => ({}));
+      if (r.status === 401) {
+        // La clave guardada no sirve más: que la vuelva a escribir.
+        recordar('clave', '');
+        $('impClave').classList.add('pide');
+        $('impClaveInput').value = '';
+        $('impClaveInput').focus();
+        throw new Error('Clave incorrecta.');
+      }
+      if (!r.ok || !j.ok) throw new Error(j.error || `La base contestó ${r.status}.`);
+
+      recordar('clave', clave);
+      recordar('quien', quien);
+      $('impClave').classList.remove('pide');
+      window.NakuPublicado = { publicado: j.publicado, quien: j.quien };
+      window.NakuPintar(ultimoJson);     // repinta el pie con quién publicó
+      estado('Publicado. Ya lo ven todos los que abran el tablero.', 'bien');
+      $('impPublicar').textContent = 'Publicado ✓';
+    } catch (err) {
+      estado(err.name === 'TimeoutError'
+        ? 'La base tardó demasiado. Probá de nuevo.'
+        : (err.message || String(err)), 'mal');
+    } finally {
+      $('impPublicar').disabled = false;
+    }
+  }
 
   function bajar() {
     if (!ultimoJson) return;
@@ -275,7 +342,13 @@
   $('impFondo').addEventListener('click', (e) => { if (e.target === $('impFondo')) cerrar(); });
   addEventListener('keydown', (e) => { if (e.key === 'Escape' && !$('impFondo').hidden) cerrar(); });
   $('impProcesar').addEventListener('click', procesar);
+  $('impPublicar').addEventListener('click', publicar);
   $('impBajar').addEventListener('click', bajar);
+  // Si vuelve a procesar después de publicar, el botón tiene que dejar de decir
+  // "Publicado ✓": lo que hay cargado ya no es lo que está publicado.
+  $('impProcesar').addEventListener('click', () => {
+    $('impPublicar').textContent = 'Publicar para todos';
+  });
   pintarZonas();
   revisarListo();
 })();
