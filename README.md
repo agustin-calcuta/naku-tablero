@@ -46,6 +46,70 @@ tools/                build-tablero.mjs (arma nueva.html) + validación (reconci
 > números salgan del backend con token (`getRollup()`), y dejar el HTML público sin cifras.
 > Si querés, lo dejo con números redondeados/relativos para el demo.
 
+## Tablero de dirección (`docs/direccion.html`)
+
+Segundo tablero, para los socios: ventas, estado de resultados y central de
+atención en una pantalla. **Todo sale de `docs/data/direccion.json`**, que se
+genera con:
+
+```bash
+node tools/build-direccion.mjs            # datos en ../Naku Datos
+NAKU_DATA="/otra/ruta" node tools/build-direccion.mjs
+```
+
+En ese directorio (fuera del repo, no versionado) tienen que estar:
+
+| archivo | de dónde sale | qué alimenta |
+|---|---|---|
+| `*Ventas_AR*.xlsx` | export de MercadoLibre / Mercado Shops | ventas, órdenes, productos, familias, provincias, envíos, día por día **y todos los cargos de plataforma** |
+| `*TiendaNube*.csv` | export de TiendaNube (cp1252, `;`) | lo mismo del canal propio |
+| `PLANILLA_MADRE.xlsx` | planilla de compras | costo unitario **sin IVA** por SKU (hoja del mes, columna `COSTO SIN IVA`) |
+| `Naku - SKU+Buyer+Cat.csv` | maestro de la agencia | nombre y familia de cada SKU |
+| `Embudos_NAKU.xlsx` | export del Sheet de la central de atención | postventa y preventa |
+
+### Decisiones que hay que tener presentes
+
+- **Un mes por vez, del export crudo.** El histórico del motor
+  (`docs/data/lines.json`) *no* se usa acá: guarda `Total (ARS)`, que es el neto
+  que el canal liquida, sin los cargos desglosados, y su último mes viene cortado
+  a mitad. Mezclar las dos fuentes daba variaciones falsas (junio 2026 aparentaba
+  una caída del 30% porque el export cortó el día 16). Dejando más exports en el
+  directorio, cada mes entra solo en la serie y aparece el comparativo.
+- **Todo sin IVA.** Las ventas y los cargos de los canales vienen con IVA; el
+  costo de la planilla es sin IVA. Comparar los dos sin corregir infla el margen
+  unos 8 puntos (62,8% en vez de 55,4%).
+- **El estado de resultados corta en el resultado de contribución.** Ventas
+  netas → costo de la mercadería → margen bruto → comisiones, envíos e impuestos
+  del canal. Marketing, estructura y sueldos, impuestos propios, amortizaciones y
+  resultados financieros no salen de ningún export: el tablero los lista como
+  pendientes en vez de dibujar cero.
+- **Lo que no tiene fuente no se dibuja.** La posición financiera, el EBITDA, el
+  margen mes a mes (necesita tres meses) y la preventa por volumen (sin casos
+  cargados) están ocultos hasta que haya datos.
+- **Control de integridad.** El build verifica que los componentes del export de
+  MeLi sumen su propio `Total (ARS)`. Si MeLi renombra una columna, el build
+  falla en vez de publicar un margen mal calculado.
+
+### Tres campos que la central de atención no está cargando
+
+El tablero los informa como pendientes porque sin ellos no se puede medir:
+
+1. **`Fecha de cierre`** — vacía en los 849 casos, incluidos los 750 marcados
+   `Resuelto …`. Sin eso no hay tiempo de resolución ni evolución de la cola.
+2. **`3· Contactado`** — se marca junto con el alta (mediana ingreso→contactado:
+   medio minuto, a veces *anterior* al alta). Mide cuándo se cargó el caso, no
+   cuándo se le respondió al cliente.
+3. **`Estatus` de preventa** — 653 de 683 consultas quedan en el inicial
+   `Pregunta Meli`, así que no hay conversión del embudo.
+
+Los tres se arreglan del lado de `appsscript/` de la central: sellar
+`Fecha de cierre` cuando el estatus pasa a `Resuelto …` es una línea.
+
+> ⚠️ **El JSON tiene el estado de resultados real.** Publicado en `/docs`, queda
+> en una URL de GitHub Pages **pública** (el repo privado no la protege). Antes de
+> mergear a `main`, decidir si el tablero de dirección va a Pages o a un host con
+> contraseña.
+
 ## Backend (Google Drive + Sheet + Apps Script) → su propia URL
 
 Es "lo de Drive". Pasos completos en **`appsscript/README.md`**. Resumen:
