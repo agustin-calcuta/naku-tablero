@@ -111,12 +111,6 @@ a{color:var(--azul)}
 .tema .luna{display:var(--ico-luna)}
 .tema .sol{display:var(--ico-sol)}
 
-/* ---------- aviso de demo ---------- */
-.aviso{background:var(--lima);color:#111315;border-bottom:1px solid rgba(17,19,21,.12)}
-.avisoin{max-width:1200px;margin:0 auto;padding:9px 24px;display:flex;align-items:center;gap:14px;flex-wrap:wrap;font-size:13px}
-.avisoin b{font-family:var(--mono);font-size:10.5px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;
-  background:#111315;color:var(--lima);padding:3px 8px;border-radius:5px;white-space:nowrap}
-
 .hoja{max-width:1200px;margin:0 auto;padding:0 24px 80px}
 
 /* ---------- encabezado de página ---------- */
@@ -143,7 +137,9 @@ a{color:var(--azul)}
 .panel > header .sub{font-size:12px;color:var(--media)}
 .panel .cuerpo{padding:14px 18px 18px}
 
-.rejilla{display:grid;gap:14px}
+/* Cada panel toma su altura natural: estirarlos deja huecos cuando uno tiene
+   bastante menos contenido que el otro. */
+.rejilla{display:grid;gap:14px;align-items:start}
 .r2{grid-template-columns:repeat(2,minmax(0,1fr))}
 .r3{grid-template-columns:repeat(3,minmax(0,1fr))}
 .r-53{grid-template-columns:minmax(0,5fr) minmax(0,3fr)}
@@ -161,7 +157,6 @@ a{color:var(--azul)}
 .ficha .val small{font-size:16px;font-weight:500;color:var(--media);letter-spacing:-.01em}
 .ficha .pie{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:auto;padding-top:4px}
 .ficha .glosa{font-size:12px;color:var(--media)}
-.ficha svg.chispa{width:96px;height:30px;flex:none}
 
 .delta{display:inline-flex;align-items:center;gap:4px;font-family:var(--mono);font-size:12px;font-weight:600;
   padding:2px 7px;border-radius:20px;white-space:nowrap}
@@ -177,7 +172,6 @@ table.eerr th:first-child{text-align:left}
 table.eerr td{padding:7px 0;border-bottom:1px solid var(--linea2);text-align:right;white-space:nowrap;
   font-family:var(--mono);font-variant-numeric:tabular-nums}
 table.eerr td:first-child{text-align:left;white-space:normal;font-family:var(--sans);color:var(--media)}
-table.eerr td.barra{width:88px;padding-left:14px}
 table.eerr tr.total td{font-weight:700;color:var(--tinta);border-bottom:1px solid var(--linea);
   border-top:1px solid var(--linea);padding:10px 0}
 table.eerr tr.total td:first-child{font-weight:700;color:var(--tinta);font-family:var(--sans)}
@@ -185,10 +179,6 @@ table.eerr tr.destacado td{background:var(--azul-suave)}
 table.eerr tr.destacado td:first-child{padding-left:8px;border-radius:6px 0 0 6px}
 table.eerr tr.destacado td:last-child{padding-right:8px;border-radius:0 6px 6px 0}
 table.eerr .neg{color:var(--media)}
-.mini{display:block;height:7px;border-radius:2px;background:var(--linea2);overflow:hidden}
-.mini i{display:block;height:100%;border-radius:2px;background:var(--c1)}
-.mini.gasto i{background:var(--c3)}
-
 /* ---------- barras horizontales ---------- */
 .lista{display:flex;flex-direction:column;gap:11px}
 .item{display:grid;grid-template-columns:1fr auto;gap:3px 12px;align-items:baseline}
@@ -245,7 +235,11 @@ table.eerr .neg{color:var(--media)}
 .leyenda i{width:10px;height:10px;border-radius:3px;flex:none}
 
 /* ---------- semáforo de casos ---------- */
-.luces{display:grid;grid-template-columns:repeat(auto-fit,minmax(78px,1fr));gap:9px}
+/* Tres urgencias entran en fila; cuando además hay casos sin clasificar, dos por
+   fila leen mucho mejor que cuatro apretadas. */
+.luces{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.luces.cuatro{grid-template-columns:repeat(2,minmax(0,1fr))}
+@media (max-width:520px){.luces,.luces.cuatro{grid-template-columns:repeat(2,minmax(0,1fr))}}
 .luz{border:1px solid var(--linea);border-radius:10px;padding:11px 13px;background:var(--panel);
   cursor:pointer;text-align:left;font-family:inherit;color:inherit;display:flex;flex-direction:column;gap:2px}
 .luz .n{font-family:var(--mono);font-size:26px;font-weight:600;line-height:1.05;letter-spacing:-.03em}
@@ -309,13 +303,6 @@ table.casos tr.vencido td.dias{color:var(--mal);font-weight:600}
 .pie-doc{margin-top:52px;padding-top:20px;border-top:1px solid var(--linea);
   display:flex;justify-content:space-between;gap:18px;flex-wrap:wrap;font-size:12.5px;color:var(--media)}
 .pie-doc b{color:var(--tinta)}
-
-/* ---------- lo que todavía no tiene fuente ---------- */
-.pendientes{display:flex;flex-direction:column;gap:9px}
-.pendientes .p{display:flex;align-items:baseline;gap:9px;font-size:13px;color:var(--media)}
-.pendientes .p::before{content:'';width:6px;height:6px;border-radius:50%;flex:none;
-  border:1.5px solid var(--linea);transform:translateY(-2px)}
-.pendientes .pie-p{margin:4px 0 0;font-size:12px;color:var(--tenue);line-height:1.5}
 
 /* ---------- avisos dentro de un panel ---------- */
 .nodato{font-size:13px;color:var(--media);line-height:1.55;background:var(--panel2);
@@ -393,13 +380,6 @@ try {
   </div>
 </header>
 
-<div class="aviso" id="aviso" hidden>
-  <div class="avisoin">
-    <b id="avisoTitulo">Datos reales</b>
-    <span id="avisoTexto"></span>
-  </div>
-</div>
-
 <main class="hoja">
 
   <!-- ══════════ PULSO ══════════ -->
@@ -436,7 +416,7 @@ try {
           <div class="tablaEnv">
             <table class="eerr" id="tablaEerr">
               <thead>
-                <tr><th>Concepto</th><th id="thMes">Mes</th><th>% s/ventas netas</th><th></th></tr>
+                <tr><th>Concepto</th><th id="thMes">Mes</th><th>% s/ventas netas</th></tr>
               </thead>
               <tbody></tbody>
             </table>
@@ -444,16 +424,10 @@ try {
         </div>
       </div>
 
-      <div style="display:flex;flex-direction:column;gap:14px">
-        <div class="panel">
-          <header><h3>A dónde se va cada peso</h3><span class="sub">Sobre ventas netas</span></header>
-          <div class="cuerpo">
-            <div class="lista" id="gastos"></div>
-          </div>
-        </div>
-        <div class="panel" id="panelFaltan">
-          <header><h3>Para llegar al resultado neto</h3><span class="sub">Todavía sin fuente</span></header>
-          <div class="cuerpo"><div class="pendientes" id="faltan"></div></div>
+      <div class="panel">
+        <header><h3>A dónde se va cada peso</h3><span class="sub">Sobre ventas netas</span></header>
+        <div class="cuerpo">
+          <div class="lista" id="gastos"></div>
         </div>
       </div>
     </div>
@@ -613,24 +587,6 @@ function delta(valor, { bueno = 'sube', sufijo = '%', texto = null } = {}) {
 }
 const variacion = (hoy, antes) => (antes ? 100 * (hoy - antes) / Math.abs(antes) : null);
 
-/** Línea de tendencia chiquita. Con menos de 3 puntos no dice nada: no se dibuja. */
-function chispa(vals, color, { w = 96, h = 30, clase = 'chispa' } = {}) {
-  const v = (vals || []).filter((x) => Number.isFinite(x));
-  if (v.length < 3) return '';
-  const p = 3;
-  const min = Math.min(...v), max = Math.max(...v), rango = max - min || 1;
-  const x = (i) => p + i * (w - 2 * p) / (v.length - 1);
-  const y = (val) => h - p - (val - min) / rango * (h - 2 * p);
-  const linea = v.map((val, i) => `${i ? 'L' : 'M'}${x(i).toFixed(1)},${y(val).toFixed(1)}`).join(' ');
-  const area = `${linea} L${x(v.length - 1).toFixed(1)},${h} L${x(0).toFixed(1)},${h} Z`;
-  return `<svg class="${clase}" viewBox="0 0 ${w} ${h}" aria-hidden="true">
-    <path d="${area}" fill="${color}" opacity=".13"/>
-    <path d="${linea}" fill="none" stroke="${color}" stroke-width="1.7"
-      stroke-linejoin="round" stroke-linecap="round"/>
-    <circle cx="${x(v.length - 1).toFixed(1)}" cy="${y(v[v.length - 1]).toFixed(1)}" r="2.3" fill="${color}"/>
-  </svg>`;
-}
-
 /** Barras horizontales. `datos` = [{n, v}], `formato` decide cómo se lee el valor. */
 function barras(destino, datos, opts = {}) {
   const { formato = (v) => nf.format(v), extra = () => '', clase = '', max = null } = opts;
@@ -651,10 +607,10 @@ fetch('data/direccion.json', { cache: 'no-cache' })
   .then((r) => { if (!r.ok) throw new Error(r.status); return r.json(); })
   .then(pintar)
   .catch((e) => {
-    $('aviso').hidden = false;
-    $('avisoTitulo').textContent = 'Sin datos';
-    $('avisoTexto').textContent =
-      'No pude leer data/direccion.json. Corré «node tools/build-direccion.mjs» y volvé a publicar. (' + e.message + ')';
+    // Sin datos no hay tablero: se dice arriba de todo, donde no se puede pasar por alto.
+    document.querySelector('main').insertAdjacentHTML('afterbegin',
+      '<p class="nodato" style="margin:28px 0">No pude leer <b>data/direccion.json</b>. '
+      + 'Corré «node tools/build-direccion.mjs» y volvé a publicar. (' + e.message + ')</p>');
   });
 
 function pintar(D) {
@@ -678,14 +634,6 @@ function pintar(D) {
     : `${nf.format(E.ordenes)} órdenes · ${nf.format(E.unidades)} unidades`;
 
   const F = D.fuentes;
-  $('aviso').hidden = false;
-  $('avisoTitulo').textContent = 'Datos reales';
-  $('avisoTexto').textContent =
-    `Ventas y finanzas de ${D.mesCerrado.largo}, del export de los canales`
-    + `${F.postventa ? `; atención al cliente al ${F.postventa.corte}` : ''}. `
-    + 'El estado de resultados llega hasta el resultado de contribución: marketing, estructura y sueldos '
-    + 'todavía no tienen fuente, así que no se muestran.'
-    + (D.mesCerrado.previo ? '' : ' Con un solo mes cargado todavía no hay comparación contra el mes anterior.');
 
   $('fuenteFinanzas').textContent = `Exports de los canales + planilla de costos (${F.costos.hoja.toLowerCase()})`;
   $('fuenteVentas').textContent = 'Exports de Mercado Libre y Tienda Nube';
@@ -700,7 +648,6 @@ function pintar(D) {
       et: 'Cobrado de los canales', val: moneyM(ult.neto),
       d: variacion(ult.neto, prev.neto),
       glosa: `Neto liquidado por los dos canales${glosaPrev ? ' ' + glosaPrev : ''}`,
-      chispa: dias.map((x) => x.v),
     },
     {
       et: 'Ventas netas', val: moneyM(ventasNetas.v), sub: 'sin IVA',
@@ -718,13 +665,11 @@ function pintar(D) {
       et: 'Órdenes', val: nf.format(ult.ordenes),
       d: variacion(ult.ordenes, prev.ordenes),
       glosa: `Mercado Libre + Tienda Nube${glosaPrev ? ' ' + glosaPrev : ''}`,
-      chispa: dias.map((x) => x.ordenes),
     },
     {
       et: 'Ticket promedio', val: money(ult.neto / ult.ordenes),
       d: variacion(ult.neto / ult.ordenes, prev.neto / prev.ordenes),
       glosa: `Cobrado por orden${glosaPrev ? ' ' + glosaPrev : ''}`,
-      chispa: dias.filter((x) => x.ordenes).map((x) => x.v / x.ordenes),
     },
   ];
 
@@ -737,7 +682,6 @@ function pintar(D) {
           ${delta(f.d, { bueno: f.bueno || 'sube', sufijo: f.sufijo || '%' })}
           <span class="glosa">${f.glosa}</span>
         </div>
-        ${chispa(f.chispa, 'var(--c1)')}
       </div>
     </article>`).join('');
 
@@ -745,7 +689,6 @@ function pintar(D) {
   $('thMes').textContent = D.mesCerrado.largo.replace(/^./, (c) => c.toUpperCase());
   $('subEerr').textContent = `${nf.format(E.ordenes)} órdenes · en pesos, sin IVA`;
 
-  const maxAbs = Math.max(...E.lineas.map((l) => Math.abs(l.v)));
   $('tablaEerr').querySelector('tbody').innerHTML = E.lineas.map((f) => {
     const clase = f.tipo === 'total' ? 'total' : (f.tipo === 'destacado' ? 'destacado total' : '');
     const neg = f.v < 0;
@@ -753,17 +696,10 @@ function pintar(D) {
       <td>${f.c}</td>
       <td class="${neg ? 'neg' : ''}">${neg ? '(' + moneyM(-f.v) + ')' : moneyM(f.v)}</td>
       <td class="${neg ? 'neg' : ''}">${neg ? '(' + pct(Math.abs(f.pct)) + ')' : pct(f.pct)}</td>
-      <td class="barra"><span class="mini ${neg ? 'gasto' : ''}">
-        <i style="width:${(100 * Math.abs(f.v) / maxAbs).toFixed(1)}%"></i></span></td>
     </tr>`;
   }).join('');
 
   barras('gastos', D.gastos, { formato: (v) => pct(v), clase: 'c3' });
-
-  /* Lo que falta para bajar del resultado de contribución al neto. */
-  $('faltan').innerHTML = (E.faltan || []).map((x) => `<span class="p">${x}</span>`).join('')
-    + `<p class="pie-p">Son datos que hoy no salen de ningún export. Con una planilla de gastos
-       mensuales — seis o siete filas por mes — el tablero cierra hasta el resultado neto.</p>`;
 
   /* El margen mes a mes necesita el export crudo de cada mes; hoy sólo hay uno. */
   const conMargen = serie.filter((s) => s.mb != null && !s.parcial);
@@ -926,6 +862,7 @@ function pintarClientes(C, D) {
   const P = C.postventa;
   $('subPostventa').textContent = `${P.abiertos} sin cerrar al ${C.corte}`;
 
+  $('luces').className = 'luces' + (P.urgencias.length > 3 ? ' cuatro' : '');
   $('luces').innerHTML = P.urgencias.map((x) => `
     <button class="luz ${x.clase}" data-u="${x.u}" aria-pressed="false">
       <span class="n">${x.n}</span>
@@ -939,9 +876,11 @@ function pintarClientes(C, D) {
   /* La evolución de la cola sale sólo si se carga la fecha de cierre. */
   const t = $('tendenciaCasos');
   if (P.cola && P.cola.length >= 3) {
-    t.innerHTML = `<span class="et">Casos abiertos al cierre de cada mes</span>
-      ${chispa(P.cola.map((c) => c.v), 'var(--c4)', { w: 320, h: 52, clase: 'tendenciaSvg' })}
-      <div class="pieT"><span>${P.cola[0].mes}</span><span>${P.cola[P.cola.length - 1].mes}</span></div>`;
+    t.innerHTML = `<span class="et">Casos abiertos al cierre de cada mes</span>`
+      + '<div class="lista" id="colaMeses"></div>';
+    barras('colaMeses', P.cola.map((c) => ({ n: c.mes, v: c.v })), {
+      formato: (v) => `${nf.format(v)} casos`, clase: 'c4',
+    });
   } else if (C.calidad.faltantes.length) {
     t.innerHTML = `<p class="nodato">${C.calidad.faltantes.map((f) => `<b>·</b> ${f}`).join('<br>')}</p>`;
   }
