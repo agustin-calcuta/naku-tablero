@@ -66,8 +66,15 @@ Los exports son lo único manual, y no hay forma de evitarlo hasta la API de
 MercadoLibre: no se pueden bajar sin entrar a la cuenta. Cuando Leo los pase, van
 a `../Naku Datos/` y se corre el comando.
 
-El puente se instala una sola vez siguiendo **[`appsscript/fuentes/README.md`](appsscript/fuentes/README.md)**.
-Sin él, el build usa los archivos que estén en el directorio de datos y avisa.
+El puente se instala una sola vez con dos comandos:
+
+```bash
+npx @google/clasp@2.4.2 login     # abre el navegador, entrás con tu cuenta
+npm run instalar-puente           # crea, publica y prueba el Apps Script
+```
+
+Detalle y qué hacer si algo falla, en **[`appsscript/fuentes/README.md`](appsscript/fuentes/README.md)**.
+Sin puente, el build usa los archivos que estén en el directorio de datos y avisa.
 
 ### Otros comandos
 
