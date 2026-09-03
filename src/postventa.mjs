@@ -8,8 +8,11 @@
 // Tres campos que el tablero necesitaría no se están cargando, así que en vez de
 // mostrar un número inventado se informan como pendientes (ver `calidad`):
 //
-//   'Fecha de cierre'   vacía en todos los casos, incluidos los 'Resuelto …'.
-//                       Sin eso no hay tiempo de resolución ni cola histórica.
+//   'Fecha de cierre'   la sella el servidor desde septiembre 2026. Los casos
+//                       cerrados antes se rellenaron con la última actualización:
+//                       son APROXIMADOS, sirven para la tendencia de la cola pero
+//                       no para medir cuánto tardó un caso puntual. Se detectan
+//                       porque cierre y 'Última actualización' coinciden exacto.
 //   '3· Contactado'     se marca junto con el alta (mediana ingreso→contactado:
 //                       medio minuto, y a veces anterior al alta). Mide cuándo
 //                       se cargó el caso, no cuándo se le respondió al cliente.
@@ -109,17 +112,27 @@ export function buildPostventa(aoaPostventa, aoaMinorista, aoaVolumen, ordenesPo
   // ¿Se están cargando los campos que hacen falta para medir tiempos?
   const conCierre = pv.filter((r) => r.cierre).length;
   const resueltos = pv.filter((r) => r.estatus === OK || r.estatus === MAL);
+  // Un cierre que cae al mismo instante que la última actualización viene del
+  // relleno de los casos viejos, no de un cierre real: aproxima el mes, no el caso.
+  const aproximado = (r) => r.cierre && r.actualizado
+    && Math.abs(r.cierre - r.actualizado) < 1000;
   // Si contactado ≈ alta, la marca es del momento de la carga, no de la respuesta.
   const respuestaPropia = pv.filter((r) => r.contactado && r.alta
     && Math.abs(r.contactado - r.alta) > 30 * 60 * 1000).length;
 
+  const cierresReales = resueltos.filter((r) => r.cierre && !aproximado(r));
   const calidad = {
     cierreCargado: resueltos.length ? +(100 * conCierre / resueltos.length).toFixed(0) : 0,
+    cierreReal: resueltos.length ? +(100 * cierresReales.length / resueltos.length).toFixed(0) : 0,
     respuestaCargada: pv.length ? +(100 * respuestaPropia / pv.length).toFixed(0) : 0,
     faltantes: [],
   };
   if (calidad.cierreCargado < 20) {
     calidad.faltantes.push('Fecha de cierre: no se está cargando, así que no hay tiempo de resolución ni evolución de la cola mes a mes.');
+  } else if (cierresReales.length < 30) {
+    calidad.faltantes.push(`Los ${conCierre - cierresReales.length} casos cerrados antes de septiembre 2026 `
+      + 'tienen una fecha de cierre aproximada (se rellenó con la última actualización). '
+      + 'Sirve para la tendencia mes a mes, no para medir cuánto tardó un caso puntual.');
   }
   if (calidad.respuestaCargada < 30) {
     calidad.faltantes.push('«3· Contactado» se marca junto con el alta del caso: mide cuándo se registró, no cuándo se le respondió al cliente.');
@@ -148,6 +161,17 @@ export function buildPostventa(aoaPostventa, aoaMinorista, aoaVolumen, ordenesPo
     return viejo >= 7 ? `El más viejo, ${viejo} días` : 'Todos de esta semana';
   };
 
+  // El tiempo hasta el cierre se mide sólo con cierres reales: mezclarlos con los
+  // rellenados daría una mediana que no corresponde a ninguna gestión de verdad.
+  const tiempos = cierresReales
+    .map((r) => dias(r.ingreso || r.alta, r.cierre))
+    .filter((d) => Number.isFinite(d) && d >= 0 && d < 365)
+    .sort((a, b) => a - b);
+  const medianaCierre = tiempos.length >= 10
+    ? (tiempos.length % 2 ? tiempos[tiempos.length >> 1]
+      : (tiempos[(tiempos.length >> 1) - 1] + tiempos[tiempos.length >> 1]) / 2)
+    : null;
+
   const ordenesRef = ordenesPorMes[mesRef] || 0;
   const kpis = [
     { n: `Ingresados en ${mesLegible(mesRef).replace(/ \d{4}$/, '')}`, v: String(base.length) },
@@ -158,6 +182,9 @@ export function buildPostventa(aoaPostventa, aoaMinorista, aoaVolumen, ordenesPo
     },
     { n: 'Siguen abiertos', v: String(base.filter((r) => r.estatus === ABIERTO).length) },
   ];
+  if (medianaCierre != null) {
+    kpis.push({ n: 'Días hasta el cierre', v: medianaCierre.toFixed(1).replace('.', ',') });
+  }
   if (ordenesRef) {
     kpis.push({
       n: 'Reclamos cada 100 órdenes',
@@ -189,6 +216,7 @@ export function buildPostventa(aoaPostventa, aoaMinorista, aoaVolumen, ordenesPo
     corte: corte.toISOString().slice(0, 10),
     mesRef,
     mesRefLargo: mesLegible(mesRef),
+    cierresAproximados: conCierre - cierresReales.length,
     calidad,
     postventa: {
       total: pv.length,
@@ -212,6 +240,7 @@ export function buildPostventa(aoaPostventa, aoaMinorista, aoaVolumen, ordenesPo
       canales: cuenta(base, (r) => r.canalVenta),
       responsables: cuenta(base, (r) => r.responsable),
       // Sólo tiene sentido con 'Fecha de cierre' cargada; si no, el tablero la oculta.
+      // Para la cola alcanza con saber en qué mes se cerró: los aproximados entran.
       cola: calidad.cierreCargado >= 20
         ? [...new Set(pv.map((r) => mesDe(r.alta || r.ingreso)).filter(Boolean))].sort().map((mes) => {
           const fin = new Date(Date.UTC(+mes.slice(0, 4), +mes.slice(5, 7), 0, 23, 59, 59));

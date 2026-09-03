@@ -564,8 +564,10 @@
   "corte": "2026-09-03",
   "mesRef": "2026-08",
   "mesRefLargo": "agosto 2026",
+  "cierresAproximados": 0,
   "calidad": {
    "cierreCargado": 0,
+   "cierreReal": 0,
    "respuestaCargada": 0,
    "faltantes": [
     "Fecha de cierre: no se está cargando, así que no hay tiempo de resolución ni evolución de la cola mes a mes.",
