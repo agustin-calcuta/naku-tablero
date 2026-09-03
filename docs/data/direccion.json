@@ -9,6 +9,23 @@
   "previoMes": null
  },
  "fuentes": {
+  "origen": {
+   "costos": {
+    "origen": "local-viejo",
+    "motivo": "Google devolvió una página en vez del archivo. Casi siempre es que no está compartido: abrilo → Compartir → Acceso general → \"Cualquiera con el enlace\" (Lector)",
+    "dias": 0
+   },
+   "postventa": {
+    "origen": "local-viejo",
+    "motivo": "Google devolvió 401",
+    "dias": 0
+   },
+   "maestro": {
+    "origen": "local",
+    "motivo": null,
+    "dias": null
+   }
+  },
   "costos": {
    "archivo": "PLANILLA_MADRE.xlsx",
    "hoja": "JULIO 2026",

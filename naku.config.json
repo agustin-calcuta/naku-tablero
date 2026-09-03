@@ -1,0 +1,41 @@
+{
+  "_comentario": [
+    "De dónde saca el build cada fuente.",
+    "",
+    "1. PUENTE (recomendado). Un Apps Script implementado 'como vos' lee las",
+    "   planillas con tu propio acceso y devuelve sólo las columnas que el tablero",
+    "   usa. Las planillas NO se comparten con nadie. Ver appsscript/fuentes/.",
+    "   La URL y el token pueden ir acá o en las variables de entorno",
+    "   NAKU_FUENTES_URL y NAKU_FUENTES_TOKEN (mejor: no quedan en el repo).",
+    "",
+    "2. LINK DE GOOGLE. Sólo sirve si la planilla está en 'cualquiera con el",
+    "   enlace'. Para las de Naku no aplica: tienen costos y datos de clientes.",
+    "",
+    "3. ARCHIVO LOCAL. Lo último: la copia que haya en el directorio de datos.",
+    "",
+    "Los exports de MercadoLibre y TiendaNube no se pueden traer solos: hay que",
+    "dejarlos en el directorio de datos."
+  ],
+  "fuentes": {
+    "url": "",
+    "token": ""
+  },
+  "costos": {
+    "id": "",
+    "tipo": "drive",
+    "archivo": "PLANILLA_MADRE.xlsx",
+    "descripcion": "Planilla madre de compras — costo sin IVA por SKU (columna CZ)"
+  },
+  "postventa": {
+    "id": "",
+    "tipo": "sheet",
+    "archivo": "Embudos_NAKU.xlsx",
+    "descripcion": "Central de atención al cliente — postventa y preventa"
+  },
+  "maestro": {
+    "id": "",
+    "tipo": "sheet",
+    "archivo": "Naku - SKU+Buyer+Cat.csv",
+    "descripcion": "Maestro SKU → nombre y familia"
+  }
+}

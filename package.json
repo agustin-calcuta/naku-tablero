@@ -1,10 +1,12 @@
 {
   "name": "naku-tablero",
   "version": "1.0.0",
-  "description": "",
+  "description": "Tableros de NAKU: ventas por comprador y tablero de dirección",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "actualizar": "node tools/actualizar.mjs",
+    "tablero": "node tools/build-direccion.mjs",
+    "test": "node tools/test-tablero.mjs"
   },
   "keywords": [],
   "author": "",

@@ -137,16 +137,16 @@ a{color:var(--azul)}
 .panel > header .sub{font-size:12px;color:var(--media)}
 .panel .cuerpo{padding:14px 18px 18px}
 
-/* Los paneles de una fila comparten alto —queda mejor a la vista— y su contenido
-   reparte el espacio sobrante en vez de dejar un hueco muerto abajo. */
-.rejilla{display:grid;gap:14px;align-items:stretch}
+/* Dos paneles al lado quedan mejor con el mismo alto, pero sólo si tienen una
+   cantidad de contenido parecida: estirar cuatro barras al alto de una tabla de
+   once filas las deja flotando en el vacío. La clase la pone `emparejar()`
+   midiendo la diferencia real; por defecto cada uno toma su altura. */
+.rejilla{display:grid;gap:14px;align-items:start}
+.rejilla.pareja{align-items:stretch}
 .panel{display:flex;flex-direction:column}
 .panel .cuerpo{flex:1;display:flex;flex-direction:column}
-.panel .cuerpo > .lista{flex:1;justify-content:space-between;min-height:0;
-  /* Con pocas barras y mucho alto sobrante, el reparto las dejaría flotando: el
-     gap máximo las mantiene agrupadas y el resto del espacio queda abajo. */
-  gap:clamp(11px,4vh,26px)}
-.panel .cuerpo > .lista.pegada{justify-content:flex-start;gap:11px}
+.rejilla.pareja .panel .cuerpo > .lista{flex:1;justify-content:space-between;min-height:0}
+.lista{gap:11px}
 .r2{grid-template-columns:repeat(2,minmax(0,1fr))}
 .r3{grid-template-columns:repeat(3,minmax(0,1fr))}
 .r-53{grid-template-columns:minmax(0,5fr) minmax(0,3fr)}
@@ -538,7 +538,7 @@ try {
 
     <div class="panel">
       <header>
-        <h3 id="tituloMeses">Cómo se cobró el mes, día por día</h3>
+        <h3 id="tituloMeses">Cómo se vendió el mes, día por día</h3>
         <span class="sub" id="subMeses"></span>
       </header>
       <div class="cuerpo">
@@ -678,9 +678,8 @@ function barras(destino, datos, opts = {}) {
   if (!el) return;
   if (!datos || !datos.length) { el.innerHTML = '<p class="nodato">Sin datos para este período.</p>'; return; }
   const tope = max ?? Math.max(...datos.map((d) => d.v));
-  el.classList.toggle('pegada', clase.includes('pegada'));
   el.innerHTML = datos.map((d) => `
-    <div class="item ${clase.replace('pegada', '').trim()}">
+    <div class="item ${clase}">
       <span class="nom">${d.sku ? `<em>${d.sku}</em>` : ''}${d.n}</span>
       <span class="cif">${formato(d.v)}${extra(d)}</span>
       <span class="riel"><i style="width:${tope ? (100 * d.v / tope).toFixed(1) : 0}%"></i></span>
@@ -841,7 +840,7 @@ function pintarVista(D, filtro) {
 
   /* ---------------- ventas ---------------- */
   const pico = dias.reduce((a, x) => (x.v > a.v ? x : a), dias[0] || { v: 0, d: 0 });
-  $('subMeses').textContent = `${rotulo}${soloUno ? ` · ${nombreCanal}` : ' · neto liquidado por cada canal'}`
+  $('subMeses').textContent = `${rotulo}${soloUno ? ` · ${nombreCanal}` : ' · vendido por cada canal, sin IVA'}`
     + (pico.v ? ` · el día más fuerte fue el ${pico.d} con ${moneyM(pico.v)}` : '');
   $('leyendaMeses').innerHTML = soloUno ? ''
     : '<span><i style="background:var(--c1)"></i> Mercado Libre</span>'
@@ -870,6 +869,9 @@ function pintarVista(D, filtro) {
   }
 
   pintarNotas(D, V, filtro, { rotulo, todoElMes, soloUno, nombreCanal });
+
+  // Después de que el navegador acomode el contenido nuevo.
+  requestAnimationFrame(emparejar);
 }
 
 const canales_ = (D) => D.canales || [{ id: 'todos', n: 'Los dos canales' }];
@@ -929,7 +931,7 @@ function graficoDias(dias, mesInfo) {
       y="${mSup}" width="${pasoX}" height="${alto}" fill="transparent"/>`).join('');
 
   cont.innerHTML = `<svg viewBox="0 0 ${W} ${H}" role="img"
-      aria-label="Neto liquidado por día de ${mesInfo.largo}, separado por canal">
+      aria-label="Vendido por día de ${mesInfo.largo}, separado por canal">
       ${ejes}${barrasSvg}${etiquetas}
       <line class="base" x1="${mIzq}" y1="${mSup + alto}" x2="${W - mDer}" y2="${mSup + alto}"/>
       ${zonas}
@@ -941,7 +943,7 @@ function graficoDias(dias, mesInfo) {
     const mostrar = () => {
       const x = dias[+r.dataset.i];
       globo.innerHTML = `<b>${x.d} de ${mesInfo.largo.split(' ')[0]}</b>
-        <span>Total ${moneyM(x.v)}</span>
+        <span>Vendido ${moneyM(x.v)}</span>
         <span>Mercado Libre ${moneyM(x.ml)}</span>
         ${x.tn ? `<span>Tienda Nube ${moneyM(x.tn)}</span>` : ''}
         <span>${nf.format(x.ordenes)} órdenes${x.ordenes ? ` · ticket ${money(x.v / x.ordenes)}` : ''}</span>`;
@@ -1088,6 +1090,7 @@ function pintarNotas(D, V, filtro, ctx) {
   const prev = todoElMes ? (serie.find((s) => s.mes === D.mesCerrado.previoMes) || {}) : {};
   const dias = V.dias || [];
   const E = V.eerr;
+  const ventasNetas = (E.lineas.find((l) => l.c === 'Ventas netas') || {}).v || 0;
   const C = D.clientes;
   /* Lo mismo que se está mirando, en el otro canal: la comparación que abre el
      filtro. Hay que entrar por [canal][período], no sólo por canal. */
@@ -1109,10 +1112,10 @@ function pintarNotas(D, V, filtro, ctx) {
     const mejores = orden.slice(0, cuantos).reduce((a, x) => a + x.v, 0);
     notas.push({
       sev: 'info',
-      h: `${soloUno ? ctx.nombreCanal + ', ' : ''}${rotulo}: ${moneyM(V.neto)} con ${nf.format(E.ordenes)} órdenes`
+      h: `${soloUno ? ctx.nombreCanal + ', ' : ''}${rotulo}: ${moneyM(ventasNetas)} con ${nf.format(E.ordenes)} órdenes`
         .replace(/^./, (c) => c.toUpperCase()),
       p: `Los ${cuantos} mejores días explican el ${pct(100 * mejores / total)} del período; el más fuerte `
-        + `fue el ${orden[0].d} con ${moneyM(orden[0].v)}. Ticket promedio ${money(V.neto / E.ordenes)}.`,
+        + `fue el ${orden[0].d} con ${moneyM(orden[0].v)}. Ticket promedio ${money(ventasNetas / E.ordenes)}.`,
       q: 'Ventas',
     });
   }
@@ -1197,6 +1200,27 @@ botonTema.setAttribute('aria-label', temaVigente() === 'dark' ? 'Cambiar a modo 
 botonTema.title = botonTema.getAttribute('aria-label');
 botonTema.addEventListener('click', () => aplicarTema(temaVigente() === 'dark' ? 'light' : 'dark', true));
 
+/* ---------------- alto de los paneles ----------------
+   Sólo se igualan los que ya están cerca: cuando uno tiene bastante menos
+   contenido que el otro, estirarlo deja un hueco que se lee peor que la
+   diferencia de altura. El umbral es la diferencia relativa contra el más alto. */
+const DIFERENCIA_TOLERADA = 0.28;
+
+function emparejar() {
+  document.querySelectorAll('.rejilla').forEach((rejilla) => {
+    const paneles = [...rejilla.children].filter((c) => !c.hidden);
+    if (paneles.length < 2) { rejilla.classList.remove('pareja'); return; }
+    // Se mide sin estirar; si no, todos darían el mismo alto y nunca se separarían.
+    rejilla.classList.remove('pareja');
+    const altos = paneles.map((c) => c.offsetHeight);
+    const alto = Math.max(...altos); const bajo = Math.min(...altos);
+    // En una sola columna (móvil) no hay nada que emparejar.
+    const unaColumna = paneles.length > 1
+      && paneles[0].getBoundingClientRect().top !== paneles[1].getBoundingClientRect().top;
+    rejilla.classList.toggle('pareja', !unaColumna && alto > 0 && (alto - bajo) / alto <= DIFERENCIA_TOLERADA);
+  });
+}
+
 /* ---------------- navegación ----------------
    La altura pegada arriba cambia según haya barra de filtros o no, y de ella
    dependen tres cosas: dónde se pega la barra, cuánto baja el scroll al tocar un
@@ -1238,7 +1262,7 @@ addEventListener('scroll', () => {
 enlaces.forEach((a, id) => a.addEventListener('click', () => marcar(id)));
 
 medirSticky();
-addEventListener('resize', medirSticky);
+addEventListener('resize', () => { medirSticky(); emparejar(); });
 if (secciones[0] && scrollY < 40) marcar(secciones[0].id);
 </script>
 </body>

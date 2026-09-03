@@ -46,6 +46,41 @@ tools/                build-tablero.mjs (arma nueva.html) + validación (reconci
 > números salgan del backend con token (`getRollup()`), y dejar el HTML público sin cifras.
 > Si querés, lo dejo con números redondeados/relativos para el demo.
 
+## Actualizar el tablero de dirección — la rutina
+
+```bash
+npm run actualizar
+```
+
+Eso hace todo: trae las planillas, procesa los exports que haya, regenera el
+tablero, lo commitea y lo publica. GitHub Pages lo sirve un minuto después.
+
+| Fuente | Cómo llega |
+|---|---|
+| **Costos** (planilla de compras) | **sola**, por el puente de Apps Script |
+| **Postventa** (central de atención) | **sola**, por el puente |
+| **Maestro** de SKU | archivo local |
+| **Exports de MercadoLibre / TiendaNube** | **a mano**: dejarlos en el directorio de datos |
+
+Los exports son lo único manual, y no hay forma de evitarlo hasta la API de
+MercadoLibre: no se pueden bajar sin entrar a la cuenta. Cuando Leo los pase, van
+a `../Naku Datos/` y se corre el comando.
+
+El puente se instala una sola vez siguiendo **[`appsscript/fuentes/README.md`](appsscript/fuentes/README.md)**.
+Sin él, el build usa los archivos que estén en el directorio de datos y avisa.
+
+### Otros comandos
+
+```bash
+npm run tablero          # sólo regenera el JSON, no toca git
+npm test                 # 65 controles sobre el JSON generado
+npm run actualizar -- --sin-publicar
+```
+
+`npm test` verifica que el estado de resultados cierre, que las quincenas sumen
+el mes, que los canales sumen el total, que las listas no tengan huecos y que las
+cifras sean plausibles. Conviene correrlo antes de publicar algo raro.
+
 ## Tablero de dirección (`docs/direccion.html`)
 
 Segundo tablero, para los socios: ventas, estado de resultados y central de
