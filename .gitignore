@@ -23,3 +23,6 @@ appsscript/.clasprc.json
 *.tmp
 scratchpad/
 .backup/
+
+# credenciales del puente de Apps Script (url + token)
+.naku-puente.json

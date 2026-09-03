@@ -6,7 +6,8 @@
   "scripts": {
     "actualizar": "node tools/actualizar.mjs",
     "tablero": "node tools/build-direccion.mjs",
-    "test": "node tools/test-tablero.mjs"
+    "test": "node tools/test-tablero.mjs",
+    "instalar-puente": "node tools/instalar-puente.mjs"
   },
   "keywords": [],
   "author": "",

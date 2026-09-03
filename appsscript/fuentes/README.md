@@ -8,7 +8,35 @@ Se implementa **ejecutándose como vos**, así que lee las planillas con tu prop
 acceso. Nadie más las ve. Afuera queda una URL con token que devuelve nada más
 que las columnas que el tablero usa — ni teléfonos, ni direcciones, ni nombres.
 
-## Los 6 pasos (unos 10 minutos, una sola vez)
+## La forma corta: dos comandos
+
+```bash
+npx @google/clasp@2.4.2 login     # una vez: abre el navegador, entrás con tu cuenta
+npm run instalar-puente
+```
+
+El segundo hace todo lo demás: genera el token, crea el proyecto, sube el código,
+lo publica como aplicación web configurada para correr con **tu** cuenta, prueba
+que responda y te deja las dos líneas para pegar en `~/.zshrc`.
+
+Dos cosas pueden pedirte una vuelta más, y el propio comando te dice cuál:
+
+- **"La API de Apps Script está apagada"** → abrís
+  [script.google.com/home/usersettings](https://script.google.com/home/usersettings),
+  la ponés en *Activado*, y volvés a correr el comando. Es un interruptor, una vez.
+- **"Está publicado pero todavía no contesta"** → falta autorizar los permisos.
+  Abrís el proyecto, ejecutás la función `probar` y aceptás. Google va a decir
+  "no verificada": es tu propio script, entrás por *Configuración avanzada*.
+
+Ese último paso es el único que no se puede automatizar, y es a propósito: el
+script lee tus planillas con tu acceso, así que Google exige que la autorización
+la des vos. Es justamente lo que evita tener que compartirlas con nadie.
+
+Para subir cambios más adelante: `npm run instalar-puente -- --actualizar`.
+
+---
+
+## La forma larga (a mano, si preferís ver cada paso)
 
 1. **[script.google.com](https://script.google.com) → Nuevo proyecto.** Nombralo
    *Naku · Fuentes del tablero*.
