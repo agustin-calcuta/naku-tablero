@@ -344,13 +344,13 @@ table.casos tr.vencido td.dias{color:var(--mal);font-weight:600}
   background:color-mix(in srgb,var(--papel) 94%,transparent);backdrop-filter:blur(10px);
   border-bottom:1px solid var(--linea)}
 .filtrosin{max-width:1200px;margin:0 auto;padding:9px 24px;display:flex;align-items:center;
-  gap:10px;flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none}
+  gap:10px;flex-wrap:wrap}
 .filtrosin::-webkit-scrollbar{display:none}
 .filtrosin > *{flex:none}
 .filtros .et{font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;
   color:var(--tenue);white-space:nowrap}
 .filtros .sep{width:1px;height:20px;background:var(--linea);flex:none}
-.filtros .resumen{margin-left:auto;font-size:12.5px;color:var(--media);white-space:nowrap;padding-left:8px}
+.filtros .resumen{flex-basis:100%;font-size:12.5px;color:var(--media);white-space:normal}
 .filtros .resumen b{color:var(--tinta);font-weight:600}
 .filtros select{font-family:inherit;font-size:12.5px;font-weight:600;color:var(--tinta);
   background:var(--panel);border:1px solid var(--linea);border-radius:7px;padding:5px 8px}
@@ -660,6 +660,7 @@ try {
               </thead>
               <tbody></tbody>
             </table>
+            <p class="notaPanel" id="datosPendientes"></p>
           </div>
         </div>
       </div>
@@ -1025,10 +1026,21 @@ function pintarVista(D, filtro) {
   const ult = serie.find((s) => s.mes === D.mesCerrado.mes) || serie[serie.length - 1] || {};
   /* Sólo se compara contra un mes entero: un mes cortado a mitad daría una
      variación falsa. Con un único export todavía no hay contra qué comparar. */
-  const prev = serie.find((s) => s.mes === D.mesCerrado.previoMes) || {};
+  const mesElegido = mesesPedidos.length === 1 ? mesesPedidos[0] : '';
+  const anterior = mesElegido ? new Date(Date.UTC(+mesElegido.slice(0,4), +mesElegido.slice(5,7)-2, 1)).toISOString().slice(0,7) : '';
+  const bloquePrevio = anterior && porCanal[`mes:${anterior}`];
+  const prev = bloquePrevio ? { neto: bloquePrevio.eerr.netoFaltante ? null : bloquePrevio.neto, ordenes: bloquePrevio.eerr.ordenes,
+    m: (D.mesesCargados.find(m => m.mes === anterior) || {}).corto } : {};
   const glosaPrev = prev.m ? `contra ${prev.m}` : '';
   const dias = V.puntos || [];
   const E = V.eerr;
+  const ausentes = mesesPedidos.filter(m => canal === 'todos' && (!D.vistas.ml?.[`mes:${m}`] || !D.vistas.tn?.[`mes:${m}`]));
+  $('datosPendientes').textContent =
+    `Estimación con costos de ${D.fuentes.costos.hoja}; no son costos históricos de cada mes. `
+    + `Falta incorporar: ${(E.faltan || []).join('; ')}. `
+    + (E.cargosAgrupados ? 'Mercado Libre agrupa comisión e impuestos; las diferencias contra Total se muestran sin clasificar. ' : '')
+    + (E.sinCosto?.length ? `SKU sin costo: ${E.sinCosto.map(x => x.sku).join(', ')}. ` : '')
+    + (ausentes.length ? `Falta un canal en ${ausentes.join(', ')}; esos meses no representan el total de la empresa.` : '');
   const linea = (nombre) => (E.lineas || []).find((l) => l.c === nombre) || { v: 0, pct: 0 };
   const ventasNetas = linea('Ventas netas');
   const margen = linea('Margen bruto');
@@ -1040,17 +1052,18 @@ function pintarVista(D, filtro) {
   const sujeto = soloUno ? nombreCanal : 'los dos canales';
   const deposito = soloUno ? 'depositó' : 'depositaron';
 
-  const rotulo = todoElMes ? D.mesCerrado.largo : `${P.n.toLowerCase()} de ${D.mesCerrado.largo}`;
+  const nombreMes = m => (D.mesesCargados.find(x => x.mes === m) || {}).largo || m;
+  const rotulo = todoElMes ? nombreMes(mesElegido) : `${nombreMes(mesesPedidos[0])} – ${nombreMes(mesesPedidos.at(-1))}`;
   $('resumenFiltro').innerHTML = soloUno
     ? `Sólo <b>${nombreCanal}</b> · <b>${nf.format(E.ordenes)}</b> órdenes de ${rotulo}`
     : `<b>${nf.format(E.ordenes)}</b> órdenes de ${rotulo}`;
 
   /* ---------------- encabezado ---------------- */
   $('mesCerrado').textContent = todoElMes
-    ? D.mesCerrado.largo.replace(/^./, (c) => c.toUpperCase())
+    ? rotulo.replace(/^./, (c) => c.toUpperCase())
     : P.n;
-  $('mesPrevio').textContent = todoElMes && D.mesCerrado.previo
-    ? `Comparado contra ${D.mesCerrado.previo}`
+  $('mesPrevio').textContent = todoElMes && bloquePrevio
+    ? `Comparado contra ${nombreMes(anterior)}`
     : `${nf.format(E.ordenes)} órdenes · ${nf.format(E.unidades)} unidades`;
 
 
@@ -1060,30 +1073,29 @@ function pintarVista(D, filtro) {
   const fichas = [
     {
       et: 'Vendimos', val: moneyM(ventasNetas.v), foco: true,
-      glosa: `Lo que se vendió en ${todoElMes ? 'el mes' : 'el período'}, antes de descontar nada`,
+      glosa: `Ventas netas de ${todoElMes ? 'el mes' : 'el período'}, antes de costos y cargos`,
     },
     {
-      et: 'Nos depositaron', val: moneyM(V.neto),
-      d: variacion(V.neto, prev.neto),
-      glosa: `Lo que ${sujeto} ${deposito}, ya con sus comisiones descontadas`,
+      et: 'Neto informado por los canales', val: moneyM(V.neto),
+      d: E.netoFaltante ? null : variacion(V.neto, prev.neto),
+      glosa: E.netoFaltante ? `Parcial: ${nf.format(E.netoFaltante)} órdenes sin Total neto. No acredita depósitos bancarios.` : 'Según el export; no acredita depósitos bancarios',
     },
     {
-      et: 'Margen bruto', val: pct(margen.pct), sub: moneyM(margen.v),
-      glosa: 'Queda después de pagar la mercadería',
+      et: 'Margen bruto estimado', val: pct(margen.pct), sub: moneyM(margen.v),
+      glosa: `Costos de ${D.fuentes.costos.hoja.toLowerCase()}. Cobertura ${pct(E.cobertura)}`,
     },
     {
-      et: 'Nos queda', val: pct(contrib.pct), sub: moneyM(contrib.v), foco: true,
-      glosa: 'Después de mercadería, comisiones y envíos. Sin contar sueldos ni marketing',
+      et: 'Contribución estimada', val: pct(contrib.pct), sub: moneyM(contrib.v), foco: true,
+      glosa: 'Antes de gastos pendientes, sueldos y marketing. En TN falta el costo del transportista',
     },
     {
       et: 'Órdenes', val: nf.format(E.ordenes),
       d: variacion(E.ordenes, prev.ordenes),
-      glosa: `Ventas del mes en ${soloUno ? nombreCanal : 'los dos canales'}`,
+      glosa: `Ventas del período en ${soloUno ? nombreCanal : 'los dos canales'}`,
     },
     {
-      et: 'Ticket promedio', val: money(E.ordenes ? V.neto / E.ordenes : 0),
-      d: variacion(V.neto / E.ordenes, prev.neto / prev.ordenes),
-      glosa: 'Lo que deja cada orden en promedio',
+      et: 'Ticket promedio', val: money(E.ordenes ? ventasNetas.v / E.ordenes : 0),
+      glosa: 'Ventas netas por orden, sin IVA',
     },
   ];
 
@@ -1109,19 +1121,23 @@ function pintarVista(D, filtro) {
         ? `destacado total${f.c === 'Resultado de contribución' ? ' cierre' : ''}` : '');
     const neg = f.v < 0;
     return `<tr class="${clase}">
-      <td>${f.c}</td>
-      <td class="${neg ? 'neg' : ''}">${neg ? '(' + moneyM(-f.v) + ')' : moneyM(f.v)}</td>
-      <td class="${neg ? 'neg' : ''}">${neg ? '(' + pct(Math.abs(f.pct)) + ')' : pct(f.pct)}</td>
+      <td>${E.cargosAgrupados && f.c === 'Comisiones de plataforma' ? 'Comisiones e impuestos agrupados de ML + cargos de TN' : f.c}</td>
+      <td class="${neg ? 'neg' : ''}">${E.cargosAgrupados && f.c === 'Impuestos de plataforma' && !f.v ? 'Incluidos arriba' : neg ? '(' + moneyM(-f.v) + ')' : moneyM(f.v)}</td>
+      <td class="${neg ? 'neg' : ''}">${E.cargosAgrupados && f.c === 'Impuestos de plataforma' && !f.v ? '—' : neg ? '(' + pct(Math.abs(f.pct)) + ')' : pct(f.pct)}</td>
     </tr>`;
   }).join('');
 
   barras('gastos', V.gastos, { formato: (v) => pct(v), clase: 'c3' });
 
   /* El margen mes a mes necesita el export crudo de cada mes; hoy sólo hay uno. */
-  const conMargen = serie.filter((s) => s.mb != null && !s.parcial);
+  const conMargen = mesesPedidos.map(m => {
+    const b = porCanal[`mes:${m}`];
+    return b ? { m: nombreMes(m), mb: b.eerr.lineas.find(l => l.c === 'Margen bruto').pct } : null;
+  }).filter(Boolean);
+  $('filaMargen').hidden = conMargen.length < 3;
   if (conMargen.length >= 3) {
     $('filaMargen').hidden = false;
-    $('subMargen').textContent = `% sobre ventas netas · ${conMargen.length} meses`;
+    $('subMargen').textContent = `Estimado con costos de ${D.fuentes.costos.hoja.toLowerCase()} · ${conMargen.length} meses`;
     graficoLinea('gMargen', conMargen, 'mb', 'var(--c1)', 'Margen bruto mensual', (v) => pct(v));
   }
 
@@ -1152,12 +1168,12 @@ function pintarVista(D, filtro) {
   /* La central de atención también se filtra por canal. Su corte es otro —los
      casos son de agosto y septiembre—, así que el período de ventas no aplica. */
   if (D.clientes) {
-    const C = (D.clientes.porCanal && D.clientes.porCanal[canal]) || D.clientes;
+    const C = D.clientes.porCanal ? D.clientes.porCanal[canal] : (canal === 'todos' ? D.clientes : null);
     if (C) { document.getElementById('clientes').hidden = false; pintarClientes(C, D, soloUno ? nombreCanal : null); }
     else document.getElementById('clientes').hidden = true;
   }
 
-  pintarNotas(D, V, filtro, { rotulo, todoElMes, soloUno, nombreCanal });
+  pintarNotas(D, V, filtro, { rotulo, todoElMes, soloUno, nombreCanal, prev, mesesPedidos });
 
   // Después de que el navegador acomode el contenido nuevo.
   requestAnimationFrame(emparejar);
@@ -1390,19 +1406,19 @@ function pintarNotas(D, V, filtro, ctx) {
   const canal = filtro.canal;
   const { rotulo, todoElMes, soloUno } = ctx;
   const serie = D.serie || [];
-  const prev = todoElMes ? (serie.find((s) => s.mes === D.mesCerrado.previoMes) || {}) : {};
+  const prev = ctx.prev || {};
   const dias = V.puntos || [];
   const E = V.eerr;
   const ventasNetas = (E.lineas.find((l) => l.c === 'Ventas netas') || {}).v || 0;
   const C = D.clientes;
   /* Lo mismo que se está mirando, en el otro canal: la comparación que abre el
      filtro. Hay que entrar por [canal][período], no sólo por canal. */
-  const enCanal = (id) => (D.vistas[id] || {})[filtro.periodo] || (D.vistas[id] || {}).mes;
-  const v = variacion(V.neto, prev.neto);
+  const enCanal = (id) => filtro.periodo === 'rango' ? sumarBloques(D.vistas[id] || {}, ctx.mesesPedidos) : (D.vistas[id] || {})[filtro.periodo];
+  const v = E.netoFaltante ? null : variacion(V.neto, prev.neto);
   if (v != null) {
     notas.push({
       sev: v >= 0 ? 'bien' : 'ojo',
-      h: `Los canales liquidaron ${moneyM(V.neto)}, ${signo(v)}% contra ${prev.largo}`,
+      h: `Neto informado: ${moneyM(V.neto)}, ${signo(v)}% contra ${prev.m}`,
       p: `${nf.format(E.ordenes)} órdenes, ticket ${money(V.neto / E.ordenes)}.`,
       q: 'Ventas',
     });
@@ -1417,7 +1433,7 @@ function pintarNotas(D, V, filtro, ctx) {
       sev: 'info',
       h: `${soloUno ? ctx.nombreCanal + ', ' : ''}${rotulo}: ${moneyM(ventasNetas)} con ${nf.format(E.ordenes)} órdenes`
         .replace(/^./, (c) => c.toUpperCase()),
-      p: `Los ${cuantos} mejores días explican el ${pct(100 * mejores / total)} del período; el más fuerte `
+      p: `Los ${Math.min(cuantos,dias.length)} mejores ${V.granularidad === 'mes' ? 'meses' : 'días'} explican el ${pct(100 * mejores / total)} del período; el más fuerte `
         + `fue el ${orden[0].d} con ${moneyM(orden[0].v)}. Ticket promedio ${money(ventasNetas / E.ordenes)}.`,
       q: 'Ventas',
     });
@@ -1444,7 +1460,7 @@ function pintarNotas(D, V, filtro, ctx) {
     if (tnV && mlV && V.neto) {
       notas.push({
         sev: 'info',
-        h: `Tienda Nube es el ${pct(100 * tnV.neto / V.neto)} de lo cobrado`,
+        h: `Tienda Nube es el ${pct(100 * tnV.neto / V.neto)} del neto informado${E.netoFaltante ? ' (parcial)' : ''}`,
         p: prev.neto
           ? `El mes anterior era el ${pct(100 * (prev.tn ?? 0) / prev.neto)}. Mercado Libre explica el resto.`
           : `Mercado Libre puso los otros ${moneyM(mlV.neto)}.`,
@@ -1535,7 +1551,7 @@ function sumarBloques(porCanal, meses) {
 
   const prod = new Map();
   for (const b of bloques) {
-    for (const p of b.productos) {
+    for (const p of (b.detalle?.productos || b.productos)) {
       const q = prod.get(p.sku) || { sku: p.sku, n: p.n, v: 0, u: 0 };
       q.v += p.v; q.u += p.u;
       prod.set(p.sku, q);
@@ -1547,13 +1563,22 @@ function sumarBloques(porCanal, meses) {
   const reponderar = (campo) => {
     const abs = new Map();
     for (const b of bloques) {
-      const netasB = (b.eerr.lineas.find((l) => l.c === 'Ventas netas') || {}).v || 0;
-      for (const x of b[campo]) abs.set(x.n, (abs.get(x.n) || 0) + x.v * netasB / 100);
+      if (b.detalle?.[campo]) {
+        for (const [n,v] of b.detalle[campo]) abs.set(n, (abs.get(n) || 0) + v);
+      } else {
+        const bruto = (b.eerr.lineas.find((l) => l.c === 'Ventas brutas') || {}).v || 0;
+        for (const x of b[campo]) abs.set(x.n, (abs.get(x.n) || 0) + x.v * bruto / 100);
+      }
     }
     const tot = [...abs.values()].reduce((a, b2) => a + b2, 0) || 1;
-    return [...abs.entries()]
+    const todas = [...abs.entries()]
       .map(([n, v]) => ({ n, v: +(100 * v / tot).toFixed(1) }))
       .sort((a, b2) => b2.v - a.v);
+    const n = campo === 'familias' ? 10 : 6;
+    const primeras = todas.slice(0,n);
+    const resto = todas.slice(n).reduce((s,x) => s+x.v,0);
+    if(resto > 0) primeras.push({ n: campo === 'familias' ? 'Resto de familias' : 'Resto del país', v: +resto.toFixed(1) });
+    return primeras;
   };
 
   return {
@@ -1562,7 +1587,10 @@ function sumarBloques(porCanal, meses) {
       lineas,
       ordenes: bloques.reduce((a, b) => a + b.eerr.ordenes, 0),
       unidades: bloques.reduce((a, b) => a + b.eerr.unidades, 0),
-      cobertura: +(bloques.reduce((a, b) => a + b.eerr.cobertura, 0) / bloques.length).toFixed(1),
+      netoFaltante: bloques.reduce((a,b) => a + (b.eerr.netoFaltante || 0), 0),
+      cargosAgrupados: bloques.some(b => b.eerr.cargosAgrupados),
+      cobertura: +(100 * (1 - bloques.reduce((a,b) => a+(b.detalle?.cogsFaltante || 0),0) /
+        (bloques.reduce((a,b) => a+(b.detalle?.ventaBruta || 0),0) || 1))).toFixed(1),
     },
     gastos: ['Costo de la mercadería', 'Comisiones de plataforma', 'Envíos y logística', 'Impuestos de plataforma']
       .map((n, i) => ({
@@ -1717,7 +1745,7 @@ decidirMarca();
 <!-- Actualizar datos desde el navegador. Los tres son opcionales: si no cargan,
      el tablero funciona igual y el botón no aparece. -->
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-<script src="importar.js"></script>
-<script src="importar-ui.js"></script>
+<script src="importar.js?v=20260908"></script>
+<script src="importar-ui.js?v=20260908"></script>
 </body>
 </html>

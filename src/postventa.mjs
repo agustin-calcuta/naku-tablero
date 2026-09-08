@@ -161,7 +161,7 @@ export function buildPostventa(aoaPostventa, aoaMinorista, aoaVolumen, ordenesPo
   const vencidos = conDias.filter((r) => r.urgencia === 'Alta' && r.dias >= 2).length;
 
   const delMes = pv.filter((r) => mesDe(r.alta || r.ingreso) === mesRef);
-  const base = delMes.length ? delMes : pv;
+  const base = delMes;
   const resueltosBase = base.filter((r) => r.estatus === OK || r.estatus === MAL);
   const okBase = base.filter((r) => r.estatus === OK).length;
 
@@ -203,8 +203,8 @@ export function buildPostventa(aoaPostventa, aoaMinorista, aoaVolumen, ordenesPo
   }
   if (ordenesRef) {
     kpis.push({
-      n: 'Reclamos cada 100 órdenes',
-      v: (100 * base.length / ordenesRef).toFixed(1).replace('.', ','),
+      n: canal === 'todos' ? 'Reclamos ML/TN cada 100 órdenes' : 'Reclamos cada 100 órdenes',
+      v: (100 * base.filter(r => canal !== 'todos' || ['Mercado Libre','Tienda Nube'].includes(r.canalVenta)).length / ordenesRef).toFixed(1).replace('.', ','),
     });
   }
 
@@ -220,10 +220,10 @@ export function buildPostventa(aoaPostventa, aoaMinorista, aoaVolumen, ordenesPo
     // La preventa no registra canal de venta —todavía no hay venta—, así que el
     // canal de comunicación es lo más cercano: Mercado Libre o el resto.
     && (canal === 'todos'
-      || (canal === 'Mercado Libre' ? r.canal === 'Mercado Libre' : r.canal !== 'Mercado Libre')));
+      || r.canal === canal));
 
   const minMes = min.filter((r) => mesDe(r.alta) === mesRef);
-  const minBase = minMes.length ? minMes : min;
+  const minBase = minMes;
   const ganados = minBase.filter((r) => r.estatus === 'Ganado').length;
   const perdidos = minBase.filter((r) => r.estatus === 'Perdido').length;
   const enSeguimiento = minBase.filter((r) => r.estatus === 'En seguimiento').length;

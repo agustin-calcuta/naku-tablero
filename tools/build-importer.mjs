@@ -97,27 +97,8 @@ const jsonTablero = path.join(ROOT, 'datos', 'direccion.json');
 if (!fs.existsSync(jsonTablero)) fatal('falta datos/direccion.json — corré antes: npm run tablero');
 const tablero = JSON.parse(fs.readFileSync(jsonTablero, 'utf8'));
 
-// Los costos salen de la planilla del mes; se embeben como pares [sku, costo].
-let costosPares = [];
-const fCostos = fs.existsSync(DATA)
-  ? fs.readdirSync(DATA).find((f) => /PLANILLA.?MADRE.*\.xlsx$/i.test(f)) : null;
-if (fCostos) {
-  const XLSX = await import('xlsx');
-  const wb = XLSX.read(fs.readFileSync(path.join(DATA, fCostos)), { type: 'buffer' });
-  const { hojasPorMes, buildCostos } = await import('../src/costos.mjs');
-  const cand = hojasPorMes(wb.SheetNames)[0];
-  if (cand) {
-    const c = buildCostos(
-      XLSX.utils.sheet_to_json(wb.Sheets[cand.hoja], { header: 1, raw: true, defval: '' }),
-      cand.hoja, cand.mes,
-    );
-    costosPares = [...c.costo.entries()];
-    console.log(`· costos embebidos: ${costosPares.length} SKU de "${cand.hoja}"`);
-  }
-}
-if (!costosPares.length) {
-  console.warn('⚠ sin costos embebidos: el importer va a poder mostrar ventas, no margen');
-}
+// Los costos privados se cargan desde la planilla, nunca en el JS público.
+const costosPares = [];
 
 const maestro = leerMaestro();
 console.log(`· maestro embebido: ${maestro.split('\n').length} filas`);

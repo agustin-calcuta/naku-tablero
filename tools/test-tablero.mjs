@@ -68,8 +68,9 @@ for (const [canal, porPeriodo] of Object.entries(D.vistas)) {
 
     const contrib = linea(v, 'Resultado de contribución');
     const esperado = mb + linea(v, 'Comisiones de plataforma')
-      + linea(v, 'Envíos (neto de lo cobrado)') + linea(v, 'Impuestos de plataforma');
-    check(`${etq}: contribución = margen bruto − cargos del canal`, cerca(esperado, contrib));
+      + linea(v, 'Envíos (neto de lo cobrado)') + linea(v, 'Impuestos de plataforma')
+      + linea(v, 'Diferencias no desglosadas en el export');
+    check(`${etq}: contribución = margen bruto − cargos y ajustes`, Math.abs(esperado - contrib) < 0.01);
   }
 }
 
@@ -133,8 +134,8 @@ if (D.clientes) {
     `${C.postventa.urgencias.reduce((a, u) => a + u.n, 0)} ≠ ${C.postventa.abiertos}`);
   check('hay versión por canal', !!(C.porCanal && C.porCanal.todos));
   if (C.porCanal && C.porCanal.ml && C.porCanal.tn) {
-    check('los canales suman los casos',
-      C.porCanal.ml.postventa.total + C.porCanal.tn.postventa.total === C.postventa.total);
+    check('los canales filtrados no exceden el total (también hay venta por WhatsApp)',
+      C.porCanal.ml.postventa.total + C.porCanal.tn.postventa.total <= C.postventa.total);
   }
   check('el embudo de preventa va de mayor a menor',
     C.preventa.minorista.etapas.every((e, i, a) => i === 0 || a[i - 1].v >= e.v));
@@ -148,7 +149,7 @@ if (D.clientes) {
 /* ---------------------------------------------------------------- tamaño */
 console.log('\nPeso');
 const kb = fs.statSync(RUTA).size / 1024;
-check(`el JSON pesa ${kb.toFixed(0)} KB (menos de 400)`, kb < 400);
+check(`el JSON con detalle mensual pesa ${kb.toFixed(0)} KB (menos de 2048)`, kb < 2048);
 
 console.log(`\n${fallas ? '✗' : '✓'} ${corridos - fallas}/${corridos} controles pasaron\n`);
 process.exit(fallas ? 1 : 0);

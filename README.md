@@ -48,6 +48,27 @@ tools/                build-tablero.mjs (arma nueva.html) + validación (reconci
 
 ## Actualizar el tablero de dirección — la rutina
 
+La importación admite los exports de septiembre de 2026: cargos agrupados de
+Mercado Libre, paquetes con cabecera monetaria y productos adicionales de
+Tienda Nube. Las órdenes de TN canceladas o con pago pendiente, rechazado,
+vencido o reembolsado no se cuentan como ventas. Los archivos superpuestos se
+rechazan antes de sumar para evitar duplicar importes.
+
+El margen es una **estimación con la hoja de costos cargada**, no un margen
+histórico contabilizado. Las diferencias entre los componentes de ML y su
+`Total (ARS)` se muestran sin clasificar. El envío de TN es lo cobrado al
+comprador; falta el costo del transportista. Un `Total neto` vacío queda
+identificado como faltante, sin sustituirlo por una liquidación estimada.
+
+Los rangos libres se calculan con el detalle mensual completo, conservando los
+productos fuera del top 10. Atención al cliente muestra su propio corte y se
+filtra por canal; el período comercial no cambia ese corte. WhatsApp no se
+atribuye automáticamente a Tienda Nube.
+
+El importador requiere la planilla de costos al cargar ventas. Los costos
+unitarios no se incluyen en el JavaScript público. Para validar:
+`npm test` comprueba el JSON y las regresiones de importación y filtros.
+
 ```bash
 npm run actualizar
 ```

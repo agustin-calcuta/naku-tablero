@@ -69,7 +69,7 @@ function idx(headerRow) {
 /** Los importes que se suman día por día. */
 const MONTOS = ['ventaBruta', 'bonificaciones', 'anulaciones', 'descuentos', 'comisiones',
   'envioCobrado', 'envioCosto', 'impuestos', 'netoLiquidado', 'cogs', 'cogsFaltante',
-  'lineas', 'canceladas', 'unidades', 'ml', 'tn'];
+  'lineas', 'canceladas', 'unidades', 'ml', 'tn', 'cargosAgrupados', 'netoFaltante', 'envioTnCobrado', 'ajustes'];
 
 /**
  * TODO —importes y cortes— se acumula por día del mes. Así el tablero recorta
@@ -195,18 +195,45 @@ export function ingestFinanzasMeli(aoa, costoDe, match = null) {
     bruto: at('Ingresos por productos (ARS)'),
     cargoVenta: at('Cargo por venta'), costoFijo: at('Costo fijo'),
     cargoCuotas: at('Costo por ofrecer cuotas'),
+    cargoAgrupado: at('Cargo por venta e impuestos (ARS)'),
     envioIngreso: at('Ingresos por envío (ARS)'), envioCosto: at('Costos de envío (ARS)'),
     impuestos: at('Impuestos'), bonif: at('Descuentos y bonificaciones'),
     anul: at('Anulaciones y reembolsos (ARS)'), total: at('Total (ARS)'),
     titulo: at('Título de la publicación'), envio: at('Forma de entrega'),
+    precio: at('Precio unitario de venta de la publicación (ARS)'),
   };
   for (const req of ['venta', 'bruto', 'total']) {
     if (C[req] < 0) throw new Error(`MeLi finanzas: falta una columna requerida (${req}) — ¿cambió el export?`);
   }
 
-  const porMes = new Map();
+  // Los paquetes tienen una cabecera monetaria y luego sus productos sin
+  // importes. Se cuenta una orden, sin inventar una unidad para la cabecera.
+  // El ingreso del paquete se reparte por precio × cantidad de sus productos.
+  const filas = [];
   for (let r = h + 1; r < aoa.length; r++) {
     const row = aoa[r];
+    const paquete = /^Paquete de (\d+) productos/i.exec(String(row?.[C.estado] || ''));
+    if (!paquete) { filas.push(row); continue; }
+    const hijos = aoa.slice(r + 1, r + 1 + Number(paquete[1]));
+    if (hijos.length !== Number(paquete[1]) || hijos.some(x => !String(x[C.sku] ?? '').trim() || String(x[C.bruto] ?? '').trim())) {
+      throw new Error('MeLi: un paquete no tiene el detalle de productos esperado. Revisá el export completo.');
+    }
+    const pesos = hijos.map(x => num(x[C.precio]) * (num(x[C.unidades]) || 1));
+    const peso = pesos.reduce((a,b) => a+b, 0);
+    if (!peso) throw new Error('MeLi: paquete sin precios para distribuir el ingreso por producto.');
+    hijos.forEach((hijo, i) => {
+      const x = [...hijo];
+      for (const k of ['bruto','cargoVenta','costoFijo','cargoCuotas','cargoAgrupado','envioIngreso','envioCosto','impuestos','bonif','anul','total']) {
+        if (C[k] >= 0) x[C[k]] = num(row[C[k]]) * pesos[i] / peso;
+      }
+      x[C.venta] = row[C.venta];
+      x[C.fecha] = row[C.fecha];
+      filas.push(x);
+    });
+    r += hijos.length;
+  }
+  const porMes = new Map();
+  for (const row of filas) {
     if (!row) continue;
     const venta = row[C.venta];
     if (venta == null || String(venta).trim() === '') continue;
@@ -234,13 +261,25 @@ export function ingestFinanzasMeli(aoa, costoDe, match = null) {
 
     // Los cargos ya vienen firmados en negativo: se suman, no se restan.
     d.ventaBruta += num(row[C.bruto]);
-    d.comisiones += num(row[C.cargoVenta]) + num(row[C.costoFijo]) + num(row[C.cargoCuotas]);
+    if (C.cargoAgrupado >= 0) {
+      d.comisiones += num(row[C.cargoAgrupado]);
+      d.cargosAgrupados++;
+    } else {
+      d.comisiones += num(row[C.cargoVenta]) + num(row[C.costoFijo]) + num(row[C.cargoCuotas]);
+    }
     d.envioCobrado += num(row[C.envioIngreso]);
     d.envioCosto += num(row[C.envioCosto]);
     d.impuestos += num(row[C.impuestos]);
     d.bonificaciones += num(row[C.bonif]);
     d.anulaciones += num(row[C.anul]);
     d.netoLiquidado += num(row[C.total]);
+    if (C.cargoAgrupado >= 0) {
+      // Esta versión del export no desglosa todo lo que resta del Total.
+      // La diferencia se conserva como tal; no se inventa su naturaleza.
+      const componentes = ['bruto','cargoAgrupado','envioIngreso','envioCosto','impuestos','bonif','anul']
+        .reduce((s,k) => s + num(row[C[k]]), 0);
+      d.ajustes += num(row[C.total]) - componentes;
+    }
 
     const u = num(row[C.unidades]) || 1;
     d.unidades += u;
@@ -279,7 +318,7 @@ export function ingestFinanzasTn(aoa, costoDe, match = null) {
     estado: at('Estado de la orden'), pago: at('Estado del pago'),
     sku: at('SKU'), precio: at('Precio del producto'), cant: at('Cantidad del producto'),
     subtotal: at('Subtotal de productos'), descuento: at('Descuento'),
-    envio: at('Costo de envío'), total: at('Total'),
+    envioCobrado: at('Costo de envío'), total: at('Total'), reembolso: at('Reembolso'),
     proceso: at('Costo de procesamiento'), interes: at('Interés por cuotas'),
     impuestos: at('Impuestos'), neto: at('Total neto'),
     titulo: at('Nombre del producto'), envio: at('Medio de envío'),
@@ -289,20 +328,29 @@ export function ingestFinanzasTn(aoa, costoDe, match = null) {
 
   const porMes = new Map();
   const vistas = new Set(); // el subtotal/envío/cargos se repiten por línea: se toman una vez por orden
+  let cabecera = null;
   for (let r = 1; r < aoa.length; r++) {
     const row = aoa[r];
-    if (!row || String(row[C.orden] ?? '').trim() === '') continue;
+    if (!row) continue;
+    if (String(row[C.fecha] ?? '').trim()) cabecera = row;
+    if (cabecera && String(row[C.orden] ?? '').trim() && String(row[C.orden]).trim() !== String(cabecera[C.orden]).trim()) {
+      throw new Error('TN: hay un producto sin fecha ni cabecera de su orden.');
+    }
+    if (!cabecera || (!String(row[C.orden] ?? '').trim() && !String(row[C.titulo] ?? '').trim() && !String(row[C.sku] ?? '').trim())) continue;
 
-    const mes = mesTN(row[C.fecha]);
+    const mes = mesTN(cabecera[C.fecha]);
     if (!mes) continue;
     if (!porMes.has(mes)) porMes.set(mes, vacio());
     const a = porMes.get(mes);
 
-    const dia = diaDelMes(row[C.fecha]);
+    const dia = diaDelMes(cabecera[C.fecha]);
     if (!dia) continue;
-    if (CANCEL_RE.test(String(row[C.estado] ?? ''))) { diaDe(a, dia).canceladas++; continue; }
+    if (CANCEL_RE.test(String(cabecera[C.estado] ?? '')) || /^(Reembolsado|Vencido|Pendiente|Rechazado)$/i.test(String(cabecera[C.pago] ?? '').trim())) {
+      if (row === cabecera) diaDe(a, dia).canceladas++;
+      continue;
+    }
 
-    const orden = String(row[C.orden]).trim();
+    const orden = 'tn:' + String(cabecera[C.orden]).trim();
     a.ultimoDia = Math.max(a.ultimoDia, dia);
     const d = diaDe(a, dia);
     d.lineas++;
@@ -311,12 +359,16 @@ export function ingestFinanzasTn(aoa, costoDe, match = null) {
     const claveOrden = `${mes}|${orden}`;
     if (!vistas.has(claveOrden)) {
       vistas.add(claveOrden);
-      d.ventaBruta += num(row[C.subtotal]);
-      d.descuentos += -num(row[C.descuento]);
-      d.envioCosto += -num(row[C.envio]);
-      d.comisiones += -(num(row[C.proceso]) + num(row[C.interes]));
-      d.impuestos += -num(row[C.impuestos]);
-      d.netoLiquidado += num(row[C.neto]);
+      d.ventaBruta += num(cabecera[C.subtotal]);
+      d.descuentos += -num(cabecera[C.descuento]);
+      d.anulaciones -= Math.abs(num(cabecera[C.reembolso]));
+      // El export informa lo cobrado al comprador por envío, no la factura del transportista.
+      d.envioCobrado += num(cabecera[C.envioCobrado]);
+      d.envioTnCobrado += num(cabecera[C.envioCobrado]);
+      d.comisiones += -(num(cabecera[C.proceso]) + num(cabecera[C.interes]));
+      d.impuestos += -num(cabecera[C.impuestos]);
+      if (String(cabecera[C.neto] ?? '').trim()) d.netoLiquidado += num(cabecera[C.neto]);
+      else d.netoFaltante++;
     }
 
     const q = num(row[C.cant]) || 1;
@@ -335,8 +387,8 @@ export function ingestFinanzasTn(aoa, costoDe, match = null) {
       familia: (m && m.familia) || familiaOf('', '', skuRaw),
       unidades: q,
       monto: sinIva(monto),
-      provincia: C.provincia >= 0 ? String(row[C.provincia] ?? '').trim() : '',
-      envio: C.envio >= 0 ? String(row[C.envio] ?? '').trim() : '',
+      provincia: C.provincia >= 0 ? String(cabecera[C.provincia] ?? '').trim() : '',
+      envio: C.envio >= 0 ? String(cabecera[C.envio] ?? '').trim() : '',
       orden,
       dia,
       canal: 'tn',
@@ -355,7 +407,7 @@ export function verificarMeli(acc) {
   // acc puede venir por día: se aplana primero.
   if (acc.porDia) acc = agregar(acc);
   const suma = acc.ventaBruta + acc.envioCobrado + acc.comisiones + acc.envioCosto
-    + acc.impuestos + acc.bonificaciones + acc.anulaciones;
+    + acc.impuestos + acc.bonificaciones + acc.anulaciones + acc.ajustes;
   const delta = suma - acc.netoLiquidado;
   const rel = acc.netoLiquidado ? Math.abs(delta / acc.netoLiquidado) : 0;
   return { suma, neto: acc.netoLiquidado, delta, rel, ok: rel < 0.01 };
@@ -458,14 +510,15 @@ export function eerr(acc) {
   const comisiones = sinIva(acc.comisiones);
   const envio = sinIva(acc.envioCobrado + acc.envioCosto);
   const impuestos = sinIva(acc.impuestos);
-  const contribucion = margenBruto + comisiones + envio + impuestos;
+  const ajustes = sinIva(acc.ajustes);
+  const contribucion = margenBruto + comisiones + envio + impuestos + ajustes;
 
   const pct = (v) => (ventasNetas ? +(100 * v / ventasNetas).toFixed(1) : 0);
   const ordenes = acc.ordenes.size;
 
   return {
     ventaBruta, bonificaciones, anulaciones, descuentos, ventasNetas,
-    cogs, margenBruto, comisiones, envio, impuestos, contribucion,
+    cogs, margenBruto, comisiones, envio, impuestos, ajustes, contribucion,
     margenBrutoPct: pct(margenBruto),
     contribucionPct: pct(contribucion),
     cogsPct: pct(cogs),
@@ -480,6 +533,9 @@ export function eerr(acc) {
     // También sin IVA: si no, en TiendaNube —que casi no tiene cargos— lo
     // depositado daba MÁS que lo vendido, que no se entiende ni es cierto.
     netoLiquidado: sinIva(acc.netoLiquidado),
+    netoFaltante: acc.netoFaltante,
+    cargosAgrupados: acc.cargosAgrupados > 0,
+    envioTnCobrado: sinIva(acc.envioTnCobrado),
     // Qué parte de la venta quedó sin costear: si sube, el margen deja de ser confiable.
     coberturaCostosPct: acc.ventaBruta ? +(100 * (1 - acc.cogsFaltante / acc.ventaBruta)).toFixed(1) : 0,
     cogsFaltante: acc.cogsFaltante,

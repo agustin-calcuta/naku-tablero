@@ -167,7 +167,7 @@ if (fMaestro) {
 
 /* ---------------------------------------------------------------- ventas */
 const fMeli = buscar(/ventas.?ar.*\.xlsx$/i);
-const fTn = buscar(/tiendanube.*\.csv$/i);
+const fTn = buscar(/(?:tiendanube|NAKU-TN-Ventas).*\.csv$/i);
 if (!fMeli.length && !fTn.length) fatal('no encontré exports de ventas (*Ventas_AR*.xlsx / *TiendaNube*.csv)');
 
 const mapasMeli = fMeli.map((f) => {
@@ -216,16 +216,17 @@ console.log(`· canales: ${canalesOk.join(', ')} × ${previa.tablero.periodos.le
 const fEmb = delPuente ? '(puente)' : buscar(/embudo/i)[0];
 let post = null;
 if (fEmb) {
-  const ordenesPorMes = Object.fromEntries(serie.map((s) => [s.mes, s.ordenes]));
+  const ordenes = canal => Object.fromEntries(serie.map(s => [s.mes,
+    previa.tablero.vistas[canal]?.[`mes:${s.mes}`]?.eerr.ordenes || 0]));
   // Una versión por canal, para que el filtro del tablero alcance también acá.
   const hojas = delPuente
     ? [delPuente.central.postventa, delPuente.central.minorista, delPuente.central.volumen]
     : [leerHoja(fEmb, 'Postventa'), leerHoja(fEmb, 'Preventa Minorista'),
       leerHoja(fEmb, 'Preventa Volumen')];
   const porCanal = {
-    todos: buildPostventa(...hojas, ordenesPorMes, 'todos'),
-    ml: buildPostventa(...hojas, ordenesPorMes, 'Mercado Libre'),
-    tn: buildPostventa(...hojas, ordenesPorMes, 'Tienda Nube'),
+    todos: buildPostventa(...hojas, ordenes('todos'), 'todos'),
+    ml: buildPostventa(...hojas, ordenes('ml'), 'Mercado Libre'),
+    tn: buildPostventa(...hojas, ordenes('tn'), 'Tienda Nube'),
   };
   post = { ...porCanal.todos, porCanal };
   console.log(`· postventa: ${post.postventa.total} casos, ${post.postventa.abiertos} abiertos (corte ${post.corte})`);

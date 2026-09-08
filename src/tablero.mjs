@@ -22,7 +22,7 @@ export const diasDelMes = (mes) => new Date(Date.UTC(+mes.slice(0, 4), +mes.slic
 const FILAS = 10;
 
 /** Un mes con menos órdenes que esto es la cola de otro export, no un mes de operación. */
-const MINIMO_ORDENES = 100;
+const MINIMO_ORDENES = 1;
 
 /* «Otros» es una familia real del maestro: los productos a los que nadie les
    asignó una. Junto al agrupador del resto se leían como lo mismo. */
@@ -73,18 +73,29 @@ export function bloque(porMes, meses) {
         { c: 'Comisiones de plataforma', v: e.comisiones, pct: e.comisionesPct, tipo: 'gasto' },
         { c: 'Envíos (neto de lo cobrado)', v: e.envio, pct: e.envioPct, tipo: 'gasto' },
         { c: 'Impuestos de plataforma', v: e.impuestos, pct: e.impuestosPct, tipo: 'gasto' },
+        { c: 'Diferencias no desglosadas en el export', v: e.ajustes, pct: pctDe(e.ajustes), tipo: 'gasto' },
         { c: 'Resultado de contribución', v: e.contribucion, pct: e.contribucionPct, tipo: 'destacado' },
       ],
       ordenes: e.ordenes,
       unidades: e.unidades,
       ticket: e.ticket,
       netoLiquidado: e.netoLiquidado,
+      netoFaltante: e.netoFaltante,
+      cargosAgrupados: e.cargosAgrupados,
       canceladas: e.canceladas,
       cobertura: e.coberturaCostosPct,
       sinCosto: e.skusSinCosto.slice(0, FILAS).map((x) => ({ ...x, facturacion: Math.round(x.facturacion) })),
       // Lo que todavía no tiene fuente. El tablero lo dice en vez de dibujar cero.
       faltan: ['Marketing y publicidad', 'Estructura y sueldos', 'Impuestos propios (IIBB, IVA)',
+        ...(a.tn ? ['Costo real del transportista de Tienda Nube (el export sólo informa el envío cobrado)'] : []),
         'Amortizaciones', 'Resultados financieros'],
+    },
+    // Totales completos para reagrupar un rango libre: sumar tops mensuales
+    // pierde productos y agrupa familias distintas dentro de «Resto».
+    detalle: {
+      productos: [...a.productos.values()],
+      familias: [...familias], provincias: [...a.provincias],
+      ventaBruta: a.ventaBruta, cogsFaltante: a.cogsFaltante,
     },
     gastos: [
       { n: 'Costo de la mercadería', v: Math.abs(e.cogsPct) },
@@ -132,6 +143,16 @@ function puntosDe(dias, origen, meses) {
  * @returns {{ok:true, tablero:{}}} o {{ok:false, error:string}}
  */
 export function armarTablero({ mapasMl = [], mapasTn = [], post = null, meta = {} } = {}) {
+  for (const [canal, mapas] of [['Mercado Libre', mapasMl], ['Tienda Nube', mapasTn]]) {
+    const vistos = new Set();
+    for (const mapa of mapas) {
+      const delArchivo = new Set();
+      for (const a of mapa.values()) for (const d of a.porDia.values()) for (const orden of d.ordenes) delArchivo.add(orden);
+      if ([...delArchivo].some(orden => vistos.has(orden))) return { ok: false,
+        error: `Los archivos de ${canal} tienen órdenes repetidas. Cargá exports que no se superpongan para no duplicar importes.` };
+      for (const orden of delArchivo) vistos.add(orden);
+    }
+  }
   const porMes = unirCanales(...mapasMl, ...mapasTn);
   const porMesMl = unirCanales(...mapasMl);
   const porMesTn = unirCanales(...mapasTn);
@@ -151,7 +172,9 @@ export function armarTablero({ mapasMl = [], mapasTn = [], post = null, meta = {
 
   /* Un mes cuyo último día con ventas queda lejos del fin de mes está a medio
      cerrar: se marca parcial y no sirve de base de comparación. */
-  const esParcial = (mes, a) => a.ultimoDia > 0 && a.ultimoDia < diasDelMes(mes) - 1;
+  const primerMes = [...porMes.keys()].sort()[0];
+  const esParcial = (mes, a) => (a.ultimoDia > 0 && a.ultimoDia < diasDelMes(mes) - 1)
+    || (mes === primerMes && Math.min(...a.porDia.keys()) > 1);
   const totalMes = new Map([...porMes].map(([m, a]) => [m, agregar(a, 1, diasDelMes(m))]));
   const meses = [...porMes.keys()].filter((m) => totalMes.get(m).ordenes.size >= MINIMO_ORDENES).sort();
   if (!meses.length) {
@@ -188,7 +211,10 @@ export function armarTablero({ mapasMl = [], mapasTn = [], post = null, meta = {
      que hay y se dice cuántos faltan, en vez de un tablero en cero. */
   const cargados = completos.map((s) => s.mes);           // ordenados, sin parciales
   const anioActual = mesCerrado.slice(0, 4);
-  const ultimos = (n) => cargados.slice(-n);
+  const ultimos = (n) => {
+    const desde = new Date(Date.UTC(+mesCerrado.slice(0,4), +mesCerrado.slice(5,7) - n, 1)).toISOString().slice(0,7);
+    return cargados.filter(m => m >= desde && m <= mesCerrado);
+  };
 
   const periodos = [
     { id: 'm3', n: 'Últimos 3 meses', pide: 3, meses: ultimos(3) },

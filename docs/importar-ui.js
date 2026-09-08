@@ -83,6 +83,9 @@
       return;
     }
     elegidos[zona.id] = zona.varios ? validos : [validos[0]];
+    ultimoJson = null;
+    $('impPublicar').hidden = true;
+    $('impBajar').hidden = true;
     const drop = $('impZonas').querySelector(`[data-drop="${zona.id}"]`);
     drop.classList.add('cargado');
     drop.querySelector('.imp-vacio').hidden = true;
@@ -151,6 +154,9 @@
   /* ---------------------------------------------------------------- procesar */
   async function procesar() {
     $('impProcesar').disabled = true;
+    ultimoJson = null;
+    $('impPublicar').hidden = true;
+    $('impBajar').hidden = true;
     try {
       if (typeof XLSX === 'undefined') {
         throw new Error('no se pudo cargar el lector de Excel. Revisá la conexión y recargá la página.');
@@ -170,6 +176,7 @@
         );
         mesCostos = cand.hoja;
       } else {
+        if (!M.costosPares.length) throw new Error('Cargá la planilla madre en Costos para calcular el margen.');
         costos = { costo: new Map(M.costosPares), hoja: M.mesCostos, mes: '' };
       }
       const costoDe = M.costos.makeCostMatcher(costos);
@@ -184,7 +191,11 @@
         estado(`Procesando ${f.name}…`);
         await pausa();
         const { aoa } = hoja(await leerBuffer(f), 'ventas');
-        mapasMl.push(M.finanzas.ingestFinanzasMeli(aoa, costoDe, match));
+        const mapa = M.finanzas.ingestFinanzasMeli(aoa, costoDe, match);
+        for (const [mes, a] of mapa) {
+          if (!M.finanzas.verificarMeli(a).ok) throw new Error(`Mercado Libre no concilia en ${mes}. Revisá las columnas del export.`);
+        }
+        mapasMl.push(mapa);
       }
       for (const f of (elegidos.tn || [])) {
         estado(`Procesando ${f.name}…`);
@@ -211,11 +222,14 @@
          tablero — sus casos son de otro período, no dependen del export. */
       let post = (window.NakuDatos || {}).clientes || null;
       if (central) {
-        const ordenesPorMes = {};   // se completa abajo, cuando estén los meses
+        const previa = M.tablero.armarTablero({ mapasMl, mapasTn });
+        if (!previa.ok) throw new Error(previa.error);
+        const ordenes = canal => Object.fromEntries(previa.tablero.serie.map(s => [s.mes,
+          previa.tablero.vistas[canal]?.[`mes:${s.mes}`]?.eerr.ordenes || 0]));
         const porCanal = {
-          todos: M.postventa.buildPostventa(central.postventa, central.minorista, central.volumen, ordenesPorMes, 'todos'),
-          ml: M.postventa.buildPostventa(central.postventa, central.minorista, central.volumen, ordenesPorMes, 'Mercado Libre'),
-          tn: M.postventa.buildPostventa(central.postventa, central.minorista, central.volumen, ordenesPorMes, 'Tienda Nube'),
+          todos: M.postventa.buildPostventa(central.postventa, central.minorista, central.volumen, ordenes('todos'), 'todos'),
+          ml: M.postventa.buildPostventa(central.postventa, central.minorista, central.volumen, ordenes('ml'), 'Mercado Libre'),
+          tn: M.postventa.buildPostventa(central.postventa, central.minorista, central.volumen, ordenes('tn'), 'Tienda Nube'),
         };
         post = porCanal.todos ? { ...porCanal.todos, porCanal } : null;
       }
@@ -239,12 +253,12 @@
       const D = armado.tablero;
       D.fuentes.ventas.meses = D.serie.map((x) => x.mes);
 
-      ultimoJson = D;
-      window.NakuDatos = D;
       window.NakuPintar(D);
 
-      const e = D.vistas.todos.mes.eerr;
+      const e = D.vistas.todos[`mes:${D.mesCerrado.mes}`].eerr;
       const mb = e.lineas.find((l) => l.c === 'Margen bruto');
+      ultimoJson = D;
+      window.NakuDatos = D;
       estado(`Listo: ${D.mesCerrado.largo}, ${e.ordenes.toLocaleString('es-AR')} órdenes, `
         + `margen bruto ${String(mb.pct).replace('.', ',')}%.`, 'bien');
       $('impPublicar').hidden = false;
