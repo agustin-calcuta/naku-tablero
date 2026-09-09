@@ -2,7 +2,9 @@
 
 Tablero que reparte las ventas de NAKU (MercadoLibre + Mercado Shops + TiendaNube)
 entre 5 buyer personas. El navegador parsea los exports con un motor propio y un
-backend en Google Apps Script guarda el histórico en un Google Sheet.
+backend en Neon guarda las ventas compartidas y actualiza Buyer y Finanzas juntos.
+
+El flujo vigente se documenta en [VENTAS-COMPARTIDAS.md](VENTAS-COMPARTIDAS.md).
 
 > **Fase 1 (esta):** semi-integración por exports (sin API de MeLi/TN). Ver el plan
 > completo por fases en `../Tablero Buyer Naku/PLAN-Integracion-Dashboard-Naku.md`.
@@ -257,27 +259,22 @@ Es "lo de Drive". Pasos completos en **`appsscript/README.md`**. Resumen:
 Quedan **dos URLs**: la de **GitHub Pages** (el tablero que ve Leo) y la de **Apps Script
 `/exec`** (el backend que guarda/lee los datos). El tablero le pega a la segunda.
 
-## Actualizar los datos — el botón "Actualizar datos" (Fase 1, client-side)
+## Actualizar los datos: Buyer y Finanzas
 
-El tablero v2 (`?v=nueva`) trae un botón **Actualizar datos** que abre un box donde Leo
-**arrastra los 3 `.xlsx` de MercadoLibre + el `.csv` de TiendaNube**. Todo se procesa
-**en el navegador** (SheetJS + el motor inline + el maestro embebido): recalcula, re-renderiza
-las mismas tarjetas, muestra una **reconciliación por comprador** y deja descargar
-`snapshot.json` + `unmapped_skus.csv`. **Nada se sube a internet** — los archivos no salen de
-la máquina de Leo, y la versión pública del tablero no cambia con lo que él cargue.
+Los exports de MercadoLibre y TiendaNube se guardan en Neon y alimentan los dos
+motores. Desde Buyer, **Procesar ventas** publica directamente. Desde Finanzas,
+**Procesar** muestra una vista previa y **Publicar para todos** guarda ambos
+resultados en una transacción. Los exports repetidos no duplican órdenes.
 
-- No necesita hosting extra, ni Drive, ni credenciales. Leo solo abre la URL y dropea.
-- El maestro va **embebido** en `docs/nueva.html` (lo inyecta el build). Ojo: la URL de Pages
-  es pública → ver la nota de arriba sobre no exponer cifras en producción (Fase 2).
-- **Histórico:** las líneas normalizadas se guardan en **IndexedDB** (en la compu de quien
-  carga). Cada mes que sube se **acumula**; al reabrir la URL el tablero arranca con todo lo
-  cargado. Es **por navegador/máquina** (no compartido — eso es Fase 2 con backend).
-- **Dedup:** al subir se dedup por `canal|orden|sku|unidades|facturación` (misma clave que el
-  motor). Re-subir el mismo archivo/mes → **0 nuevas, no duplica**; solo entran órdenes nuevas.
-- **Filtros:** rango de meses (desde/hasta) + presets (Último mes / 3 / 6 / Este año / Todo) que
-  re-agregan en vivo, y el toggle de canal (Ambos / ML / TiendaNube). El filtro de fecha aparece
-  cuando hay datos cargados (el ejemplo base no se puede filtrar por mes).
-- **Borrar histórico:** botón en el badge / panel → limpia IndexedDB y vuelve al ejemplo.
+Todos consultan el estado compartido al abrir y cada 30 segundos mientras la
+pestaña está visible. El Buyer acepta maestros CSV con coma o punto y coma y
+aplica los cambios al histórico. Los costos y la central se mantienen en
+Finanzas; las cargas de ventas reutilizan los últimos costos guardados.
+
+Las cargas de la versión anterior que sólo existen en un navegador se pueden
+incorporar con **Compartir histórico de este navegador**. Esa copia anterior
+se conserva. Sólo las líneas antiguas sin export original siguen siendo
+exclusivas del Buyer: no contienen los cargos necesarios para Finanzas.
 
 ### Rebuild (cuando cambie el motor o el maestro)
 

@@ -1,16 +1,5 @@
-/* ============================================================
-   Actualizar datos desde el navegador.
-
-   Cuatro zonas, una por fuente. Se procesa acá mismo: los archivos no salen de
-   esta computadora. Lo que se calcula es exactamente lo mismo que calcula el
-   build —es el mismo motor, ver tools/build-importer.mjs—, así que los números
-   coinciden con los publicados.
-
-   Los archivos no salen de esta computadora: se leen acá y lo único que sale
-   es el resultado, cuando se toca "Publicar para todos". Eso lo guarda en la
-   base (ver neon/api/) y a partir de ahí lo ve cualquiera que abra el tablero.
-   Publicar pide una clave; leer, no.
-   ============================================================ */
+/* Ventas compartidas: los exports de MeLi/TN se procesan en el servidor para
+   actualizar Buyer y Finanzas juntos. Costos y central sólo se editan acá. */
 (function () {
   const $ = (id) => document.getElementById(id);
   const M = window.NakuMotor;
@@ -37,6 +26,8 @@
 
   const elegidos = {};                  // id de zona -> File[]
   let ultimoJson = null;
+  let pendingOperation = null;
+  let publishing = false;
 
   /* ---------------------------------------------------------------- panel */
   function abrir() {
@@ -84,6 +75,7 @@
     }
     elegidos[zona.id] = zona.varios ? validos : [validos[0]];
     ultimoJson = null;
+    pendingOperation = null;
     $('impPublicar').hidden = true;
     $('impBajar').hidden = true;
     const drop = $('impZonas').querySelector(`[data-drop="${zona.id}"]`);
@@ -99,11 +91,11 @@
   }
 
   function revisarListo() {
-    const hayVentas = (elegidos.meli || []).length || (elegidos.tn || []).length;
+    const hayVentas = Object.values(elegidos).some(files=>files.length);
     $('impProcesar').disabled = !hayVentas;
     $('impNota').textContent = hayVentas
-      ? ''
-      : 'Hace falta al menos un export de ventas — Mercado Libre o Tienda Nube.';
+      ? 'Al publicar, las ventas se actualizan también en el Buyer.'
+      : 'Los exports de MeLi y TN se comparten con el Buyer. También podés actualizar sólo costos o atención al cliente.';
   }
 
   function estado(texto, clase = '') {
@@ -119,29 +111,6 @@
     r.onerror = () => rej(new Error(`no pude leer ${f.name}`));
     r.readAsArrayBuffer(f);
   });
-  /** Los exports de TiendaNube salen en cp1252; latin1 alcanza para los acentos. */
-  const leerTextoLatin1 = (f) => new Promise((res, rej) => {
-    const r = new FileReader();
-    r.onload = () => res(r.result);
-    r.onerror = () => rej(new Error(`no pude leer ${f.name}`));
-    r.readAsText(f, 'windows-1252');
-  });
-
-  function parseCSV(texto, delim = ';') {
-    const filas = []; let campo = ''; let fila = []; let comilla = false;
-    for (let i = 0; i < texto.length; i++) {
-      const c = texto[i];
-      if (comilla) {
-        if (c === '"') { if (texto[i + 1] === '"') { campo += '"'; i++; } else comilla = false; } else campo += c;
-      } else if (c === '"') comilla = true;
-      else if (c === delim) { fila.push(campo); campo = ''; }
-      else if (c === '\n') { fila.push(campo); filas.push(fila); fila = []; campo = ''; }
-      else if (c !== '\r') campo += c;
-    }
-    if (campo.length || fila.length) { fila.push(campo); filas.push(fila); }
-    return filas;
-  }
-
   const hoja = (buf, nombre) => {
     const wb = XLSX.read(buf, { type: 'array', cellDates: nombre !== 'ventas' });
     const cual = nombre === 'ventas'
@@ -153,123 +122,44 @@
 
   /* ---------------------------------------------------------------- procesar */
   async function procesar() {
-    $('impProcesar').disabled = true;
-    ultimoJson = null;
-    $('impPublicar').hidden = true;
-    $('impBajar').hidden = true;
+    if(publishing)return;
+    publishing=true;$('impProcesar').disabled=true;ultimoJson=null;pendingOperation=null;
+    $('impPublicar').hidden=true;$('impBajar').hidden=true;
     try {
-      if (typeof XLSX === 'undefined') {
-        throw new Error('no se pudo cargar el lector de Excel. Revisá la conexión y recargá la página.');
+      if(typeof XLSX==='undefined')throw new Error('No se pudo cargar el lector de Excel. Revisá la conexión.');
+      const operation={id:crypto.randomUUID(),exports:[],nombre:'Carga desde Finanzas'};
+      for(const f of elegidos.meli||[]) {
+        estado('Leyendo '+f.name+'…');await pausa();
+        operation.exports.push(window.NakuVentas.cleanExport('ml',hoja(await leerBuffer(f),'ventas').aoa,f.name));
       }
-
-      /* costos: los del archivo si lo cargaron, si no los que ya venían */
-      estado('Leyendo los costos…');
-      let costos; let mesCostos = M.mesCostos;
-      if (elegidos.costos) {
-        const buf = await leerBuffer(elegidos.costos[0]);
-        const wb = XLSX.read(buf, { type: 'array' });
-        const cand = M.costos.hojasPorMes(wb.SheetNames)[0];
-        if (!cand) throw new Error('la planilla de costos no tiene ninguna hoja con nombre de mes');
-        costos = M.costos.buildCostos(
-          XLSX.utils.sheet_to_json(wb.Sheets[cand.hoja], { header: 1, raw: true, defval: '' }),
-          cand.hoja, cand.mes,
-        );
-        mesCostos = cand.hoja;
-      } else {
-        if (!M.costosPares.length) throw new Error('Cargá la planilla madre en Costos para calcular el margen.');
-        costos = { costo: new Map(M.costosPares), hoja: M.mesCostos, mes: '' };
+      for(const f of elegidos.tn||[]) {
+        estado('Leyendo '+f.name+'…');await pausa();
+        const bytes=await f.arrayBuffer();let text;
+        try{text=new TextDecoder('utf-8',{fatal:true}).decode(bytes);}catch{text=new TextDecoder('windows-1252').decode(bytes);}
+        const rows=[';',','].map(d=>window.NakuBuyer.parseCSV(text,d)).sort((a,b)=>(b[0]?.length||0)-(a[0]?.length||0))[0];
+        operation.exports.push(window.NakuVentas.cleanExport('tn',rows,f.name));
       }
-      const costoDe = M.costos.makeCostMatcher(costos);
-
-      /* maestro: nombre y familia por SKU */
-      const maestro = M.engine.buildMaestro(parseCSV(M.maestroCSV, ';'));
-      const match = M.engine.makeMatcher(maestro);
-
-      /* ventas */
-      const mapasMl = []; const mapasTn = [];
-      for (const f of (elegidos.meli || [])) {
-        estado(`Procesando ${f.name}…`);
-        await pausa();
-        const { aoa } = hoja(await leerBuffer(f), 'ventas');
-        const mapa = M.finanzas.ingestFinanzasMeli(aoa, costoDe, match);
-        for (const [mes, a] of mapa) {
-          if (!M.finanzas.verificarMeli(a).ok) throw new Error(`Mercado Libre no concilia en ${mes}. Revisá las columnas del export.`);
-        }
-        mapasMl.push(mapa);
+      if(elegidos.costos) {
+        const wb=XLSX.read(await leerBuffer(elegidos.costos[0]),{type:'array'});
+        const cand=M.costos.hojasPorMes(wb.SheetNames)[0];
+        if(!cand)throw new Error('La planilla de costos no tiene una hoja con nombre de mes.');
+        const costs=M.costos.buildCostos(XLSX.utils.sheet_to_json(wb.Sheets[cand.hoja],{header:1,raw:true,defval:''}),cand.hoja,cand.mes);
+        operation.costos={pares:[...costs.costo],hoja:cand.hoja,mes:cand.mes,archivo:elegidos.costos[0].name};
       }
-      for (const f of (elegidos.tn || [])) {
-        estado(`Procesando ${f.name}…`);
-        await pausa();
-        mapasTn.push(M.finanzas.ingestFinanzasTn(parseCSV(await leerTextoLatin1(f), ';'), costoDe, match));
+      if(elegidos.central) {
+        const buf=await leerBuffer(elegidos.central[0]);
+        operation.central={postventa:hoja(buf,'Postventa').aoa,minorista:hoja(buf,'Preventa Minorista').aoa,volumen:hoja(buf,'Preventa Volumen').aoa};
       }
-
-      /* central de atención */
-      let central = null;
-      if (elegidos.central) {
-        estado('Leyendo la central de atención…');
-        const buf = await leerBuffer(elegidos.central[0]);
-        central = {
-          postventa: hoja(buf, 'Postventa').aoa,
-          minorista: hoja(buf, 'Preventa Minorista').aoa,
-          volumen: hoja(buf, 'Preventa Volumen').aoa,
-        };
-      }
-
-      estado('Armando el tablero…');
-      await pausa();
-
-      /* Postventa: la del archivo si lo cargaron, si no la que ya traía el
-         tablero — sus casos son de otro período, no dependen del export. */
-      let post = (window.NakuDatos || {}).clientes || null;
-      if (central) {
-        const previa = M.tablero.armarTablero({ mapasMl, mapasTn });
-        if (!previa.ok) throw new Error(previa.error);
-        const ordenes = canal => Object.fromEntries(previa.tablero.serie.map(s => [s.mes,
-          previa.tablero.vistas[canal]?.[`mes:${s.mes}`]?.eerr.ordenes || 0]));
-        const porCanal = {
-          todos: M.postventa.buildPostventa(central.postventa, central.minorista, central.volumen, ordenes('todos'), 'todos'),
-          ml: M.postventa.buildPostventa(central.postventa, central.minorista, central.volumen, ordenes('ml'), 'Mercado Libre'),
-          tn: M.postventa.buildPostventa(central.postventa, central.minorista, central.volumen, ordenes('tn'), 'Tienda Nube'),
-        };
-        post = porCanal.todos ? { ...porCanal.todos, porCanal } : null;
-      }
-
-      const armado = M.tablero.armarTablero({
-        mapasMl, mapasTn, post,
-        meta: {
-          fuentes: {
-            origen: { ventas: { origen: 'navegador' } },
-            costos: { archivo: elegidos.costos ? elegidos.costos[0].name : '(embebido)', hoja: mesCostos, skus: costos.costo.size },
-            ventas: {
-              meli: (elegidos.meli || []).map((f) => f.name),
-              tiendanube: (elegidos.tn || []).map((f) => f.name),
-              meses: [],
-            },
-            postventa: elegidos.central ? { archivo: elegidos.central[0].name, corte: post ? post.corte : '' } : null,
-          },
-        },
-      });
-      if (!armado.ok) throw new Error(armado.error);
-      const D = armado.tablero;
-      D.fuentes.ventas.meses = D.serie.map((x) => x.mes);
-
-      window.NakuPintar(D);
-
-      const e = D.vistas.todos[`mes:${D.mesCerrado.mes}`].eerr;
-      const mb = e.lineas.find((l) => l.c === 'Margen bruto');
-      ultimoJson = D;
-      window.NakuDatos = D;
-      estado(`Listo: ${D.mesCerrado.largo}, ${e.ordenes.toLocaleString('es-AR')} órdenes, `
-        + `margen bruto ${String(mb.pct).replace('.', ',')}%.`, 'bien');
-      $('impPublicar').hidden = false;
-      $('impBajar').hidden = false;
-      pedirNombreSiHace();
-      $('impCerrarPie').textContent = 'Ver el tablero';
-    } catch (err) {
-      estado(err.message || String(err), 'mal');
-    } finally {
-      $('impProcesar').disabled = false;
-    }
+      estado('Calculando la vista previa con el histórico compartido…');
+      window.NakuBuyerSync.setKey(window.NakuClave.leer('clave'));
+      const r=await window.NakuBuyerSync.request('/preview',operation);
+      ultimoJson=r.finance;pendingOperation=operation;
+      window.NakuPintar(ultimoJson);
+      estado('Vista previa lista. Publicar actualiza las ventas en Buyer y Finanzas para todos.','bien');
+      $('impPublicar').hidden=false;$('impBajar').hidden=false;pedirNombreSiHace();
+      $('impCerrarPie').textContent='Ver la vista previa';
+    }catch(e){estado(e.message||String(e),'mal');}
+    finally{publishing=false;$('impProcesar').disabled=false;}
   }
 
   /** Deja respirar al navegador para que se vea el cartel de progreso. */
@@ -288,41 +178,49 @@
   }
 
   async function publicar() {
-    if (!ultimoJson) return;
-    const clave = recordado('clave');
-    const quien = $('impQuienInput').value.trim();
-
-    $('impPublicar').disabled = true;
-    estado('Publicando…');
+    if(!pendingOperation||publishing)return;
+    publishing=true;$('impPublicar').disabled=true;
+    estado('Guardando las ventas y actualizando ambos tableros…');
     try {
-      const r = await fetch(window.NakuAPI + '/', {
-        method: 'PUT',
-        headers: {
-          'content-type': 'application/json',
-          'x-naku-clave': clave,
-          'x-naku-quien': quien,
-        },
-        body: JSON.stringify(ultimoJson),
-        signal: AbortSignal.timeout(60000),
-      });
-      const j = await r.json().catch(() => ({}));
-      // Sólo puede pasar si cambiaron la clave mientras esta pestaña estaba abierta.
-      if (r.status === 401) throw new Error('La clave cambió. Recargá la página y volvé a entrar.');
-      if (!r.ok || !j.ok) throw new Error(j.error || `La base contestó ${r.status}.`);
-
-      recordar('quien', quien);
-      window.NakuPublicado = { publicado: j.publicado, quien: j.quien };
-      window.NakuPintar(ultimoJson);     // repinta el pie con quién publicó
-      estado('Publicado. Ya lo ven todos los que abran el tablero.', 'bien');
-      $('impPublicar').textContent = 'Publicado ✓';
-    } catch (err) {
-      estado(err.name === 'TimeoutError'
-        ? 'La base tardó demasiado. Probá de nuevo.'
-        : (err.message || String(err)), 'mal');
-    } finally {
-      $('impPublicar').disabled = false;
-    }
+      window.NakuBuyerSync.setKey(recordado('clave'));
+      const r=await window.NakuBuyerSync.request('/finanzas',pendingOperation);
+      // Recuperar también después de un reintento de una publicación confirmada.
+      if(r.finance)ultimoJson=r.finance;
+      else {
+        const latest=await fetch(window.NakuAPI+'/',{headers:{'x-naku-clave':recordado('clave')}});
+        if(!latest.ok)throw new Error('Se guardó, pero no se pudo refrescar Finanzas. Recargá la página.');
+        ultimoJson=(await latest.json()).datos;
+      }
+      recordar('quien',$('impQuienInput').value.trim());
+      window.NakuPublicado={publicado:r.actualizado,quien:'Carga compartida MeLi/TN'};
+      window.NakuDatos=ultimoJson;window.NakuPintar(ultimoJson);
+      estado('Publicado para todos. Buyer y Finanzas ya toman las mismas ventas.','bien');
+      $('impPublicar').textContent='Publicado ✓';pendingOperation=null;
+    }catch(e){estado('No se pudo confirmar la publicación: '+e.message+'. Podés reintentar.','mal');}
+    finally{publishing=false;$('impPublicar').disabled=false;}
   }
+
+  // Las pestañas abiertas acompañan las cargas del Buyer sin pisar una vista previa.
+  let polling=false;
+  async function syncFinance(){
+    if(polling||publishing||pendingOperation||document.hidden||!recordado('clave')||!$('entrar').hidden)return;
+    polling=true;
+    try{
+      const headers={'x-naku-clave':recordado('clave')};
+      const state=await fetch(window.NakuAPI+'/estado',{headers,cache:'no-store',signal:AbortSignal.timeout(20000)});
+      if(!state.ok)return;
+      const meta=await state.json();
+      if(meta.actualizado!==window.NakuPublicado?.publicado){
+        const res=await fetch(window.NakuAPI+'/',{headers,cache:'no-store',signal:AbortSignal.timeout(30000)});
+        if(!res.ok)return;
+        const data=await res.json();
+        if(publishing||pendingOperation||Date.parse(data.publicado)<Date.parse(window.NakuPublicado?.publicado))return;
+        window.NakuDatos=data.datos;
+        window.NakuPublicado={publicado:data.publicado,quien:data.quien};window.NakuPintar(data.datos);
+      }
+    }catch{/* conserva la última vista confirmada */}finally{polling=false;}
+  }
+  setInterval(syncFinance,30000);window.addEventListener('focus',syncFinance);
 
   function bajar() {
     if (!ultimoJson) return;

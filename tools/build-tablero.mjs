@@ -10,6 +10,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { sharedClient } from './shared-client.mjs';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(HERE, '..');                 // .../naku-tablero
@@ -36,6 +37,9 @@ if (!html.includes('__MAESTRO_CSV__')) { console.error('✗ no encontré el plac
 // Replacer como función: evita que `$&`, `$1`, etc. del contenido rompan String.replace.
 html = html.replace('/*__ENGINE_JS__*/', () => engineJs);
 html = html.replace('__MAESTRO_CSV__', () => maestroCsv);
+html = html.replace('/*__BUYER_JS__*/', () => sharedClient(ROOT));
+html = html.replace('/*__BUYER_SYNC_JS__*/', '');
+fs.writeFileSync(path.join(ROOT,'docs','ventas-shared.js'),sharedClient(ROOT));
 
 // Baseline (datos de ejemplo) = snapshot.json, así el ejemplo trae los mismos campos
 // (envío, porMes, bundles) que los datos cargados. El literal del source se reemplaza.

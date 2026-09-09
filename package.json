@@ -6,7 +6,7 @@
   "scripts": {
     "actualizar": "node tools/actualizar.mjs",
     "tablero": "node tools/build-direccion.mjs && node tools/build-importer.mjs",
-    "test": "node tools/test-tablero.mjs && node tools/test-importacion.mjs",
+    "test": "node tools/test-tablero.mjs && node tools/test-importacion.mjs && node tools/test-shared.mjs",
     "instalar-puente": "node tools/instalar-puente.mjs",
     "importer": "node tools/build-importer.mjs",
     "api": "node tools/build-api.mjs"

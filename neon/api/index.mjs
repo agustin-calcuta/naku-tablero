@@ -96,6 +96,14 @@ export default {
       }
 
       if (request.method === 'PUT') {
+        // Una pestaña anterior al cambio no debe publicar un snapshot aislado
+        // y desincronizar Finanzas de las ventas que ya tomó el Buyer.
+        const auth = primera(await sql('select puede_leer($1) as ok', [clave]));
+        if (!auth.ok) return json({ error: 'Clave incorrecta.' }, 401);
+        const schema = primera(await sql("select to_regclass('public.buyer_estado') is not null as hay"));
+        if (schema.hay && primera(await sql('select exists(select 1 from buyer_estado) as hay')).hay) {
+          return json({ error: 'Ahora las ventas se comparten con el Buyer. Recargá la página y volvé a procesar los archivos para publicar ambos tableros juntos.' }, 409);
+        }
         if (ruta === '/volver') {
           const n = Number(url.searchParams.get('n'));
           if (!Number.isInteger(n) || n <= 0) return json({ error: 'Falta el número de versión.' }, 400);
