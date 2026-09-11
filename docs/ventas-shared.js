@@ -70,6 +70,15 @@ function unpackLines(data) {
   });
 }
 
+// Los mismos meses que publica Dirección; no recalcular «Este año» con el
+// último export, que puede ser un mes parcial o tener meses intermedios faltantes.
+function buyerPeriodMonths(data, preset) {
+  const months=data.mesesCargados||[];
+  if(preset==='1')return months.slice(-1);
+  const id=({all:'rango','3':'m3','6':'m6',ytd:'anio'})[preset];
+  return data.periodos?.find(p=>p.id===id)?.meses||months;
+}
+
 function mergeBuyer(current, operation) {
   const incoming = unpackLines(operation.ventas);
   const lines = unpackLines(current.ventas);
@@ -93,7 +102,7 @@ function mergeBuyer(current, operation) {
   return { data: { ventas: packLines(lines), maestro, manifest }, result };
 }
 
-return {BUYER_COLS,parseCSV,parseMaestro,packLines,unpackLines,lineKey,mergeMaestro,mergeBuyer};})(window.NakuMotor?.engine||window);
+return {BUYER_COLS,parseCSV,parseMaestro,packLines,unpackLines,lineKey,mergeMaestro,mergeBuyer,buyerPeriodMonths};})(window.NakuMotor?.engine||window);
 window.NakuVentas=(()=>{
 
 // Sólo columnas consumidas por los motores. No guardamos direcciones, DNI,
@@ -204,7 +213,7 @@ window.NakuBuyerSync = (() => {
     const r=await fetch(api+path,{
       method:operation?'PUT':'GET',headers:{'x-naku-clave':key,...(operation?{'content-type':'application/json'}:{})},
       body:operation?JSON.stringify({datos:await encode(operation)}):undefined,
-      signal:AbortSignal.timeout(operation?90000:45000),cache:'no-store'
+      signal:AbortSignal.timeout(path==='/sincronizar'?180000:operation?90000:45000),cache:'no-store'
     });
     const data=await r.json();
     if(!r.ok) throw Object.assign(new Error(data.error||'No se pudo acceder al Buyer.'),{status:r.status});

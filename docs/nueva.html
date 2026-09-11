@@ -347,6 +347,7 @@
         </div>
         <div id="imp-status" class="imp-status" role="status" aria-live="polite"></div>
         <div id="imp-recon" class="imp-recon" hidden></div>
+        <p id="imp-legacy-note" class="imp-note" hidden></p>
       </div>
       <div class="imp-sec">
         <div class="imp-sec-h"><span class="imp-num">2</span> Mapeo SKU → Comprador</div>
@@ -395,7 +396,7 @@
       </div>
 
       <div class="hard">
-        <div class="cell"><div class="n tnum" id="hard-fac">$4.158 M</div><div class="c">Facturación analizada (14 meses, ambos canales)</div></div>
+        <div class="cell"><div class="n tnum" id="hard-fac">$4.158 M</div><div class="c">Ventas netas sin IVA del período elegido</div></div>
         <div class="cell"><div class="n tnum" id="hard-ord">99.028</div><div class="c">Órdenes procesadas</div></div>
         <div class="cell"><div class="n tnum" id="hard-cuo">3,1–4,1</div><div class="c">Cuotas promedio según persona</div></div>
         <div class="cell"><div class="n tnum" id="hard-cob">91,5%</div><div class="c">De la facturación ya asignada a una persona</div></div>
@@ -416,7 +417,7 @@
         <div class="eyebrow" style="margin:38px 0 6px;flex:1"><span class="lab">El negocio / reparto por comprador</span><span class="ruler"></span></div>
       </div>
       <div class="neg-head" style="margin-top:6px">
-        <h2>Facturación por comprador</h2>
+        <h2>Ventas netas por comprador</h2>
         <div class="seg" role="group" aria-label="Canal">
           <button data-canal="Ambos" aria-pressed="true">Ambos</button>
           <button data-canal="MercadoLibre" aria-pressed="false">MercadoLibre</button>
@@ -430,9 +431,9 @@
         <span class="flt-arrow" aria-hidden="true">→</span>
         <select id="flt-hasta" class="flt-sel" aria-label="Mes hasta"></select>
         <div class="flt-presets" role="group" aria-label="Atajos de período">
-          <button data-preset="all" type="button" aria-pressed="true">Todo</button>
+          <button data-preset="all" type="button" aria-pressed="false">Todo</button>
           <button data-preset="1" type="button" aria-pressed="false">Último mes</button>
-          <button data-preset="3" type="button" aria-pressed="false">3 meses</button>
+          <button data-preset="3" type="button" aria-pressed="true">3 meses</button>
           <button data-preset="6" type="button" aria-pressed="false">6 meses</button>
           <button data-preset="ytd" type="button" aria-pressed="false">Este año</button>
         </div>
@@ -440,6 +441,7 @@
         <div id="flt-personas" class="flt-personas" role="group" aria-label="Filtrar por comprador"></div>
       </div>
 
+      <p id="ventas-criterio" class="imp-note">Ventas netas sin IVA, antes de costos y cargos. Mismo corte de meses cerrados que Dirección.</p>
       <div class="kpis" id="kpis"></div>
 
       <div id="chart-mes" class="chart-mes"></div>
@@ -894,6 +896,7 @@ function aggregate(lines) {
   for (const p of PERSONAS) prov[p] = {};
 
   for (const l of lines) {
+    if (l.billable === false) continue;
     const p = byPersona[l.buyer] ? l.buyer : 'Sin asignar';
     // por mes/canal/persona (filtro del dashboard)
     const mk = `${l.mes}|${l.canal}|${p}`;
@@ -1082,6 +1085,15 @@ function unpackLines(data) {
   });
 }
 
+// Los mismos meses que publica Dirección; no recalcular «Este año» con el
+// último export, que puede ser un mes parcial o tener meses intermedios faltantes.
+function buyerPeriodMonths(data, preset) {
+  const months=data.mesesCargados||[];
+  if(preset==='1')return months.slice(-1);
+  const id=({all:'rango','3':'m3','6':'m6',ytd:'anio'})[preset];
+  return data.periodos?.find(p=>p.id===id)?.meses||months;
+}
+
 function mergeBuyer(current, operation) {
   const incoming = unpackLines(operation.ventas);
   const lines = unpackLines(current.ventas);
@@ -1105,7 +1117,7 @@ function mergeBuyer(current, operation) {
   return { data: { ventas: packLines(lines), maestro, manifest }, result };
 }
 
-return {BUYER_COLS,parseCSV,parseMaestro,packLines,unpackLines,lineKey,mergeMaestro,mergeBuyer};})(window.NakuMotor?.engine||window);
+return {BUYER_COLS,parseCSV,parseMaestro,packLines,unpackLines,lineKey,mergeMaestro,mergeBuyer,buyerPeriodMonths};})(window.NakuMotor?.engine||window);
 window.NakuVentas=(()=>{
 
 // Sólo columnas consumidas por los motores. No guardamos direcciones, DNI,
@@ -1216,7 +1228,7 @@ window.NakuBuyerSync = (() => {
     const r=await fetch(api+path,{
       method:operation?'PUT':'GET',headers:{'x-naku-clave':key,...(operation?{'content-type':'application/json'}:{})},
       body:operation?JSON.stringify({datos:await encode(operation)}):undefined,
-      signal:AbortSignal.timeout(operation?90000:45000),cache:'no-store'
+      signal:AbortSignal.timeout(path==='/sincronizar'?180000:operation?90000:45000),cache:'no-store'
     });
     const data=await r.json();
     if(!r.ok) throw Object.assign(new Error(data.error||'No se pudo acceder al Buyer.'),{status:r.status});
@@ -1475,8 +1487,7 @@ const state = {tab:'negocio', canal:'Ambos', persona:'Juan', sort:'facturacion',
 
 const nf = new Intl.NumberFormat('es-AR');
 function money(n){
-  if(n>=1e9) return '$'+(n/1e6).toLocaleString('es-AR',{maximumFractionDigits:0})+' M';
-  if(n>=1e6) return '$'+(n/1e6).toLocaleString('es-AR',{maximumFractionDigits:1})+' M';
+  if(Math.abs(n)>=1e6) return '$'+(n/1e6).toLocaleString('es-AR',{minimumFractionDigits:1,maximumFractionDigits:1})+' M';
   return '$'+nf.format(Math.round(n));
 }
 // La data ya viene filtrada por canal (recompute sobre líneas), así que facFor = total de la persona.
@@ -1506,7 +1517,7 @@ function renderKPIs(){
     const share = rb&&rb.total ? 100*((rb.by[pf]||{facturacion:0}).facturacion)/rb.total : 100;
     const pd = ps.find(x=>x.key===pf)||{cuotas:0};
     document.getElementById('kpis').innerHTML = `
-      <div class="kpi"><div class="lab">Facturación</div><div class="val tnum" style="color:${PC[pf]}">${money(total)}</div><div class="sub">${pf} · ${canalLbl} · ${DATA.meta.ventana}</div></div>
+      <div class="kpi"><div class="lab">Ventas netas</div><div class="val tnum" style="color:${PC[pf]}">${money(total)}</div><div class="sub">Sin IVA · ${pf} · ${canalLbl} · ${DATA.meta.ventana}</div></div>
       <div class="kpi"><div class="lab">Peso en el total</div><div class="val tnum" style="color:${PC[pf]}">${share.toFixed(1).replace('.',',')}<small>%</small></div><div class="sub">${pf} sobre los cinco compradores</div></div>
       <div class="kpi"><div class="lab">Cuotas prom.</div><div class="val tnum">${String(pd.cuotas||0).replace('.',',')}</div><div class="sub">promedio por orden de ${pf}</div></div>
       <div class="kpi"><div class="lab">Órdenes</div><div class="val tnum">${nf.format(ord)}</div><div class="sub">ticket prom. ${money(DATA.totales.ticket)}</div></div>`;
@@ -1514,7 +1525,7 @@ function renderKPIs(){
   }
   const lead = [...ps].sort((a,b)=>facFor(b)-facFor(a))[0];
   document.getElementById('kpis').innerHTML = `
-    <div class="kpi"><div class="lab">Facturación</div><div class="val tnum">${money(total)}</div><div class="sub">${canalLbl} · ${DATA.meta.ventana}</div></div>
+    <div class="kpi"><div class="lab">Ventas netas</div><div class="val tnum">${money(total)}</div><div class="sub">Sin IVA · ${canalLbl} · ${DATA.meta.ventana}</div></div>
     <div class="kpi"><div class="lab">Comprador #1</div><div class="val tnum" style="color:${PC[lead.key]}">${lead.key}</div><div class="sub">${(100*facFor(lead)/total).toFixed(1)}% de la facturación</div></div>
     <div class="kpi"><div class="lab">Cobertura maestro</div><div class="val tnum">${String(DATA.totales.cobertura).replace('.',',')}<small>%</small></div><div class="sub">${String(DATA.sinAsignar.share).replace('.',',')}% sin asignar ↓</div></div>
     <div class="kpi"><div class="lab">Órdenes</div><div class="val tnum">${nf.format(ord)}</div><div class="sub">ticket prom. ${money(DATA.totales.ticket)}</div></div>`;
@@ -1688,7 +1699,7 @@ renderLede();renderKPIs();renderRank();renderDetail();renderCov();renderChart();
   const BASELINE=JSON.parse(JSON.stringify(DATA)), BASELINE_UN=Object.assign({},UNASSIGNED);
   const MES3=['','ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
   let picked=[], maestroFile=null, lastBuild=null, MAESTRO_TEXT=null;
-  let LINES=[], SEEN=new Set(), MANIFEST=[], FILTER={desde:null,hasta:null,canal:'Ambos',persona:null};
+  let LINES=[], SEEN=new Set(), MANIFEST=[], SHARED=null, FILTER={desde:null,hasta:null,canal:'Ambos',persona:null,preset:'3'};
   let RANKBY=null; // {by:{persona:{facturacion,ml,tn}},total} — ranking sin filtro de comprador
 
   const {parseCSV,parseMaestro,packLines,unpackLines,lineKey:keyOf}=window.NakuBuyer;
@@ -1710,9 +1721,11 @@ renderLede();renderKPIs();renderRank();renderDetail();renderCov();renderChart();
     if(r.revision<revision)return; // una consulta anterior terminó después de publicar
     if(!r.data)throw new Error('Todavía no se cargó el histórico compartido.');
     LINES=unpackLines(r.data.ventas);MANIFEST=r.data.manifest||[];MAESTRO_TEXT=r.data.maestro;
+    SHARED=r.data;
+    if(FILTER.preset)applyPreset(FILTER.preset);
     SEEN=new Set(LINES.map(keyOf));revision=r.revision;
     if(legacy){
-      const orders=new Set(LINES.map(l=>l.canal+'|'+l.order_id));
+      const orders=new Set([...LINES,...unpackLines(r.data.legacyVentas||packLines([]))].map(l=>l.canal+'|'+l.order_id));
       const missing=legacy.lines.some(l=>!orders.has(l.canal+'|'+l.order_id));
       let changed=false;
       try{changed=Boolean(legacy.maestro)&&window.NakuBuyer.mergeMaestro(MAESTRO_TEXT,legacy.maestro)!==window.NakuBuyer.mergeMaestro('',MAESTRO_TEXT);}catch{changed=true;}
@@ -1753,6 +1766,16 @@ renderLede();renderKPIs();renderRank();renderDetail();renderCov();renderChart();
 
   // ---- meses / etiquetas
   function monthsOf(ls){return [...new Set(ls.map(l=>l.mes).filter(Boolean))].sort();}
+  function availableMonths(){return SHARED?.mesesCargados||monthsOf(LINES);}
+  function selectedMonths(){
+    if(FILTER.preset&&SHARED?.periodos)return window.NakuBuyer.buyerPeriodMonths(SHARED,FILTER.preset);
+    return availableMonths().filter(m=>(!FILTER.desde||m>=FILTER.desde)&&(!FILTER.hasta||m<=FILTER.hasta));
+  }
+  function applyPreset(preset){
+    FILTER.preset=preset;
+    const ms=SHARED?.periodos?window.NakuBuyer.buyerPeriodMonths(SHARED,preset):availableMonths();
+    FILTER.desde=ms[0]||null;FILTER.hasta=ms.at(-1)||null;
+  }
   function mesLabel(ym){return (!ym||ym.length<7)?(ym||'—'):MES3[+ym.slice(5,7)]+' '+ym.slice(0,4);}
   function windowLabel(ms){return !ms.length?'—':ms.length===1?mesLabel(ms[0]):mesLabel(ms[0])+' – '+mesLabel(ms[ms.length-1]);}
 
@@ -1823,13 +1846,12 @@ renderLede();renderKPIs();renderRank();renderDetail();renderCov();renderChart();
   // withPersona=false: aplica período+canal pero ignora el filtro de comprador
   // (lo usan el ranking y el modal "Todas las ventas", que eligen persona por su cuenta).
   function filteredLines(withPersona){
-    if(!LINES.length)return null;
+    if(!LINES.length)return SHARED?[]:null;
     const cf=FILTER.canal&&FILTER.canal!=='Ambos';
     const pf=withPersona?FILTER.persona:null;
-    if(!FILTER.desde&&!FILTER.hasta&&!cf&&!pf)return LINES;
+    const months=new Set(selectedMonths());
     return LINES.filter(l=>{const m=l.mes||'';
-      if(FILTER.desde&&m<FILTER.desde)return false;
-      if(FILTER.hasta&&m>FILTER.hasta)return false;
+      if(l.billable===false||!months.has(m))return false;
       if(cf&&l.canal!==FILTER.canal)return false;
       if(pf&&l.buyer!==pf)return false;
       return true;});
@@ -1873,34 +1895,36 @@ renderLede();renderKPIs();renderRank();renderDetail();renderCov();renderChart();
     $('hard-ord').textContent=nf.format(DATA.totales.ordenes);
     $('hard-cuo').textContent=cu.length?(cu[0]===cu[cu.length-1]?f1(cu[0]):f1(cu[0])+'–'+f1(cu[cu.length-1])):'—';
     $('hard-cob').textContent=String(DATA.totales.cobertura).replace('.',',')+'%';
-    $('stamp').innerHTML=`ventana <b>${DATA.meta.ventana}</b>${FILTER.persona?' · <b>'+FILTER.persona+'</b>':''}<br>MercadoLibre + TiendaNube · ${LINES.length?('actualizado '+nowLabel()):'datos de ejemplo'}`;
+    $('stamp').innerHTML=`ventana <b>${DATA.meta.ventana}</b>${FILTER.persona?' · <b>'+FILTER.persona+'</b>':''}<br>Ventas netas sin IVA · meses cerrados`;
   }
 
   // ---- badge de fuente + barra de filtros
   function refreshUI(){
     const has=LINES.length>0;
     if(has){
-      const ms=monthsOf(LINES);
+      const ms=availableMonths();
       const opt=sel=>ms.map(m=>`<option value="${m}"${m===sel?' selected':''}>${mesLabel(m)}</option>`).join('');
       elDesde.innerHTML=opt(FILTER.desde||ms[0]);
       elHasta.innerHTML=opt(FILTER.hasta||ms[ms.length-1]);
     }
     elFlt.hidden=!has;
+    document.querySelectorAll('.flt-presets button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.preset===FILTER.preset)));
     document.querySelectorAll('#flt-personas button').forEach(b=>b.setAttribute('aria-pressed',String((b.dataset.p||null)===(FILTER.persona||null))));
     resetBtn.hidden=!legacy;
+    const parciales=SHARED?.mesesParciales||[];
+    $('ventas-criterio').textContent='Ventas netas sin IVA, antes de costos y cargos. Mismo corte de meses cerrados que Dirección.'
+      +(parciales.length?' Meses parciales fuera del total: '+parciales.map(mesLabel).join(', ')+'.':'');
+    const archivadas=SHARED?.legacyVentas?.rows.length||0;
+    $('imp-legacy-note').hidden=!archivadas;
+    $('imp-legacy-note').textContent=nf.format(archivadas)+' líneas del histórico anterior conservadas fuera de los totales: les falta el export original para calcular ventas netas. Cargá esos exports para incorporarlas a ambos tableros.';
   }
 
   function renderRecon(info){
-    const rows=DATA.personas.map(p=>{
-      const base=(BASELINE.personas.find(x=>x.key===p.key)||{}).facturacion||0;
-      const d=base?100*(p.facturacion-base)/base:0;
-      const cls=d>0.05?'up':d<-0.05?'dn':'';const ar=d>0.05?'▲':d<-0.05?'▼':'·';
-      return `<tr><td>${p.key}</td><td>${money(p.facturacion)}</td><td>${p.share}%</td><td class="${cls}">${ar} ${Math.abs(d).toFixed(1)}%</td></tr>`;
-    }).join('');
+    const rows=DATA.personas.map(p=>`<tr><td>${p.key}</td><td>${money(p.facturacion)}</td><td>${p.share}%</td></tr>`).join('');
     reconEl.hidden=false;
-    reconEl.innerHTML=`<table><thead><tr><th>Comprador</th><th>Facturación</th><th>Share</th><th>vs ejemplo</th></tr></thead><tbody>${rows}</tbody>
-      <tfoot><tr><td>Sin asignar</td><td>${money(DATA.sinAsignar.facturacion)}</td><td>${DATA.sinAsignar.share}%</td><td></td></tr></tfoot></table>
-      <div class="imp-note" style="margin-top:8px">${info?`<b>${nf.format(info.nuevas)}</b> líneas nuevas · <b>${nf.format(info.dups)}</b> ya estaban (no duplicadas) · histórico total <b>${nf.format(LINES.length)}</b>. `:''}Cobertura <b>${String(DATA.totales.cobertura).replace('.',',')}%</b> · ${nf.format(DATA.totales.ordenes)} órdenes · ${nf.format(DATA.totales.lineas)} líneas en la vista. “vs ejemplo” compara contra los números de muestra que trae el tablero.</div>`;
+    reconEl.innerHTML=`<table><thead><tr><th>Comprador</th><th>Ventas netas sin IVA</th><th>Share</th></tr></thead><tbody>${rows}</tbody>
+      <tfoot><tr><td>Sin asignar</td><td>${money(DATA.sinAsignar.facturacion)}</td><td>${DATA.sinAsignar.share}%</td></tr></tfoot></table>
+      <div class="imp-note" style="margin-top:8px">${info?`<b>${nf.format(info.nuevas)}</b> líneas nuevas · <b>${nf.format(info.dups)}</b> órdenes repetidas. `:''}Cobertura <b>${String(DATA.totales.cobertura).replace('.',',')}%</b> · ${nf.format(DATA.totales.ordenes)} órdenes · ${nf.format(DATA.totales.lineas)} líneas en la vista. Totales conciliados con Dirección.</div>`;
   }
 
   function download(name,text,mime){
@@ -1932,7 +1956,7 @@ renderLede();renderKPIs();renderRank();renderDetail();renderCov();renderChart();
       if(!exports.some(f=>f.rows.length))throw new Error('No se leyeron ventas. Revisá que sean los exports de MercadoLibre o TiendaNube.');
       setMsg('Guardando en el histórico compartido…');
       const info=await publishOperation({id:crypto.randomUUID(),exports,nombre:selection.map(p=>p.file.name).join(', ')});
-      FILTER.desde=null;FILTER.hasta=null;recompute();renderRecon(info);
+      recompute();renderRecon(info);
       picked=[];renderList();
       setMsg(`✓ Guardado para todos · <b>${nf.format(info.nuevas)}</b> líneas nuevas · <b>${nf.format(info.dups)}</b> órdenes repetidas · <b>${nf.format(info.actualizadas||0)}</b> órdenes actualizadas. Buyer y Finanzas actualizados.`);
     }catch(e){setErr('No se pudo confirmar la carga compartida: '+e.message+'. Podés reintentar sin duplicar ventas.');}
@@ -1978,15 +2002,11 @@ renderLede();renderKPIs();renderRank();renderDetail();renderCov();renderChart();
   drop.addEventListener('drop',e=>{if(e.dataTransfer&&e.dataTransfer.files)addFiles(e.dataTransfer.files);});
   runBtn.addEventListener('click',process);
   resetBtn.addEventListener('click',shareLegacy);
-  elDesde.addEventListener('change',()=>{FILTER.desde=elDesde.value;if(FILTER.hasta&&FILTER.desde>FILTER.hasta)FILTER.hasta=FILTER.desde;recompute();});
-  elHasta.addEventListener('change',()=>{FILTER.hasta=elHasta.value;if(FILTER.desde&&FILTER.hasta<FILTER.desde)FILTER.desde=FILTER.hasta;recompute();});
+  elDesde.addEventListener('change',()=>{FILTER.preset=null;FILTER.desde=elDesde.value;if(FILTER.hasta&&FILTER.desde>FILTER.hasta)FILTER.hasta=FILTER.desde;recompute();});
+  elHasta.addEventListener('change',()=>{FILTER.preset=null;FILTER.hasta=elHasta.value;if(FILTER.desde&&FILTER.hasta<FILTER.desde)FILTER.desde=FILTER.hasta;recompute();});
   document.querySelectorAll('.flt-presets button').forEach(b=>b.addEventListener('click',()=>{
-    const ms=monthsOf(LINES);if(!ms.length)return;const p=b.dataset.preset;
-    // solo el período: no pisar el canal ni el comprador elegidos
-    if(p==='all'){FILTER.desde=null;FILTER.hasta=null;}
-    else if(p==='ytd'){FILTER.desde=ms[ms.length-1].slice(0,4)+'-01';FILTER.hasta=ms[ms.length-1];}
-    else{FILTER.desde=ms[Math.max(0,ms.length-(+p))];FILTER.hasta=ms[ms.length-1];}
-    document.querySelectorAll('.flt-presets button').forEach(x=>x.setAttribute('aria-pressed',x===b));
+    if(!availableMonths().length)return;
+    applyPreset(b.dataset.preset);
     recompute();
   }));
   // filtro por comprador: pills "Todos | Juan | …" — recalcula KPIs, gráfico y detalle

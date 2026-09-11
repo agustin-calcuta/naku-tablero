@@ -431,6 +431,7 @@ export function aggregate(lines) {
   for (const p of PERSONAS) prov[p] = {};
 
   for (const l of lines) {
+    if (l.billable === false) continue;
     const p = byPersona[l.buyer] ? l.buyer : 'Sin asignar';
     // por mes/canal/persona (filtro del dashboard)
     const mk = `${l.mes}|${l.canal}|${p}`;

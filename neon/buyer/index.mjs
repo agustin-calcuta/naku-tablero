@@ -1,4 +1,5 @@
 import { createHandler } from './handler.mjs';
+import { leerFuentes } from '../../src/fuentes-sync.mjs';
 
 async function sql(query, params) {
   const cs=process.env.DATABASE_URL;
@@ -13,4 +14,4 @@ async function sql(query, params) {
   }
   return result;
 }
-export default {fetch:createHandler(sql)};
+export default {fetch:createHandler(sql,{leerFuentes})};

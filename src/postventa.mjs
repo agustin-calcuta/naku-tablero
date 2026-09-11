@@ -93,6 +93,30 @@ const cuenta = (arr, fn) => {
   return [...m.entries()].map(([n, v]) => ({ n, v })).sort((a, b) => b.v - a.v);
 };
 
+/** Flujos de casos por mes. No reconstruye una cola histórica a partir del
+ * estado actual ni usa unidades de la planilla como si fueran órdenes. */
+export function postventaMensual(central) {
+  const meses={};
+  const grupo=(mes,canal)=>{
+    if(!mes)return null;
+    const base={ingresos:0,urgentes:0,cierresReales:0,cierresAproximados:0,tipos:{}};
+    return ((meses[mes]??={})[canal]??=base);
+  };
+  for(const r of filasPorNombre(central?.postventa)) {
+    const canal=txt(r['Canal de venta'])==='Mercado Libre'?'ml':txt(r['Canal de venta'])==='Tienda Nube'?'tn':'otros';
+    const alta=fecha(r['Alta del caso'])||fecha(r['Ingreso del mensaje']);
+    const cierre=fecha(r['Fecha de cierre']);
+    for(const c of ['empresa',canal]) {
+      const ing=grupo(mesDe(alta),c);
+      if(ing){ing.ingresos++;if(txt(r.Urgencia)==='Alta')ing.urgentes++;const tipo=txt(r['Tipo de reclamo'])||'Sin tipificar';ing.tipos[tipo]=(ing.tipos[tipo]||0)+1;}
+      if(cierre&&/^Resuelto/.test(txt(r['7· Estatus']))) {
+        const fin=grupo(mesDe(cierre),c);fin[cierre<CIERRES_REALES_DESDE?'cierresAproximados':'cierresReales']++;
+      }
+    }
+  }
+  return {meses,nota:'Ingresos y cierres del período. Los cierres anteriores al 4/9/2026 son aproximados; no se usan para medir tiempos de resolución.'};
+}
+
 /**
  * @param aoaPostventa   hoja 'Postventa'
  * @param aoaMinorista   hoja 'Preventa Minorista'

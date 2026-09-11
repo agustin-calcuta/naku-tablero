@@ -5,6 +5,23 @@ los tableros alimentan ambos. Buyer publica al procesar. Finanzas conserva la
 vista previa y el botón de publicación. Ambos consultan cambios cada 30 segundos
 y al recuperar el foco.
 
+Compradores y la vista **Detalle de ventas** de Dirección usan **ventas netas sin IVA, antes de costos y cargos**,
+las mismas órdenes válidas y los mismos meses cerrados. «Este año», 3 meses y
+6 meses se resuelven con los períodos del servidor, incluyendo sus meses
+faltantes. El mes parcial se conserva pero no entra en esos filtros.
+
+La vista principal **Cierre mensual** usa las tres planillas administrativas,
+incluye mayoristas y presenta una conciliación con el detalle online. Ese flujo
+y su activación están en [GESTION-MENSUAL.md](GESTION-MENSUAL.md).
+
+El motor financiero emite las líneas comerciales de Compradores durante el
+mismo procesamiento: una orden por paquete ML, sin cancelaciones ni pagos TN
+pendientes/rechazados/vencidos/reembolsados. Los descuentos y reembolsos TN se
+distribuyen entre todos los productos por su valor. Se conservan las ventas
+sin SKU como «Sin asignar» y los renglones idénticos dentro de una orden.
+Antes de guardar, se comparan importe, órdenes y unidades por período y canal;
+una diferencia rechaza la publicación completa.
+
 Los costos y la central sólo se actualizan desde Finanzas. El servidor conserva
 la última planilla de costos para las siguientes cargas. El maestro de Buyer
 acepta `,` y `;`, BOM, comillas y saltos de línea dentro de celdas. Las filas
@@ -41,9 +58,10 @@ Los datos existentes en IndexedDB se conservan; el botón **Compartir histórico
 este navegador** incorpora los faltantes sin sobrescribir órdenes de las fuentes
 compartidas. Si hay maestro local, la confirmación informa que también lo aplica.
 
-Las líneas antiguas que no tienen export original sólo completan Buyer: les
-faltan los cargos e importes necesarios para Finanzas. Re-subir el export original
-las incorpora a ambos. El maestro adjunto por Leo no se aplica durante la
+Las líneas antiguas que no tienen export original se conservan en `legacyVentas`,
+fuera de los totales comerciales de ambos tableros: les faltan los importes
+necesarios para calcular ventas netas. El panel de carga informa cuántas son.
+Re-subir el export original las incorpora a ambos. El maestro adjunto por Leo no se aplica durante la
 migración; lo puede subir desde la interfaz.
 
 ## Construcción y despliegue

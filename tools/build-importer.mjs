@@ -70,7 +70,7 @@ function envolver(nombre, archivo, disponibles) {
 const construidos = [];
 const partes = [];
 for (const [nombre, archivo] of [['costos', 'costos.mjs'], ['engine', 'engine.mjs'],
-  ['finanzas', 'finanzas.mjs'], ['postventa', 'postventa.mjs'], ['tablero', 'tablero.mjs']]) {
+  ['finanzas', 'finanzas.mjs'], ['postventa', 'postventa.mjs'], ['tablero', 'tablero.mjs'], ['gestion','gestion.mjs']]) {
   const r = envolver(nombre, archivo, construidos);
   construidos.push(nombre);
   partes.push(r.js);
@@ -81,7 +81,7 @@ for (const [nombre, archivo] of [['costos', 'costos.mjs'], ['engine', 'engine.mj
    El maestro (nombre y familia por SKU) y los costos del mes: sin ellos el
    navegador podría contar unidades pero no calcular margen ni agrupar familias. */
 function leerMaestro() {
-  const local = fs.readdirSync(DATA).find((f) => /SKU.*Buyer.*\.csv$/i.test(f));
+  const local = fs.existsSync(DATA)?fs.readdirSync(DATA).find((f) => /SKU.*Buyer.*\.csv$/i.test(f)):null;
   if (local) return fs.readFileSync(path.join(DATA, local), 'utf8');
   // Segunda opción: el que quedó embebido en el tablero de ventas.
   const nueva = path.join(ROOT, 'docs', 'nueva.html');
@@ -125,6 +125,7 @@ window.NakuMotor = {
   finanzas: __finanzas,
   postventa: __postventa,
   tablero: __tablero,
+  gestion: __gestion,
   maestroCSV: NAKU_MAESTRO_CSV,
   costosPares: NAKU_COSTOS,
   mesCostos: NAKU_MES_COSTOS,
@@ -133,6 +134,7 @@ window.NakuMotor = {
 
 fs.mkdirSync(path.dirname(OUT), { recursive: true });
 fs.writeFileSync(OUT, cabecera + partes.join('\n') + cola);
+fs.copyFileSync(path.join(ROOT,'web','gestion-ui.js'),path.join(ROOT,'docs','gestion-ui.js'));
 const kb = (fs.statSync(OUT).size / 1024).toFixed(0);
 console.log(`✓ ${path.relative(ROOT, OUT)} — ${kb} KB`);
 

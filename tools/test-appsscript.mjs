@@ -1,0 +1,25 @@
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import vm from 'node:vm';
+const source=fs.readFileSync(new URL('../appsscript/fuentes/Codigo.gs',import.meta.url),'utf8');
+let request;
+const context=vm.createContext({Sheets:{Spreadsheets:{get:(id,options)=>{
+ request={id,options};
+ return {properties:{timeZone:'America/Argentina/Buenos_Aires'},sheets:[{properties:{title:'Septiembre',hidden:true},data:[{startRow:1,startColumn:1,rowData:[{values:[{effectiveValue:{numberValue:0}},{effectiveValue:{numberValue:46266},effectiveFormat:{numberFormat:{type:'DATE'}}},{effectiveValue:{numberValue:42},userEnteredValue:{formulaValue:'=21*2'}}]}]}]}]};
+}}}});
+vm.runInContext(source,context);
+const sheet=vm.runInContext("abrirPlanilla_('archivo').getSheets()[0]",context);
+assert.equal(request.id,'archivo');
+assert.equal(sheet.isSheetHidden(),true);
+assert.equal(sheet.getDataRange().getValues()[0][0],'');
+assert.equal(sheet.getDataRange().getValues()[1][1],0);
+assert.equal(sheet.getDataRange().getValues()[1][2],'2026-09-01T00:00:00.000Z');
+assert.equal(sheet.getDataRange().getFormulas()[1][3],'=21*2');
+const central=vm.runInContext("datosRecortados_([['Teléfono','Caso','Alta del caso','SKU'],['privado','PV-1',46266,'SKU-A']],['Caso','Alta del caso','SKU'])",context);
+assert.deepEqual(JSON.parse(JSON.stringify(central)),[['Caso','Alta del caso','SKU'],['PV-1','2026-09-01T00:00:00.000Z','SKU-A']]);
+assert.throws(()=>vm.runInContext("datosRecortados_([['Teléfono']],['Caso'])",context),/columna Caso/);
+const manifest=JSON.parse(fs.readFileSync(new URL('../appsscript/fuentes/appsscript.json',import.meta.url)));
+assert(manifest.dependencies.enabledAdvancedServices.some(s=>s.serviceId==='drive'));
+assert(manifest.dependencies.enabledAdvancedServices.some(s=>s.serviceId==='sheets'));
+assert(!manifest.oauthScopes.includes('https://www.googleapis.com/auth/spreadsheets'));
+console.log('✓ Apps Script: lectura con permisos mínimos, fechas, fórmulas, ceros, hojas ocultas y recorte de postventa');

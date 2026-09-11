@@ -1,7 +1,8 @@
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
-import {parseCSV,parseMaestro,mergeMaestro,packLines,unpackLines} from '../src/buyer.mjs';
-import {cleanExport,buildShared} from '../src/ventas-compartidas.mjs';
+import {parseCSV,parseMaestro,mergeMaestro,packLines,unpackLines,buyerPeriodMonths} from '../src/buyer.mjs';
+import {aggregate} from '../src/engine.mjs';
+import {cleanExport,buildShared,verificarCompradores} from '../src/ventas-compartidas.mjs';
 import {createHandler,encode,decode} from '../neon/buyer/handler.mjs';
 import {connection,applySchema} from './neon-sql.mjs';
 
@@ -35,6 +36,49 @@ assert.ok(unpackLines(mapped.buyer.ventas).filter(l=>l.sku==='A').every(l=>l.buy
 assert.equal(mapped.result.cambios,2);
 assert.equal(parseMaestro(mapped.buyer.maestro).length,3);
 console.log('✓ CSV, paquetes ML, productos TN, superposición, cancelaciones y maestro parcial');
+
+const comparable=(built,preset='ytd',channel=null)=>{
+  const months=buyerPeriodMonths(built.buyer,preset);
+  return aggregate(unpackLines(built.buyer.ventas).filter(l=>months.includes(l.mes)&&(!channel||l.canal===channel)));
+};
+assert.equal(comparable(result).totales.ordenes,2,'Un paquete ML es una orden, junto a una TN');
+assert.equal(comparable(result).totales.facturacion,Math.round(600/1.21),'Ventas antes de cargos, sin IVA, para ambos canales');
+assert.equal(comparable(updated).totales.ordenes,1,'Las cancelaciones no suman órdenes ni unidades');
+const discounted=tn('discount');discounted.rows[0][8]=60;discounted.rows[0][18]=30;
+const pending=tn('pending');pending.rows[0][3]='Pendiente';
+const rejected=tn('rejected');rejected.rows[0][3]='Rechazado';
+const expired=tn('expired');expired.rows[0][3]='Vencido';
+const refunded=tn('refunded');refunded.rows[0][3]='Reembolsado';
+const repeatedSku=tn('same-sku');repeatedSku.rows[1][4]='A';repeatedSku.rows[1][6]=1;repeatedSku.rows[0][7]=200;
+const free=tn('free');free.rows[0][5]=0;free.rows[1][5]=0;
+const noSku=cleanExport('ml',[mh,['missing','31 de agosto de 2026','Venta con solicitud de cambio','',1,'',100,-10,90,'','']]);
+const september=cleanExport('ml',[mh,['partial','2 de septiembre de 2026','Entregado','',1,'A',100,-10,90,100,'Soporte']]);
+const august=cleanExport('ml',[mh,['start','1 de agosto de 2026','Entregado','',1,'A',100,-10,90,100,'Soporte']]);
+const enriched=buildShared(empty,support,{exports:[august,ml,noSku,discounted,pending,rejected,expired,refunded,repeatedSku,free,september]},null);
+const dl=unpackLines(enriched.buyer.ventas).filter(l=>l.order_id==='discount');
+assert.ok(Math.abs(dl.reduce((s,l)=>s+l.facturacion,0)-210/1.21)<1e-9,'Descuento y reembolso se distribuyen una sola vez');
+assert.ok(Math.abs(dl.find(l=>l.sku==='A').facturacion-70/1.21)<1e-9,'Prorrateo por valor de cada producto');
+assert.equal(unpackLines(enriched.buyer.ventas).filter(l=>l.order_id==='same-sku').length,2,'Conserva dos renglones idénticos de una orden');
+assert.ok(unpackLines(enriched.buyer.ventas).some(l=>l.order_id==='missing'&&l.buyer==='Sin asignar'),'No pierde ventas sin SKU');
+assert.ok(!unpackLines(enriched.buyer.ventas).some(l=>['pending','rejected','expired','refunded'].includes(l.order_id)));
+assert.deepEqual(buyerPeriodMonths(enriched.buyer,'ytd'),['2026-08'],'Septiembre parcial no entra en Este año');
+assert.deepEqual(buyerPeriodMonths(enriched.buyer,'3'),enriched.finance.periodos.find(p=>p.id==='m3').meses);
+const totals=comparable(enriched);
+assert.equal(totals.totales.ordenes,6);
+assert.equal(totals.totales.facturacion,Math.round(1210/1.21));
+assert.equal(Object.values(totals.byPersona).reduce((s,p)=>s+p.unidades,0),enriched.finance.vistas.todos.anio.eerr.unidades);
+assert.equal(aggregate([{...dl[0],billable:false}]).totales.ordenes,0);
+assert.throws(()=>verificarCompradores(unpackLines(enriched.buyer.ventas).slice(1),enriched.finance),/no coinciden/);
+const oldLine={...dl[0],order_id:'old-only',facturacion:123};
+const archived=buildShared({...enriched.buyer,ventas:packLines([...unpackLines(enriched.buyer.ventas),oldLine])},enriched.sources,{},enriched.finance);
+assert.equal(comparable(archived).totales.facturacion,totals.totales.facturacion);
+assert.equal(unpackLines(archived.buyer.legacyVentas).length,1,'Histórico antiguo conservado fuera de los totales');
+const archiveAgain=buildShared(archived.buyer,archived.sources,{},archived.finance);
+assert.equal(archiveAgain.buyer.legacyVentas.rows.length,1,'No duplica el archivo histórico al recalcular');
+const restored=buildShared(archiveAgain.buyer,archiveAgain.sources,{exports:[tn('old-only')]},archiveAgain.finance);
+assert.equal(restored.buyer.legacyVentas.rows.length,0,'Subir el export original incorpora la orden a ambos');
+assert.equal(comparable(restored).totales.ordenes,totals.totales.ordenes+1);
+console.log('✓ Conciliación Buyer/Dirección: importes, IVA, órdenes, unidades, paquetes, pagos, descuentos, meses parciales e histórico');
 
 if(process.env.NAKU_TEST_BRANCH){
   assert.notEqual(process.env.NAKU_TEST_BRANCH,'br-wispy-lake-ayf0dl28','No ejecutar pruebas en producción');

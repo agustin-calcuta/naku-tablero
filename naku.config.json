@@ -20,6 +20,11 @@
     "url": "",
     "token": ""
   },
+  "gestion": {
+    "id": "1vS1xtTIjIbuq4GCRNvNJDYqZKx-KUzxt",
+    "archivo": "Saldos - Cash flow.xlsx",
+    "descripcion": "Fuente principal del cierre mensual: cuatro canales, gastos, costos, caja y proyecciones"
+  },
   "costos": {
     "id": "",
     "tipo": "drive",

@@ -7,12 +7,16 @@
 
   const ZONAS = [
     {
+      id: 'gestion', titulo: 'Ventas, gastos y caja', acepta: '.xlsx',
+      pista: 'Saldos - Cash flow · cierre mensual', varios: false, tipo: 'apoyo',
+    },
+    {
       id: 'meli', titulo: 'Mercado Libre', acepta: '.xlsx',
-      pista: 'Ventas AR — uno o varios meses', varios: true, tipo: 'ventas',
+      pista: 'Opcional · detalle por producto y comprador', varios: true, tipo: 'ventas',
     },
     {
       id: 'tn', titulo: 'Tienda Nube', acepta: '.csv',
-      pista: 'Export de órdenes', varios: true, tipo: 'ventas',
+      pista: 'Opcional · detalle de órdenes', varios: true, tipo: 'ventas',
     },
     {
       id: 'costos', titulo: 'Costos', acepta: '.xlsx',
@@ -95,7 +99,7 @@
     $('impProcesar').disabled = !hayVentas;
     $('impNota').textContent = hayVentas
       ? 'Al publicar, las ventas se actualizan también en el Buyer.'
-      : 'Los exports de MeLi y TN se comparten con el Buyer. También podés actualizar sólo costos o atención al cliente.';
+      : 'Sincronizá las tres planillas o cargá sus copias. MeLi/TN son opcionales para ampliar el detalle comercial.';
   }
 
   function estado(texto, clase = '') {
@@ -128,6 +132,10 @@
     try {
       if(typeof XLSX==='undefined')throw new Error('No se pudo cargar el lector de Excel. Revisá la conexión.');
       const operation={id:crypto.randomUUID(),exports:[],nombre:'Carga desde Finanzas'};
+      if(elegidos.gestion){
+        const f=elegidos.gestion[0],wb=XLSX.read(await leerBuffer(f),{type:'array',cellDates:true});
+        operation.gestion=M.gestion.libroDesdeXlsx(wb,XLSX,f.name);
+      }
       for(const f of elegidos.meli||[]) {
         estado('Leyendo '+f.name+'…');await pausa();
         operation.exports.push(window.NakuVentas.cleanExport('ml',hoja(await leerBuffer(f),'ventas').aoa,f.name));
@@ -141,10 +149,7 @@
       }
       if(elegidos.costos) {
         const wb=XLSX.read(await leerBuffer(elegidos.costos[0]),{type:'array'});
-        const cand=M.costos.hojasPorMes(wb.SheetNames)[0];
-        if(!cand)throw new Error('La planilla de costos no tiene una hoja con nombre de mes.');
-        const costs=M.costos.buildCostos(XLSX.utils.sheet_to_json(wb.Sheets[cand.hoja],{header:1,raw:true,defval:''}),cand.hoja,cand.mes);
-        operation.costos={pares:[...costs.costo],hoja:cand.hoja,mes:cand.mes,archivo:elegidos.costos[0].name};
+        operation.costos={...M.costos.buildHistorialCostos(wb.SheetNames,n=>XLSX.utils.sheet_to_json(wb.Sheets[n],{header:1,raw:true,defval:''})),archivo:elegidos.costos[0].name};
       }
       if(elegidos.central) {
         const buf=await leerBuffer(elegidos.central[0]);
@@ -235,6 +240,19 @@
   /* ---------------------------------------------------------------- cablear */
   $('btnActualizar').hidden = false;
   $('btnActualizar').addEventListener('click', abrir);
+  const sync=document.createElement('button');sync.className='primario';sync.type='button';sync.id='impSincronizar';sync.textContent='Sincronizar las tres planillas';
+  $('impZonas').before(sync);
+  sync.onclick=async()=>{
+    if(publishing||pendingOperation){estado('Terminá o cerrá la vista previa antes de sincronizar.','mal');return;}
+    publishing=true;sync.disabled=true;estado('Leyendo costos, gestión y postventa desde Google…');
+    try{
+      window.NakuBuyerSync.setKey(recordado('clave'));
+      const r=await window.NakuBuyerSync.request('/sincronizar',{id:crypto.randomUUID()});
+      if(r.finance){window.NakuDatos=r.finance;window.NakuPublicado={publicado:r.actualizado,quien:'Planillas de Google'};window.NakuPintar(r.finance);}
+      estado(r.sinCambios?'Las planillas ya estaban al día.':'Planillas sincronizadas. Ambos tableros usan la versión compartida.','bien');
+    }catch(e){estado(e.message||'No se pudo sincronizar. Se conserva la última versión.','mal');}
+    finally{publishing=false;sync.disabled=false;}
+  };
   $('impCerrar').addEventListener('click', cerrar);
   $('impCerrarPie').addEventListener('click', cerrar);
   $('impFondo').addEventListener('click', (e) => { if (e.target === $('impFondo')) cerrar(); });

@@ -16,8 +16,8 @@
 // margen unos 8 puntos. Todo el estado de resultados se expresa SIN IVA
 // (criterio contable habitual: el IVA no es ingreso ni gasto, es un pasaje).
 //
-// Este módulo es aparte de engine.mjs a propósito: el tablero de ventas que ya
-// usa Leo no se toca, así que sus números y su histórico quedan como están.
+// Las mismas filas válidas alimentan Dirección y Compradores. El callback
+// opcional recibe el detalle comercial sin IVA, antes de los cargos del canal.
 
 import { IVA } from './costos.mjs';
 import { headerIndex, bucketEnvio, normSku, cleanName, familiaOf } from './engine.mjs';
@@ -178,7 +178,7 @@ function acumularCortes(a, { sku, nombre, familia, unidades, monto, provincia, e
  * @param costoDe   matcher de src/costos.mjs
  * @returns Map<mes, acumulador>
  */
-export function ingestFinanzasMeli(aoa, costoDe, match = null) {
+export function ingestFinanzasMeli(aoa, costoDe, match = null, emitirVenta = null) {
   let h = -1;
   for (let i = 0; i < Math.min(aoa.length, 12); i++) {
     if ((aoa[i] || []).some((c) => c != null && String(c).includes('# de venta'))) { h = i; break; }
@@ -284,13 +284,22 @@ export function ingestFinanzasMeli(aoa, costoDe, match = null) {
     const u = num(row[C.unidades]) || 1;
     d.unidades += u;
     const bruto = num(row[C.bruto]);
-    const { costo } = costoDe(row[C.sku]);
+    const { costo } = costoDe(row[C.sku], mes);
     if (costo == null) { d.cogsFaltante += bruto; faltante(d, row[C.sku], bruto); }
     else d.cogs += costo * u;
 
     const titulo = C.titulo >= 0 ? cleanName(row[C.titulo]) : '';
     const skuRaw = String(row[C.sku] ?? '').trim();
     const m = match ? match(row[C.sku], titulo) : null;
+    if (emitirVenta) emitirVenta({
+      canal: 'MercadoLibre', order_id: String(row[C.venta]).trim(), mes,
+      sku: normSku(skuRaw), sku_raw: skuRaw, buyer: m?.buyer || 'Sin asignar',
+      nombre: m?.nombre || titulo || skuRaw || 'Venta sin producto identificado',
+      familia: m?.familia || familiaOf('', '', skuRaw), unidades: u,
+      facturacion: sinIva(bruto + num(row[C.bonif]) + num(row[C.anul])),
+      cuotas: 0, provincia: iProv >= 0 ? String(row[iProv] ?? '').trim() : '',
+      envio: C.envio >= 0 ? String(row[C.envio] ?? '').trim() : '', billable: true,
+    });
     acumularCortes(a, {
       sku: normSku(skuRaw),
       nombre: (m && m.nombre) || titulo || skuRaw,
@@ -311,7 +320,7 @@ export function ingestFinanzasMeli(aoa, costoDe, match = null) {
  * Export de TiendaNube (CSV ;, cp1252, una fila por línea de la orden).
  * Los cargos vienen en positivo: acá se guardan firmados igual que MeLi.
  */
-export function ingestFinanzasTn(aoa, costoDe, match = null) {
+export function ingestFinanzasTn(aoa, costoDe, match = null, emitirVenta = null) {
   const at = idx(aoa[0]);
   const C = {
     orden: at('Número de orden'), fecha: at('Fecha'),
@@ -323,11 +332,13 @@ export function ingestFinanzasTn(aoa, costoDe, match = null) {
     impuestos: at('Impuestos'), neto: at('Total neto'),
     titulo: at('Nombre del producto'), envio: at('Medio de envío'),
     provincia: at('Provincia o estado'),
+    cuotas: at('Cantidad de cuotas'),
   };
   if (C.orden < 0) throw new Error('TN finanzas: falta la columna "Número de orden"');
 
   const porMes = new Map();
   const vistas = new Set(); // el subtotal/envío/cargos se repiten por línea: se toman una vez por orden
+  const comerciales = new Map();
   let cabecera = null;
   for (let r = 1; r < aoa.length; r++) {
     const row = aoa[r];
@@ -374,13 +385,28 @@ export function ingestFinanzasTn(aoa, costoDe, match = null) {
     const q = num(row[C.cant]) || 1;
     d.unidades += q;
     const monto = num(row[C.precio]) * q;
-    const { costo } = costoDe(row[C.sku]);
+    const { costo } = costoDe(row[C.sku], mes);
     if (costo == null) { d.cogsFaltante += monto; faltante(d, row[C.sku], monto); }
     else d.cogs += costo * q;
 
     const titulo = C.titulo >= 0 ? cleanName(row[C.titulo]) : '';
     const skuRaw = String(row[C.sku] ?? '').trim();
     const m = match ? match(row[C.sku], titulo) : null;
+    if (emitirVenta) {
+      if (!comerciales.has(claveOrden)) comerciales.set(claveOrden, {
+        total: sinIva(num(cabecera[C.subtotal]) - num(cabecera[C.descuento]) - Math.abs(num(cabecera[C.reembolso]))),
+        lineas: [],
+      });
+      comerciales.get(claveOrden).lineas.push({
+        canal: 'TiendaNube', order_id: String(cabecera[C.orden]).trim(), mes,
+        sku: normSku(skuRaw), sku_raw: skuRaw, buyer: m?.buyer || 'Sin asignar',
+        nombre: m?.nombre || titulo || skuRaw || 'Venta sin producto identificado',
+        familia: m?.familia || familiaOf('', '', skuRaw), unidades: q,
+        facturacion: monto, cuotas: num(cabecera[C.cuotas]),
+        provincia: C.provincia >= 0 ? String(cabecera[C.provincia] ?? '').trim() : '',
+        envio: C.envio >= 0 ? String(cabecera[C.envio] ?? '').trim() : '', billable: true,
+      });
+    }
     acumularCortes(a, {
       sku: normSku(skuRaw),
       nombre: (m && m.nombre) || titulo || skuRaw,
@@ -392,6 +418,19 @@ export function ingestFinanzasTn(aoa, costoDe, match = null) {
       orden,
       dia,
       canal: 'tn',
+    });
+  }
+  // El subtotal, cupones y reembolsos pertenecen a la orden. Se distribuyen
+  // entre TODOS sus productos, incluso si el export repite un mismo SKU.
+  for (const { total, lineas } of comerciales.values()) {
+    const pesos = lineas.map(l => Math.max(0, l.facturacion));
+    const suma = pesos.reduce((s, n) => s + n, 0);
+    let repartido = 0;
+    lineas.forEach((l, i) => {
+      const facturacion = i === lineas.length - 1 ? total - repartido
+        : total * (suma ? pesos[i] / suma : 1 / lineas.length);
+      repartido += facturacion;
+      emitirVenta({ ...l, facturacion });
     });
   }
   return porMes;

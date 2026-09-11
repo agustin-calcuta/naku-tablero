@@ -4,7 +4,8 @@ Tablero que reparte las ventas de NAKU (MercadoLibre + Mercado Shops + TiendaNub
 entre 5 buyer personas. El navegador parsea los exports con un motor propio y un
 backend en Neon guarda las ventas compartidas y actualiza Buyer y Finanzas juntos.
 
-El flujo vigente se documenta en [VENTAS-COMPARTIDAS.md](VENTAS-COMPARTIDAS.md).
+El cierre mensual desde tres planillas se documenta en [GESTION-MENSUAL.md](GESTION-MENSUAL.md).
+El detalle de órdenes compartido con Compradores está en [VENTAS-COMPARTIDAS.md](VENTAS-COMPARTIDAS.md).
 
 > **Fase 1 (esta):** semi-integración por exports (sin API de MeLi/TN). Ver el plan
 > completo por fases en `../Tablero Buyer Naku/PLAN-Integracion-Dashboard-Naku.md`.
@@ -72,23 +73,24 @@ unitarios no se incluyen en el JavaScript público. Para validar:
 `npm test` comprueba el JSON y las regresiones de importación y filtros.
 
 ```bash
-npm run actualizar
+npm run actualizar -- --google --sin-publicar
 ```
 
-Eso hace todo: trae las planillas, procesa los exports que haya, regenera el
-tablero y lo sube a la base, que es lo que lee el tablero. Necesita `NAKU_CLAVE`
-en el entorno. El JSON no se commitea: queda en `datos/`, que git ignora.
+Eso lee las tres planillas del puente privado y prepara una vista local. La nueva
+rutina no publica por defecto. `--publicar` y `NAKU_CLAVE` permiten guardar mediante
+la API compartida. El JSON queda en `datos/`, que git ignora.
 
 | Fuente | Cómo llega |
 |---|---|
 | **Costos** (planilla de compras) | **sola**, por el puente de Apps Script |
 | **Postventa** (central de atención) | **sola**, por el puente |
+| **Gestión** (ventas, gastos y caja) | **sola**, por el puente; fuente del cierre mensual |
 | **Maestro** de SKU | archivo local |
 | **Exports de MercadoLibre / TiendaNube** | **a mano**: dejarlos en el directorio de datos |
 
-Los exports son lo único manual, y no hay forma de evitarlo hasta la API de
-MercadoLibre: no se pueden bajar sin entrar a la cuenta. Cuando Leo los pase, van
-a `../Naku Datos/` y se corre el comando.
+Los exports son opcionales para ampliar el detalle comercial y los compradores.
+Se cargan desde cualquiera de los tableros. El cierre mensual no depende de ellos.
+La conexión automática requiere activar el puente y su disparador horario.
 
 El puente se instala una sola vez con dos comandos:
 
@@ -273,8 +275,9 @@ Finanzas; las cargas de ventas reutilizan los últimos costos guardados.
 
 Las cargas de la versión anterior que sólo existen en un navegador se pueden
 incorporar con **Compartir histórico de este navegador**. Esa copia anterior
-se conserva. Sólo las líneas antiguas sin export original siguen siendo
-exclusivas del Buyer: no contienen los cargos necesarios para Finanzas.
+se conserva. Las líneas antiguas sin export original quedan fuera del total
+comercial: no permiten reconstruir las ventas netas que usan ambos tableros.
+Al cargar el export original se incorporan a los dos con el mismo criterio.
 
 ### Rebuild (cuando cambie el motor o el maestro)
 

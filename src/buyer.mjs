@@ -70,6 +70,15 @@ export function unpackLines(data) {
   });
 }
 
+// Los mismos meses que publica Dirección; no recalcular «Este año» con el
+// último export, que puede ser un mes parcial o tener meses intermedios faltantes.
+export function buyerPeriodMonths(data, preset) {
+  const months=data.mesesCargados||[];
+  if(preset==='1')return months.slice(-1);
+  const id=({all:'rango','3':'m3','6':'m6',ytd:'anio'})[preset];
+  return data.periodos?.find(p=>p.id===id)?.meses||months;
+}
+
 export function mergeBuyer(current, operation) {
   const incoming = unpackLines(operation.ventas);
   const lines = unpackLines(current.ventas);

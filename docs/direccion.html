@@ -809,7 +809,7 @@ const nf = new Intl.NumberFormat('es-AR');
 const coma = (s) => String(s).replace('.', ',');
 const money = (n) => '$' + nf.format(Math.round(n));
 const moneyM = (n) => (Math.abs(n) >= 1e6
-  ? '$' + coma((n / 1e6).toFixed(1)) + ' M'
+  ? '$' + (n / 1e6).toLocaleString('es-AR', {minimumFractionDigits:1, maximumFractionDigits:1}) + ' M'
   : '$' + nf.format(Math.round(n)));
 const pct = (n, d = 1) => coma(Number(n).toFixed(d)) + '%';
 const signo = (n) => (n > 0 ? '+' : '') + coma(Number(n).toFixed(1));
@@ -934,6 +934,8 @@ $('entrarForm').addEventListener('submit', async (ev) => {
 })();
 
 function pintar(D) {
+  if(D.gestion && window.NakuGestionUI && !window.NakuDetalle)return window.NakuGestionUI.pintar(D);
+  window.NakuGestionUI?.restaurar(D);
   /* ---------------- filtros: canal y período ---------------- */
   // El período por defecto es el primero que tenga datos: los ids salen del JSON
   // y cambian según cuántos meses haya cargados, así que no se puede fijar uno.
@@ -948,7 +950,7 @@ function pintar(D) {
       class="${x.disponible === false ? 'sindatos' : ''}"
       title="${x.disponible === false ? 'Todavía no hay exports cargados para este período' : ''}"
       aria-selected="${x.id === filtro[clave]}">${x.n}</button>`).join('');
-    $(cont).addEventListener('click', (ev) => {
+    $(cont).onclick = (ev) => {
       const b = ev.target.closest('[data-v]');
       if (!b || b.dataset.v === filtro[clave]) return;
       filtro[clave] = b.dataset.v;
@@ -956,7 +958,7 @@ function pintar(D) {
         o.setAttribute('aria-selected', String(o.dataset.v === filtro[clave])));
       if (alCambiar) alCambiar();
       pintarVista(D, filtro);
-    });
+    };
   };
 
   /* El rango libre elige entre los meses que hay cargados. Un mes suelto sale de
@@ -973,12 +975,12 @@ function pintar(D) {
     const libre = (periodos.find((p) => p.id === filtro.periodo) || {}).libre;
     $('rango').hidden = !libre;
   }
-  ['rangoDesde', 'rangoHasta'].forEach((id) => $(id).addEventListener('change', () => {
+  ['rangoDesde', 'rangoHasta'].forEach((id) => { $(id).onchange = () => {
     // Que "desde" no quede después de "hasta": se corrige el otro extremo.
     const d = $('rangoDesde').value; const h = $('rangoHasta').value;
     if (d > h) { if (id === 'rangoDesde') $('rangoHasta').value = d; else $('rangoDesde').value = h; }
     pintarVista(D, filtro);
-  }));
+  }; });
 
   if (canales.length > 1 || periodos.length > 1) {
     $('filtros').hidden = false;
@@ -1036,7 +1038,8 @@ function pintarVista(D, filtro) {
   const E = V.eerr;
   const ausentes = mesesPedidos.filter(m => canal === 'todos' && (!D.vistas.ml?.[`mes:${m}`] || !D.vistas.tn?.[`mes:${m}`]));
   $('datosPendientes').textContent =
-    `Estimación con costos de ${D.fuentes.costos.hoja}; no son costos históricos de cada mes. `
+    (D.fuentes.costos.historicos ? 'Costos unitarios según la vigencia disponible para cada mes. ' : `Estimación con costos de ${D.fuentes.costos.hoja}; no son costos históricos de cada mes. `)
+    + (D.fuentes.costos.omitidas?.length ? `Hojas antiguas de costos sin formato compatible: ${D.fuentes.costos.omitidas.map(h=>h.hoja).join(', ')}. ` : '')
     + `Falta incorporar: ${(E.faltan || []).join('; ')}. `
     + (E.cargosAgrupados ? 'Mercado Libre agrupa comisión e impuestos; las diferencias contra Total se muestran sin clasificar. ' : '')
     + (E.sinCosto?.length ? `SKU sin costo: ${E.sinCosto.map(x => x.sku).join(', ')}. ` : '')
@@ -1073,7 +1076,7 @@ function pintarVista(D, filtro) {
   const fichas = [
     {
       et: 'Vendimos', val: moneyM(ventasNetas.v), foco: true,
-      glosa: `Ventas netas de ${todoElMes ? 'el mes' : 'el período'}, antes de costos y cargos`,
+      glosa: `Ventas netas sin IVA de ${todoElMes ? 'el mes' : 'el período'}, antes de costos y cargos`,
     },
     {
       et: 'Neto informado por los canales', val: moneyM(V.neto),
@@ -1082,7 +1085,7 @@ function pintarVista(D, filtro) {
     },
     {
       et: 'Margen bruto estimado', val: pct(margen.pct), sub: moneyM(margen.v),
-      glosa: `Costos de ${D.fuentes.costos.hoja.toLowerCase()}. Cobertura ${pct(E.cobertura)}`,
+      glosa: `${D.fuentes.costos.historicos?'Costos por vigencia mensual':`Costos de ${D.fuentes.costos.hoja.toLowerCase()}`}. Cobertura ${pct(E.cobertura)}`,
     },
     {
       et: 'Contribución estimada', val: pct(contrib.pct), sub: moneyM(contrib.v), foco: true,
@@ -1137,7 +1140,7 @@ function pintarVista(D, filtro) {
   $('filaMargen').hidden = conMargen.length < 3;
   if (conMargen.length >= 3) {
     $('filaMargen').hidden = false;
-    $('subMargen').textContent = `Estimado con costos de ${D.fuentes.costos.hoja.toLowerCase()} · ${conMargen.length} meses`;
+    $('subMargen').textContent = `${D.fuentes.costos.historicos?'Costos por vigencia mensual':`Estimado con costos de ${D.fuentes.costos.hoja.toLowerCase()}`} · ${conMargen.length} meses`;
     graficoLinea('gMargen', conMargen, 'mb', 'var(--c1)', 'Margen bruto mensual', (v) => pct(v));
   }
 
@@ -1745,8 +1748,9 @@ decidirMarca();
 <!-- Actualizar datos desde el navegador. Los tres son opcionales: si no cargan,
      el tablero funciona igual y el botón no aparece. -->
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-<script src="importar.js?v=20260908"></script>
-<script src="ventas-shared.js?v=20260909"></script>
-<script src="importar-ui.js?v=20260909"></script>
+<script src="importar.js?v=20260911"></script>
+<script src="gestion-ui.js?v=20260911"></script>
+<script src="ventas-shared.js?v=20260911"></script>
+<script src="importar-ui.js?v=20260911"></script>
 </body>
 </html>

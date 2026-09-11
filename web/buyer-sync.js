@@ -29,7 +29,7 @@ window.NakuBuyerSync = (() => {
     const r=await fetch(api+path,{
       method:operation?'PUT':'GET',headers:{'x-naku-clave':key,...(operation?{'content-type':'application/json'}:{})},
       body:operation?JSON.stringify({datos:await encode(operation)}):undefined,
-      signal:AbortSignal.timeout(operation?90000:45000),cache:'no-store'
+      signal:AbortSignal.timeout(path==='/sincronizar'?180000:operation?90000:45000),cache:'no-store'
     });
     const data=await r.json();
     if(!r.ok) throw Object.assign(new Error(data.error||'No se pudo acceder al Buyer.'),{status:r.status});

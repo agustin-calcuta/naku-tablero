@@ -63,15 +63,18 @@ export function baseSku(s) {
  * → { costo: Map<SKU, number>, hoja, mes, filas }
  */
 export function buildCostos(rows, hoja = '', mes = '') {
+  // En el histórico Naku, «COSTO DÓLAR SIN IVA» ya multiplica el landed
+  // por el cambio de la hoja: sus valores están en pesos. No convertir otra vez.
+  const esCosto=c=>/^COSTO(?: D[ÓO]LAR)? SIN IVA$/i.test(String(c??'').trim());
   let h = -1;
   for (let i = 0; i < Math.min(rows.length, 12); i++) {
-    if ((rows[i] || []).some((c) => c != null && /^COSTO SIN IVA$/i.test(String(c).trim()))) { h = i; break; }
+    if ((rows[i] || []).some(esCosto)) { h = i; break; }
   }
   if (h < 0) throw new Error(`costos: no encontré la fila de encabezados ("COSTO SIN IVA") en la hoja "${hoja}"`);
 
   const header = (rows[h] || []).map((c) => String(c ?? '').trim().toUpperCase());
   const iSku = header.indexOf('SKU: NAKU');
-  const iCosto = header.indexOf('COSTO SIN IVA');
+  const iCosto = header.findIndex(esCosto);
   if (iSku < 0) throw new Error(`costos: falta la columna "SKU: NAKU" en la hoja "${hoja}"`);
 
   const costo = new Map();
@@ -87,7 +90,23 @@ export function buildCostos(rows, hoja = '', mes = '') {
     filas++;
     if (!costo.has(sku)) costo.set(sku, n);        // primera aparición gana
   }
-  return { costo, hoja, mes, filas };
+  return { costo, hoja, mes, filas, columna:header[iCosto] };
+}
+
+export function buildHistorialCostos(nombres, leerFilas) {
+  const historial=[],omitidas=[];
+  for(const [i,c] of hojasPorMes(nombres).entries()) {
+    try {
+      const parsed=buildCostos(leerFilas(c.hoja),c.hoja,c.mes);
+      if(!parsed.costo.size)throw new Error('No hay costos positivos por SKU en '+c.hoja);
+      historial.push({...c,pares:[...parsed.costo],columna:parsed.columna});
+    } catch(e) {
+      if(i===0)throw e;
+      omitidas.push({...c,motivo:e.message});
+    }
+  }
+  if(!historial.length)throw new Error('No se encontraron costos por mes.');
+  return {...historial[0],historial,omitidas};
 }
 
 /**
@@ -125,5 +144,16 @@ export function makeCostMatcher({ costo }) {
       if (soloAlnum(k) === baseA) return { costo: v * mult, metodo: mult > 1 ? 'pack' : 'variante' };
     }
     return { costo: null, metodo: 'sin costo' };
+  };
+}
+
+/** Costo vigente en el mes; nunca aplica un costo futuro a una venta anterior. */
+export function matcherCostosHistoricos(fuente) {
+  const historial=fuente?.historial?.length?fuente.historial:[fuente].filter(Boolean);
+  const meses=historial.filter(c=>c?.mes&&c.pares?.length).sort((a,b)=>a.mes.localeCompare(b.mes));
+  const matches=new Map(meses.map(c=>[c.mes,makeCostMatcher({costo:new Map(c.pares)})]));
+  return (sku,mes)=>{
+    const fuente=meses.filter(c=>!mes||c.mes<=mes).at(-1);
+    return fuente?{...matches.get(fuente.mes)(sku),mes:fuente.mes,estimado:fuente.mes!==mes}:{costo:null,metodo:'sin costo histórico',mes:null};
   };
 }

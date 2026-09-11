@@ -64,6 +64,7 @@ const API = 'https://script.google.com/home/usersettings';
 const config = JSON.parse(fs.readFileSync(path.join(ROOT, 'naku.config.json'), 'utf8'));
 const idCostos = (config.costos || {}).idPlanilla || '1XQeYyMcS9LRv2wXmbsf_9hYj0o2vrrJU';
 const idCentral = (config.postventa || {}).idPlanilla || '1Of9JnLdQu3y4wrAoIU26mjxGk1nIHwewamsIdfHiej0';
+const idGestion = config.gestion?.id || '1vS1xtTIjIbuq4GCRNvNJDYqZKx-KUzxt';
 
 let previo = fs.existsSync(CREDS) ? JSON.parse(fs.readFileSync(CREDS, 'utf8')) : null;
 const token = (previo && previo.token) || crypto.randomBytes(24).toString('hex');
@@ -77,9 +78,10 @@ const fuente = fs.readFileSync(path.join(FUENTE, 'Codigo.gs'), 'utf8');
 const conValores = fuente
   .replace(/COSTOS_ID:\s*'[^']*'/, `COSTOS_ID: '${idCostos}'`)
   .replace(/CENTRAL_ID:\s*'[^']*'/, `CENTRAL_ID: '${idCentral}'`)
+  .replace(/GESTION_ID:\s*'[^']*'/, `GESTION_ID: '${idGestion}'`)
   .replace(/TOKEN:\s*'[^']*'/, `TOKEN: '${token}'`);
 
-for (const [campo, valor] of [['COSTOS_ID', idCostos], ['CENTRAL_ID', idCentral], ['TOKEN', token]]) {
+for (const [campo, valor] of [['COSTOS_ID', idCostos], ['CENTRAL_ID', idCentral], ['GESTION_ID',idGestion], ['TOKEN', token]]) {
   if (!conValores.includes(`${campo}: '${valor}'`)) {
     salir(`no pude inyectar ${campo} en Codigo.gs — ¿cambió el formato de CONFIG?`);
   }
@@ -128,6 +130,12 @@ if (scriptId && actualizar) {
   console.log(`✓ proyecto creado (${scriptId.slice(0, 12)}…)`);
 }
 
+// clasp create escribe su manifiesto inicial. Restaurar el nuestro después de
+// crear el proyecto para conservar los permisos de lectura y la aplicación web.
+fs.writeFileSync(path.join(taller, 'Codigo.js'), conValores);
+fs.copyFileSync(path.join(FUENTE, 'appsscript.json'), path.join(taller, 'appsscript.json'));
+fs.writeFileSync(CREDS, `${JSON.stringify({ ...previo, scriptId, token }, null, 2)}\n`, { mode: 0o600 });
+
 /* ---------------------------------------------------------------- 4. subir y publicar */
 console.log('· subiendo el código…');
 const push = clasp(['push', '-f'], { cwd: taller });
@@ -135,7 +143,7 @@ if (!push.ok) salir(`no pude subir el código:\n\n${push.salida}`);
 console.log('✓ código subido');
 
 console.log('· publicando como aplicación web…');
-const deploy = clasp(['deploy', '--description', `tablero ${new Date().toISOString().slice(0, 10)}`],
+const deploy = clasp(['deploy', ...(actualizar&&previo?.deploymentId?['--deploymentId',previo.deploymentId]:[]), '--description', `tablero ${new Date().toISOString().slice(0, 10)}`],
   { cwd: taller });
 if (!deploy.ok) salir(`no pude publicar:\n\n${deploy.salida}`);
 
@@ -147,7 +155,7 @@ console.log('✓ publicado');
 /* ---------------------------------------------------------------- 5. guardar */
 fs.writeFileSync(CREDS, `${JSON.stringify({
   scriptId, deploymentId: idDeploy, url, token, actualizado: new Date().toISOString(),
-}, null, 2)}\n`);
+}, null, 2)}\n`, { mode: 0o600 });
 fs.rmSync(taller, { recursive: true, force: true });
 
 /* ---------------------------------------------------------------- 6. probar */
@@ -155,7 +163,9 @@ console.log('\n· probando el puente…');
 let anduvo = false;
 for (let intento = 1; intento <= 3; intento++) {
   try {
-    const res = await fetch(`${url}?action=ping&token=${token}`, {
+    const res = await fetch(url, {
+      method: 'POST', headers: {'content-type':'application/json'},
+      body: JSON.stringify({action:'ping',token}),
       redirect: 'follow', signal: AbortSignal.timeout(30000),
     });
     const t = await res.text();
@@ -170,7 +180,7 @@ for (let intento = 1; intento <= 3; intento++) {
 
 console.log(neg('\n' + '─'.repeat(64)));
 if (anduvo) {
-  console.log(neg('\n✓ El puente quedó andando.\n'));
+  console.log(neg('\n✓ El endpoint responde. Falta comprobar las tres fuentes con probar.\n'));
 } else {
   console.log(neg('\n⚠ El puente está publicado pero todavía no contesta.\n'));
   console.log('Falta autorizar los permisos, que es el único paso que tenés que dar vos:\n');
@@ -182,9 +192,7 @@ if (anduvo) {
   console.log('  4. En el registro tenés que ver los SKU y los casos que encontró\n');
 }
 
-console.log('Para que el tablero lo use, agregá esto al final de tu ~/.zshrc:\n');
-console.log(`  export NAKU_FUENTES_URL="${url}"`);
-console.log(`  export NAKU_FUENTES_TOKEN="${token}"`);
-console.log(`\n${tenue('(también quedó guardado en .naku-puente.json, que git ignora)')}`);
-console.log('\nY después:\n');
-console.log(`  ${neg('npm run tablero')}   ${tenue('→ la primera línea tiene que nombrar el puente')}\n`);
+console.log('URL y token guardados en .naku-puente.json (privado, fuera de git).');
+console.log('Configurar NAKU_FUENTES_URL y NAKU_FUENTES_TOKEN en el servidor.');
+console.log(`Proyecto: https://script.google.com/home/projects/${scriptId}/edit`);
+console.log('Continuar con la autorización y sincronización de GESTION-MENSUAL.md.');
