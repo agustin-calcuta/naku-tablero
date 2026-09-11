@@ -6,7 +6,7 @@
   const monto=v=>v===null||v===undefined?'—':Math.abs(v)>=1e6?'$'+(v/1e6).toLocaleString('es-AR',{maximumFractionDigits:1})+' M':'$'+nf.format(v);
   const porcentaje=v=>v===null?'—':v.toLocaleString('es-AR',{maximumFractionDigits:1})+'%';
   const nombre=m=>new Date(m+'-15T12:00:00').toLocaleDateString('es-AR',{month:'long',year:'numeric'});
-  let originales=null, filtro={canal:'empresa',periodo:'mes'},D=null;
+  let filtro={canal:'empresa',periodo:'mes'},D=null;
   const card=(titulo,valor,nota,focus=false)=>`<article class="ficha${focus?' foco':''}"><span class="et">${esc(titulo)}</span><span class="val">${valor}</span><div class="pie"><span class="glosa">${esc(nota)}</span></div></article>`;
   const panel=(titulo,sub,body)=>`<div class="panel"><header><h3>${esc(titulo)}</h3><span class="sub">${esc(sub)}</span></header><div class="cuerpo">${body}</div></div>`;
   const barras=(items,formato=monto)=>{
@@ -24,21 +24,10 @@
     )}</div>`;
   }
   const rotulo=t=>`<div class="rotulo"><span class="lab">${esc(t)}</span><span class="regla"></span></div>`;
-  function prepararModo(data){
-    const campo=$('modoDatos'),selector=$('modoSelect');campo.hidden=!data.gestion;
-    selector.value=window.NakuDetalle?'detalle':'cierre';
-    selector.querySelector('[value="detalle"]').disabled=!Object.keys(data.vistas||{}).length;
-    const agenda=document.querySelector('nav a[href="#agenda"]');if(agenda)agenda.textContent='La semana';
-    selector.onchange=()=>{window.NakuDetalle=selector.value==='detalle';window.NakuPintar(data);};
-  }
-  function restaurar(data){
-    if(originales){for(const [id,html]of Object.entries(originales))$(id).innerHTML=html;originales=null;}
-    prepararModo(data);
-  }
   function pintar(data){
-    D=data;prepararModo(D);
+    D=data;
+    const agenda=document.querySelector('nav a[href="#agenda"]');if(agenda)agenda.textContent='La semana';
     if(!$('gestionStyles')){const css=document.createElement('style');css.id='gestionStyles';css.textContent='.gestion-fichas{grid-template-columns:repeat(3,minmax(0,1fr))}@media(max-width:900px){.gestion-fichas{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:560px){.gestion-fichas{grid-template-columns:1fr}}';document.head.append(css);}
-    if(!originales)originales=Object.fromEntries(['pulso','finanzas','ventas','clientes','agenda'].map(id=>[id,$(id).innerHTML]));
     const g=D.gestion,meses=Object.keys(g.meses).filter(m=>g.meses[m].calendarioCerrado).sort();
     if(!meses.length){$('pulso').innerHTML='<p>No hay meses cerrados disponibles en la planilla.</p>';return;}
     const ultimo=meses.at(-1),year=ultimo.slice(0,4);
@@ -80,17 +69,19 @@
     const ventasSerie=serie.filter(x=>x.ventas!==null),margenSerie=serie.filter(x=>x.margen!==null);
     if(ventasSerie.length)graficoLinea('gVentasGestion',ventasSerie,'ventas','var(--c1)','Evolución mensual de ventas',monto);
     if(margenSerie.length)graficoLinea('gMargenGestion',margenSerie,'margen','var(--c4)','Evolución mensual del margen bruto',porcentaje);
-    pintarClientes(g,pedidos,selected);
+    pintarPostventa(D);
     pintarSemana(g,pedidos,V,selected,comercial);
     $('pieFuentes').textContent=g.alcance+' '+(D.sincronizacion?'Última actualización desde Google: '+new Date(D.sincronizacion.actualizado).toLocaleString('es-AR'):'Vista de archivos importados. Sincronización de Google pendiente de activar.');
     requestAnimationFrame(()=>{if(typeof medirSticky==='function')medirSticky();});
   }
-  function pintarClientes(g,pedidos,selected){
-    $('clientes').hidden=false;let ingresos=0,cierres=0,aprox=0,urgentes=0;
-    const canales=filtro.canal==='empresa'?['empresa']:selected.filter(c=>['ml','tn'].includes(c));
-    for(const m of pedidos)for(const c of canales){const p=g.postventa?.meses[m]?.[c];if(p){ingresos+=p.ingresos;cierres+=p.cierresReales;aprox+=p.cierresAproximados;urgentes+=p.urgentes;}}
-    const datos=canales.length&&g.postventa;
-    $('clientes').innerHTML=rotulo('Atención al cliente')+(datos?`<div class="fichas">${card('Casos ingresados',nf.format(ingresos),'Altas en los meses seleccionados')+card('Ingresos urgentes',nf.format(urgentes),'Casos ingresados con urgencia alta')+card('Cierres con fecha real',nf.format(cierres),aprox+' cierres adicionales con fecha aproximada')}</div><p class="notaPanel">${esc(g.postventa.nota)} No se calcula una tasa sobre ventas sin contar órdenes del mismo universo.</p>`:panel('Postventa','Sin desglose disponible','<p>La central no identifica ventas A/B por separado. Toda la empresa muestra todos los casos; MeLi/TN tienen su propio filtro.</p>'));
+  function pintarPostventa(data){
+    const id={empresa:'todos',online:'todos',ml:'ml',tn:'tn'}[filtro.canal];
+    const C=id&&(data.clientes?.porCanal?.[id]||(id==='todos'?data.clientes:null));
+    if(!C||typeof window.pintarClientes!=='function'){$('clientes').hidden=true;return;}
+    $('clientes').hidden=false;
+    $('fuenteClientes').textContent=`Central de atención · corte ${C.corte}`;
+    const canal=id==='ml'?'Mercado Libre':id==='tn'?'Tienda Nube':null;
+    window.pintarClientes(C,data,canal);
   }
   function detalleComercial(data,meses,canal){
     const id={empresa:'todos',online:'todos',ml:'ml',tn:'tn'}[canal],porCanal=id&&data.vistas?.[id];
@@ -114,6 +105,6 @@
     $('agenda').hidden=false;
     $('agenda').innerHTML=rotulo('Para la semana')+`<div class="agenda">${cierre+gasto+producto+post}</div>`;
   }
-  window.NakuGestionUI={pintar,restaurar,prepararModo};
+  window.NakuGestionUI={pintar};
   if(window.NakuDatos?.gestion&&window.NakuPintar)window.NakuPintar(window.NakuDatos);
 })();

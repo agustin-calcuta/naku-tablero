@@ -22,15 +22,16 @@ Se inspeccionó el libro completo: seis hojas de gestión, una de préstamo y 85
 versiones/escenarios de cash flow. Se conserva un inventario de todas las hojas,
 incluidas las ocultas y las celdas con errores.
 
-## Dos vistas con poblaciones explícitas
+## Una vista con poblaciones explícitas
 
-Dirección abre **Cierre mensual**, con empresa, online, mayoristas y cuatro canales.
+Dirección integra cierre, ventas y postventa en un único panel, con empresa, online,
+mayoristas y cuatro canales.
 Sólo ofrece meses anteriores al mes actual. Un mes calendario terminado puede tener
 gastos pendientes: el resultado se identifica como provisional. No hay una señal de
 aprobación contable en el archivo y no se inventa una.
 
-**Detalle de ventas** conserva los mismos importes, órdenes y períodos que
-Compradores. En Cierre mensual, Ventas reutiliza ese detalle para mostrar artículos,
+Ventas conserva los mismos importes, órdenes y períodos que Compradores. El panel
+reutiliza ese detalle para mostrar artículos,
 familias, provincias y forma de entrega de MeLi/Tienda Nube. Mayoristas mantiene
 sus totales y señala que la planilla no informa esos desgloses. No se altera el
 valor de productos para forzar que los resúmenes coincidan.
@@ -65,8 +66,8 @@ fijos más variables; mercadería y cargos de los canales no se vuelven a sumar.
 El tablero muestra categorías y sus variaciones. Los nombres de proveedores y
 personas no aparecen en la vista de Dirección.
 
-La interfaz deja los filtros de vista, canal y período en una sola línea mediante
-desplegables. Se retiraron la conciliación técnica, el inventario de fuentes, caja
+La interfaz deja los filtros de canal y período en una sola línea mediante desplegables.
+Se retiraron el selector de vistas, la conciliación técnica, el inventario de fuentes, caja
 y pagos proyectados, y las consultas de cargos. La sección **Para la semana** resume
 cuatro acciones: cierre, gasto con mayor aumento, producto principal y casos urgentes.
 
