@@ -58,16 +58,21 @@ export async function leerFuentes({url=process.env.NAKU_FUENTES_URL,token=proces
 // https://developers.google.com/apps-script/guides/content#redirects
 export async function respuestaPuente(url,token,fetcher=fetch) {
   const deadline=Date.now()+120000;
+  const solicitar=async(u,opciones)=>{
+    try{return await fetcher(u,opciones);}
+    catch(e){throw Object.assign(new Error('No se pudo conectar con Google. Reintentá en unos segundos.'),{transitorio:true});}
+  };
   for(let intento=0;intento<2;intento++) {
+    try {
     const u=new URL(url);u.searchParams.set('requestId',randomUUID());
     const signal=AbortSignal.timeout(Math.max(1,deadline-Date.now()));
-    let r=await fetcher(u,{method:'POST',headers:{'content-type':'application/json','cache-control':'no-store'},body:JSON.stringify({token,action:'todo'}),redirect:'manual',cache:'no-store',signal});
+    let r=await solicitar(u,{method:'POST',headers:{'content-type':'application/json','cache-control':'no-store'},body:JSON.stringify({token,action:'todo'}),redirect:'manual',cache:'no-store',signal});
     let redirigida=false;
     if([301,302,303].includes(r.status)) {
       const destino=new URL(r.headers.get('location')||'',u);
       if(destino.protocol!=='https:'||destino.hostname!=='script.googleusercontent.com')throw new Error('Google requiere revisar la autorización del puente.');
       redirigida=true;
-      r=await fetcher(destino,{method:'GET',redirect:'error',cache:'no-store',signal});
+      r=await solicitar(destino,{method:'GET',redirect:'error',cache:'no-store',signal});
     }
     if(!r.ok) {
       if(intento===0&&(r.status===429||r.status>=500||(redirigida&&r.status===404)))continue;
@@ -75,5 +80,9 @@ export async function respuestaPuente(url,token,fetcher=fetch) {
     }
     try{return await r.json();}
     catch{if(intento===0)continue;throw new Error('Google no devolvió datos. Revisá la autorización del puente.');}
+    } catch(e) {
+      if(e.transitorio&&intento===0&&Date.now()<deadline)continue;
+      throw e;
+    }
   }
 }

@@ -100,6 +100,9 @@ const puente=await respuestaPuente('https://script.google.com/macros/s/example/e
 assert.ok(puente.ok);assert.equal(solicitudes.length,4);
 assert.notEqual(solicitudes[0].url,solicitudes[2].url,'Un redirect vencido requiere una solicitud nueva');
 await assert.rejects(()=>respuestaPuente('https://script.google.com/macros/s/example/exec','private',async()=>new Response(null,{status:302,headers:{location:'https://otro.example'}})),/autorización/);
+let intentosRed=0;
+assert.ok((await respuestaPuente('https://script.google.com/macros/s/example/exec','private',async()=>{if(++intentosRed===1)throw new TypeError('fetch failed');return Response.json({ok:true});})).ok);
+assert.equal(intentosRed,2,'Una conexión interrumpida se reintenta sin perder el último cierre');
 
 // Verificación opcional con la copia del usuario; nunca contiene datos privados en git.
 if(process.env.NAKU_GESTION_TEST){
