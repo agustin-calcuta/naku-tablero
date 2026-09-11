@@ -343,17 +343,20 @@ table.casos tr.vencido td.dias{color:var(--mal);font-weight:600}
 .filtros{position:sticky;top:var(--barra,56px);z-index:9;
   background:color-mix(in srgb,var(--papel) 94%,transparent);backdrop-filter:blur(10px);
   border-bottom:1px solid var(--linea)}
-.filtrosin{max-width:1200px;margin:0 auto;padding:9px 24px;display:flex;align-items:center;
-  gap:10px;flex-wrap:wrap}
+.filtrosin{max-width:1200px;margin:0 auto;padding:9px 24px;display:flex;align-items:flex-end;
+  gap:12px;flex-wrap:nowrap}
 .filtrosin::-webkit-scrollbar{display:none}
 .filtrosin > *{flex:none}
 .filtros .et{font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;
   color:var(--tenue);white-space:nowrap}
 .filtros .sep{width:1px;height:20px;background:var(--linea);flex:none}
-.filtros .resumen{flex-basis:100%;font-size:12.5px;color:var(--media);white-space:normal}
+.filtro-control{display:flex;flex-direction:column;gap:4px;min-width:150px}
+.filtro-control.canal{min-width:190px}.filtro-control.periodo{min-width:170px}
+.filtros .resumen{margin-left:auto;font-size:12.5px;color:var(--media);white-space:nowrap;
+  overflow:hidden;text-overflow:ellipsis;align-self:center}
 .filtros .resumen b{color:var(--tinta);font-weight:600}
-.filtros select{font-family:inherit;font-size:12.5px;font-weight:600;color:var(--tinta);
-  background:var(--panel);border:1px solid var(--linea);border-radius:7px;padding:5px 8px}
+.filtros select{width:100%;font-family:inherit;font-size:13px;font-weight:600;color:var(--tinta);
+  background:var(--panel);border:1px solid var(--linea);border-radius:8px;padding:7px 30px 7px 10px}
 .filtros .rango{display:flex;align-items:center;gap:6px}
 .filtros .rango .a{font-size:12px;color:var(--tenue)}
 /* Un período que todavía no tiene exports se ve, pero se ve que le falta. */
@@ -392,6 +395,11 @@ table.casos tr.vencido td.dias{color:var(--mal);font-weight:600}
 .imp-x{background:none;border:0;font-size:22px;line-height:1;color:var(--tenue);cursor:pointer;padding:0 2px}
 .imp-x:hover{color:var(--tinta)}
 .imp-cuerpo{padding:16px 22px 20px}
+.imp-cuerpo > #impSincronizar{width:100%;padding:10px 16px;margin-bottom:16px;cursor:pointer;
+  border:1px solid var(--azul);border-radius:8px;background:var(--azul);color:#fff;font:600 13px var(--sans)}
+.imp-seccion{display:flex;align-items:baseline;justify-content:space-between;gap:10px;
+  border-top:1px solid var(--linea);padding-top:16px;margin-bottom:10px}
+.imp-seccion b{font-size:14px}.imp-seccion span{font-size:11.5px;color:var(--tenue)}
 .imp-zonas{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:11px}
 @media (max-width:560px){.imp-zonas{grid-template-columns:minmax(0,1fr)}}
 .imp-zona.apoyo{opacity:.9}
@@ -434,7 +442,7 @@ table.casos tr.vencido td.dias{color:var(--mal);font-weight:600}
 .vacio button{font-family:inherit;font-size:13px;font-weight:600;border-radius:8px;
   padding:8px 15px;cursor:pointer;border:1px solid var(--linea);background:var(--panel);color:var(--tinta)}
 .vacio button.primario{background:var(--azul);border-color:var(--azul);color:#fff}
-@media (max-width:620px){.filtros .resumen{margin-left:0;width:100%}}
+@media (max-width:760px){.filtrosin{overflow-x:auto;align-items:flex-end}.filtro-control{min-width:145px}.filtros .resumen{display:none}}
 
 /* ============================================================
    Móvil. El tablero se mira tanto del teléfono como del escritorio,
@@ -458,11 +466,6 @@ table.casos tr.vencido td.dias{color:var(--mal);font-weight:600}
   /* Pegada arriba ocupaba un tercio de la pantalla; se elige una vez y listo. */
   .filtros{position:static}
   .filtrosin{padding:10px 16px;gap:9px}
-  .filtros > .filtrosin > .et{display:none}
-  .filtros .pestanas{width:100%;overflow-x:auto;scrollbar-width:none}
-  .filtros .pestanas::-webkit-scrollbar{display:none}
-  .filtros .pestanas button{white-space:nowrap;flex:1 0 auto}
-  .filtros .resumen{margin-left:0;width:100%;font-size:12px}
 
   .hoja{padding:0 16px 56px}
   .portada{padding:22px 0 4px}
@@ -575,8 +578,8 @@ try {
     <div class="imp-top">
       <div>
         <h2 id="impTitulo">Actualizar datos</h2>
-        <p>Arrastrá cada archivo en la casilla que le toca. Se procesan acá, en
-           esta computadora; después publicás el resultado y lo ve todo el mundo.</p>
+        <p>Actualizá las tres planillas conectadas o cargá los exports para renovar
+           el detalle de productos y compradores.</p>
       </div>
       <button class="imp-x" id="impCerrar" type="button" aria-label="Cerrar">&times;</button>
     </div>
@@ -584,33 +587,33 @@ try {
       <div class="imp-zonas" id="impZonas"></div>
       <p class="imp-estado" id="impEstado"></p>
       <p class="imp-nota" id="impNota"></p>
-      <div class="imp-clave pide" id="impClave">
-        <label for="impQuienInput">Tu nombre</label>
-        <input id="impQuienInput" type="text" autocomplete="off" spellcheck="false"
-               placeholder="Leo" maxlength="40">
-        <small>Queda al pie del tablero, para saber quién cargó los últimos datos.
-          Se guarda en este navegador; no hace falta escribirlo de nuevo.</small>
-      </div>
       <div class="imp-pie">
-        <button class="primario" id="impProcesar" type="button" disabled>Procesar</button>
-        <button class="primario" id="impPublicar" type="button" hidden>Publicar para todos</button>
-        <button id="impBajar" type="button" hidden>Bajar el archivo</button>
+        <button class="primario" id="impProcesar" type="button" disabled>Actualizar productos y ventas</button>
         <button class="suelto" id="impCerrarPie" type="button">Cerrar</button>
       </div>
-      <p class="imp-privado">Los archivos no salen de esta computadora: se leen acá y
-        se sube sólo el resultado. Hasta que toques <b>Publicar</b>, lo que cargaste se
-        ve nada más que en esta pantalla.</p>
+      <p class="imp-privado">Los archivos se procesan en esta computadora y se guarda
+        únicamente la información necesaria para los tableros.</p>
     </div>
   </div>
 </div>
 
 <div class="filtros" id="filtros" hidden>
   <div class="filtrosin">
-    <span class="et">Canal</span>
-    <div class="pestanas" role="tablist" aria-label="Filtrar por canal" id="tabsCanal"></div>
-    <span class="sep"></span>
-    <span class="et">Período</span>
-    <div class="pestanas" role="tablist" aria-label="Filtrar por período" id="tabsPeriodo"></div>
+    <label class="filtro-control" id="modoDatos">
+      <span class="et">Vista</span>
+      <select id="modoSelect" aria-label="Elegir vista">
+        <option value="cierre">Cierre mensual</option>
+        <option value="detalle">Detalle de ventas</option>
+      </select>
+    </label>
+    <label class="filtro-control canal">
+      <span class="et">Canal</span>
+      <select id="tabsCanal" aria-label="Filtrar por canal"></select>
+    </label>
+    <label class="filtro-control periodo">
+      <span class="et">Período</span>
+      <select id="tabsPeriodo" aria-label="Filtrar por período"></select>
+    </label>
     <span class="rango" id="rango" hidden>
       <select id="rangoDesde" aria-label="Desde"></select>
       <span class="a">a</span>
@@ -946,16 +949,10 @@ function pintar(D) {
   const periodos = D.periodos || [];
 
   const grupo = (cont, items, clave, alCambiar) => {
-    $(cont).innerHTML = items.map((x) => `<button role="tab" data-v="${x.id}"
-      class="${x.disponible === false ? 'sindatos' : ''}"
-      title="${x.disponible === false ? 'Todavía no hay exports cargados para este período' : ''}"
-      aria-selected="${x.id === filtro[clave]}">${x.n}</button>`).join('');
-    $(cont).onclick = (ev) => {
-      const b = ev.target.closest('[data-v]');
-      if (!b || b.dataset.v === filtro[clave]) return;
-      filtro[clave] = b.dataset.v;
-      $(cont).querySelectorAll('[data-v]').forEach((o) =>
-        o.setAttribute('aria-selected', String(o.dataset.v === filtro[clave])));
+    $(cont).innerHTML = items.map((x) => `<option value="${x.id}"
+      ${x.disponible === false ? 'disabled' : ''}${x.id === filtro[clave] ? ' selected' : ''}>${x.n}</option>`).join('');
+    $(cont).onchange = () => {
+      filtro[clave] = $(cont).value;
       if (alCambiar) alCambiar();
       pintarVista(D, filtro);
     };
@@ -1651,8 +1648,7 @@ function pintarSinDatos(D, P, filtro) {
   $('sinDatos').querySelector('[data-vacio="volver"]').addEventListener('click', () => {
     // Al primer período que sí tenga datos: los ids cambian según lo cargado.
     const primero = (D.periodos || []).find((x) => x.disponible);
-    const tab = primero && $('tabsPeriodo').querySelector(`[data-v="${primero.id}"]`);
-    if (tab) tab.click();
+    if(primero){$('tabsPeriodo').value=primero.id;$('tabsPeriodo').dispatchEvent(new Event('change'));}
   });
 
   $('resumenFiltro').innerHTML = `<b>${P.n}</b> · sin datos cargados`;
@@ -1749,8 +1745,8 @@ decidirMarca();
      el tablero funciona igual y el botón no aparece. -->
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <script src="importar.js?v=20260911"></script>
-<script src="gestion-ui.js?v=20260911"></script>
+<script src="gestion-ui.js?v=20260911b"></script>
 <script src="ventas-shared.js?v=20260911"></script>
-<script src="importar-ui.js?v=20260911"></script>
+<script src="importar-ui.js?v=20260911b"></script>
 </body>
 </html>

@@ -30,8 +30,10 @@ gastos pendientes: el resultado se identifica como provisional. No hay una seña
 aprobación contable en el archivo y no se inventa una.
 
 **Detalle de ventas** conserva los mismos importes, órdenes y períodos que
-Compradores. La vista mensual muestra la conciliación entre planilla y órdenes.
-No se altera el valor de productos para forzar que los resúmenes coincidan.
+Compradores. En Cierre mensual, Ventas reutiliza ese detalle para mostrar artículos,
+familias, provincias y forma de entrega de MeLi/Tienda Nube. Mayoristas mantiene
+sus totales y señala que la planilla no informa esos desgloses. No se altera el
+valor de productos para forzar que los resúmenes coincidan.
 
 Mayoristas conserva la base monetaria informada. No se divide A/B automáticamente
 por una tasa de IVA. En ML/TN se parte de productos, descuentos y devoluciones para
@@ -60,7 +62,17 @@ Se muestran importe cargado, porcentaje de ventas y variación contra el mismo
 número de meses inmediatamente anteriores. Las celdas vacías se señalan; no se
 calcula una variación con datos incompletos. La suma de categorías coincide con
 fijos más variables; mercadería y cargos de los canales no se vuelven a sumar.
-Los nombres y los cargos detallados quedan en consultas desplegables.
+El tablero muestra categorías y sus variaciones. Los nombres de proveedores y
+personas no aparecen en la vista de Dirección.
+
+La interfaz deja los filtros de vista, canal y período en una sola línea mediante
+desplegables. Se retiraron la conciliación técnica, el inventario de fuentes, caja
+y pagos proyectados, y las consultas de cargos. La sección **Para la semana** resume
+cuatro acciones: cierre, gasto con mayor aumento, producto principal y casos urgentes.
+
+El botón **Actualizar datos** tiene dos caminos: **Actualizar planillas** sincroniza
+gestión, costos y postventa desde Google; los únicos archivos manuales son los exports
+de MeLi/Tienda Nube usados para productos, órdenes y compradores.
 
 Las equivalencias confirmadas se guardan en `fuentes.gastosCategorias`, sólo en
 la base financiera. Una operación `/finanzas` puede agregar/corregir asignaciones

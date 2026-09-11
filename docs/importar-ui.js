@@ -1,5 +1,5 @@
-/* Ventas compartidas: los exports de MeLi/TN se procesan en el servidor para
-   actualizar Buyer y Finanzas juntos. Costos y central sólo se editan acá. */
+/* Actualización simple: Google trae las tres planillas; los únicos archivos que
+   se cargan a mano son los exports de MeLi/TN para el detalle comercial. */
 (function () {
   const $ = (id) => document.getElementById(id);
   const M = window.NakuMotor;
@@ -7,30 +7,16 @@
 
   const ZONAS = [
     {
-      id: 'gestion', titulo: 'Ventas, gastos y caja', acepta: '.xlsx',
-      pista: 'Saldos - Cash flow · cierre mensual', varios: false, tipo: 'apoyo',
-    },
-    {
       id: 'meli', titulo: 'Mercado Libre', acepta: '.xlsx',
-      pista: 'Opcional · detalle por producto y comprador', varios: true, tipo: 'ventas',
+      pista: 'Ventas por producto', varios: true, tipo: 'ventas',
     },
     {
       id: 'tn', titulo: 'Tienda Nube', acepta: '.csv',
-      pista: 'Opcional · detalle de órdenes', varios: true, tipo: 'ventas',
-    },
-    {
-      id: 'costos', titulo: 'Costos', acepta: '.xlsx',
-      pista: 'Planilla madre de compras', varios: false, tipo: 'apoyo',
-    },
-    {
-      id: 'central', titulo: 'Atención al cliente', acepta: '.xlsx',
-      pista: 'Export del sheet de la central', varios: false, tipo: 'apoyo',
+      pista: 'Ventas por producto', varios: true, tipo: 'ventas',
     },
   ];
 
   const elegidos = {};                  // id de zona -> File[]
-  let ultimoJson = null;
-  let pendingOperation = null;
   let publishing = false;
 
   /* ---------------------------------------------------------------- panel */
@@ -78,10 +64,6 @@
       return;
     }
     elegidos[zona.id] = zona.varios ? validos : [validos[0]];
-    ultimoJson = null;
-    pendingOperation = null;
-    $('impPublicar').hidden = true;
-    $('impBajar').hidden = true;
     const drop = $('impZonas').querySelector(`[data-drop="${zona.id}"]`);
     drop.classList.add('cargado');
     drop.querySelector('.imp-vacio').hidden = true;
@@ -98,8 +80,8 @@
     const hayVentas = Object.values(elegidos).some(files=>files.length);
     $('impProcesar').disabled = !hayVentas;
     $('impNota').textContent = hayVentas
-      ? 'Al publicar, las ventas se actualizan también en el Buyer.'
-      : 'Sincronizá las tres planillas o cargá sus copias. MeLi/TN son opcionales para ampliar el detalle comercial.';
+      ? 'Los archivos actualizan productos, órdenes y compradores en los dos tableros.'
+      : 'Las planillas se sincronizan arriba. Estos archivos actualizan el detalle de productos de MeLi y Tienda Nube.';
   }
 
   function estado(texto, clase = '') {
@@ -127,15 +109,10 @@
   /* ---------------------------------------------------------------- procesar */
   async function procesar() {
     if(publishing)return;
-    publishing=true;$('impProcesar').disabled=true;ultimoJson=null;pendingOperation=null;
-    $('impPublicar').hidden=true;$('impBajar').hidden=true;
+    publishing=true;$('impProcesar').disabled=true;
     try {
       if(typeof XLSX==='undefined')throw new Error('No se pudo cargar el lector de Excel. Revisá la conexión.');
-      const operation={id:crypto.randomUUID(),exports:[],nombre:'Carga desde Finanzas'};
-      if(elegidos.gestion){
-        const f=elegidos.gestion[0],wb=XLSX.read(await leerBuffer(f),{type:'array',cellDates:true});
-        operation.gestion=M.gestion.libroDesdeXlsx(wb,XLSX,f.name);
-      }
+      const operation={id:crypto.randomUUID(),exports:[],nombre:'Actualización de productos'};
       for(const f of elegidos.meli||[]) {
         estado('Leyendo '+f.name+'…');await pausa();
         operation.exports.push(window.NakuVentas.cleanExport('ml',hoja(await leerBuffer(f),'ventas').aoa,f.name));
@@ -147,22 +124,15 @@
         const rows=[';',','].map(d=>window.NakuBuyer.parseCSV(text,d)).sort((a,b)=>(b[0]?.length||0)-(a[0]?.length||0))[0];
         operation.exports.push(window.NakuVentas.cleanExport('tn',rows,f.name));
       }
-      if(elegidos.costos) {
-        const wb=XLSX.read(await leerBuffer(elegidos.costos[0]),{type:'array'});
-        operation.costos={...M.costos.buildHistorialCostos(wb.SheetNames,n=>XLSX.utils.sheet_to_json(wb.Sheets[n],{header:1,raw:true,defval:''})),archivo:elegidos.costos[0].name};
-      }
-      if(elegidos.central) {
-        const buf=await leerBuffer(elegidos.central[0]);
-        operation.central={postventa:hoja(buf,'Postventa').aoa,minorista:hoja(buf,'Preventa Minorista').aoa,volumen:hoja(buf,'Preventa Volumen').aoa};
-      }
-      estado('Calculando la vista previa con el histórico compartido…');
+      estado('Actualizando productos y ventas en los dos tableros…');
       window.NakuBuyerSync.setKey(window.NakuClave.leer('clave'));
-      const r=await window.NakuBuyerSync.request('/preview',operation);
-      ultimoJson=r.finance;pendingOperation=operation;
+      const r=await window.NakuBuyerSync.request('/finanzas',operation);
+      const ultimoJson=r.finance;
+      window.NakuPublicado={publicado:r.actualizado,quien:'Archivos de MeLi/Tienda Nube'};
+      window.NakuDatos=ultimoJson;
       window.NakuPintar(ultimoJson);
-      estado('Vista previa lista. Publicar actualiza las ventas en Buyer y Finanzas para todos.','bien');
-      $('impPublicar').hidden=false;$('impBajar').hidden=false;pedirNombreSiHace();
-      $('impCerrarPie').textContent='Ver la vista previa';
+      estado('Productos y ventas actualizados en los dos tableros.','bien');
+      $('impCerrarPie').textContent='Cerrar';
     }catch(e){estado(e.message||String(e),'mal');}
     finally{publishing=false;$('impProcesar').disabled=false;}
   }
@@ -170,45 +140,13 @@
   /** Deja respirar al navegador para que se vea el cartel de progreso. */
   const pausa = () => new Promise((r) => setTimeout(r, 16));
 
-  /* ------------------------------------------------------------- publicar
-     Acá no se pide clave: si estás viendo esta pantalla es porque ya entraste, y
-     la misma clave que abre el tablero deja publicar. La maneja direccion.html
-     (window.NakuClave), que es quien la necesita primero. Lo único que se pide
-     es el nombre, y es opcional: sirve para que al pie diga quién cargó. */
+  /* La misma clave que abre Dirección permite sincronizar y actualizar exports. */
   const recordado = (k) => window.NakuClave.leer(k);
-  const recordar = (k, v) => window.NakuClave.guardar(k, v);
-
-  function pedirNombreSiHace() {
-    $('impQuienInput').value = recordado('quien');
-  }
-
-  async function publicar() {
-    if(!pendingOperation||publishing)return;
-    publishing=true;$('impPublicar').disabled=true;
-    estado('Guardando las ventas y actualizando ambos tableros…');
-    try {
-      window.NakuBuyerSync.setKey(recordado('clave'));
-      const r=await window.NakuBuyerSync.request('/finanzas',pendingOperation);
-      // Recuperar también después de un reintento de una publicación confirmada.
-      if(r.finance)ultimoJson=r.finance;
-      else {
-        const latest=await fetch(window.NakuAPI+'/',{headers:{'x-naku-clave':recordado('clave')}});
-        if(!latest.ok)throw new Error('Se guardó, pero no se pudo refrescar Finanzas. Recargá la página.');
-        ultimoJson=(await latest.json()).datos;
-      }
-      recordar('quien',$('impQuienInput').value.trim());
-      window.NakuPublicado={publicado:r.actualizado,quien:'Carga compartida MeLi/TN'};
-      window.NakuDatos=ultimoJson;window.NakuPintar(ultimoJson);
-      estado('Publicado para todos. Buyer y Finanzas ya toman las mismas ventas.','bien');
-      $('impPublicar').textContent='Publicado ✓';pendingOperation=null;
-    }catch(e){estado('No se pudo confirmar la publicación: '+e.message+'. Podés reintentar.','mal');}
-    finally{publishing=false;$('impPublicar').disabled=false;}
-  }
 
   // Las pestañas abiertas acompañan las cargas del Buyer sin pisar una vista previa.
   let polling=false;
   async function syncFinance(){
-    if(polling||publishing||pendingOperation||document.hidden||!recordado('clave')||!$('entrar').hidden)return;
+    if(polling||publishing||document.hidden||!recordado('clave')||!$('entrar').hidden)return;
     polling=true;
     try{
       const headers={'x-naku-clave':recordado('clave')};
@@ -219,7 +157,7 @@
         const res=await fetch(window.NakuAPI+'/',{headers,cache:'no-store',signal:AbortSignal.timeout(30000)});
         if(!res.ok)return;
         const data=await res.json();
-        if(publishing||pendingOperation||Date.parse(data.publicado)<Date.parse(window.NakuPublicado?.publicado))return;
+        if(publishing||Date.parse(data.publicado)<Date.parse(window.NakuPublicado?.publicado))return;
         window.NakuDatos=data.datos;
         window.NakuPublicado={publicado:data.publicado,quien:data.quien};window.NakuPintar(data.datos);
       }
@@ -227,24 +165,15 @@
   }
   setInterval(syncFinance,30000);window.addEventListener('focus',syncFinance);
 
-  function bajar() {
-    if (!ultimoJson) return;
-    const blob = new Blob([JSON.stringify(ultimoJson, null, 1)], { type: 'application/json' });
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = 'direccion.json';
-    a.click();
-    setTimeout(() => URL.revokeObjectURL(a.href), 1000);
-  }
-
   /* ---------------------------------------------------------------- cablear */
   $('btnActualizar').hidden = false;
   $('btnActualizar').addEventListener('click', abrir);
-  const sync=document.createElement('button');sync.className='primario';sync.type='button';sync.id='impSincronizar';sync.textContent='Sincronizar las tres planillas';
+  const sync=document.createElement('button');sync.className='primario';sync.type='button';sync.id='impSincronizar';sync.textContent='Actualizar planillas';
   $('impZonas').before(sync);
+  sync.insertAdjacentHTML('afterend','<div class="imp-seccion"><b>Actualizar productos</b><span>Subí los exports de Mercado Libre y Tienda Nube</span></div>');
   sync.onclick=async()=>{
-    if(publishing||pendingOperation){estado('Terminá o cerrá la vista previa antes de sincronizar.','mal');return;}
-    publishing=true;sync.disabled=true;estado('Leyendo costos, gestión y postventa desde Google…');
+    if(publishing)return;
+    publishing=true;sync.disabled=true;estado('Leyendo ventas, costos y postventa desde Google…');
     try{
       window.NakuBuyerSync.setKey(recordado('clave'));
       const r=await window.NakuBuyerSync.request('/sincronizar',{id:crypto.randomUUID()});
@@ -258,13 +187,6 @@
   $('impFondo').addEventListener('click', (e) => { if (e.target === $('impFondo')) cerrar(); });
   addEventListener('keydown', (e) => { if (e.key === 'Escape' && !$('impFondo').hidden) cerrar(); });
   $('impProcesar').addEventListener('click', procesar);
-  $('impPublicar').addEventListener('click', publicar);
-  $('impBajar').addEventListener('click', bajar);
-  // Si vuelve a procesar después de publicar, el botón tiene que dejar de decir
-  // "Publicado ✓": lo que hay cargado ya no es lo que está publicado.
-  $('impProcesar').addEventListener('click', () => {
-    $('impPublicar').textContent = 'Publicar para todos';
-  });
   pintarZonas();
   revisarListo();
 })();

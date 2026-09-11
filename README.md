@@ -265,13 +265,15 @@ Quedan **dos URLs**: la de **GitHub Pages** (el tablero que ve Leo) y la de **Ap
 
 Los exports de MercadoLibre y TiendaNube se guardan en Neon y alimentan los dos
 motores. Desde Buyer, **Procesar ventas** publica directamente. Desde Finanzas,
-**Procesar** muestra una vista previa y **Publicar para todos** guarda ambos
-resultados en una transacción. Los exports repetidos no duplican órdenes.
+**Actualizar planillas** lee las tres fuentes conectadas y **Actualizar productos
+y ventas** procesa los exports cargados y guarda ambos tableros en una transacción.
+Los exports repetidos no duplican órdenes.
 
 Todos consultan el estado compartido al abrir y cada 30 segundos mientras la
 pestaña está visible. El Buyer acepta maestros CSV con coma o punto y coma y
-aplica los cambios al histórico. Los costos y la central se mantienen en
-Finanzas; las cargas de ventas reutilizan los últimos costos guardados.
+aplica los cambios al histórico. Los costos y la central llegan desde
+la sincronización de Google; las cargas de ventas reutilizan los últimos costos
+guardados.
 
 Las cargas de la versión anterior que sólo existen en un navegador se pueden
 incorporar con **Compartir histórico de este navegador**. Esa copia anterior
