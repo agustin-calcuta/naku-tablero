@@ -53,7 +53,7 @@ que corta antes de filas posteriores con importes. No se modificó el archivo fu
 El resumen agrupa los gastos fijos y variables por su finalidad: Personal,
 Servicios, Instalaciones y mantenimiento, Tecnología y sistemas, Marketing y
 ventas, Logística e importación, Administración y asesoría e Impuestos. Se añade
-**Por clasificar** cuando falta confirmar qué representa un concepto. No se
+**Sin mapear** cuando falta confirmar qué representa un concepto. No se
 infiere el rubro a partir del nombre de una persona o de un proveedor.
 
 Se muestran importe cargado, porcentaje de ventas y variación contra el mismo
@@ -75,7 +75,9 @@ no se guardan en el repositorio público.
 1. El Apps Script lee las tres fuentes con el acceso de su dueño. Detecta el MIME en
    Drive: una hoja nativa se lee como hoja; un XLSX se descarga sólo si está permitido.
 2. `src/fuentes-sync.mjs` normaliza los formatos, recorta central a campos necesarios
-   y calcula una revisión de contenido. Credenciales sólo en servidor.
+   y calcula una revisión de contenido. Credenciales sólo en servidor. Cada lectura
+   inicia una solicitud nueva y sigue la URL temporal de ContentService sin reenviar
+   el token; una respuesta temporal vencida se reintenta una vez.
 3. `/sincronizar` requiere clave financiera. Lee las fuentes, las valida y usa
    `buildShared` / `buyer_guardar` para guardar fuentes y ambos tableros atómicamente.
 4. Un cambio de mes o de contenido recalcula el resultado. Sin cambios no se escribe.
@@ -84,7 +86,12 @@ no se guardan en el repositorio público.
 5. La clave Buyer puede cargar exports/maestro. No puede cargar gestión, costos,
    central, sincronizar fuentes ni recibir información financiera.
 
-La actualización programada es horaria, después de activarla. Las pestañas abiertas
+Activación verificada el 11/09/2026: lectura real de las tres fuentes, guardado
+compartido, ejecución manual de `sincronizarProgramado`, un único disparador cada
+hora y actualización desde el navegador. Una segunda lectura sin cambios conserva
+la revisión y las clasificaciones privadas.
+
+La actualización programada es horaria. Las pestañas abiertas
 consultan publicaciones cada 30 segundos. No requiere nuevos deploys para cada mes.
 
 ## Preparar y comprobar sin publicar

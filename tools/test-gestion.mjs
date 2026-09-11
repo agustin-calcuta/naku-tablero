@@ -6,7 +6,7 @@ import { buildShared } from '../src/ventas-compartidas.mjs';
 import { matcherCostosHistoricos, buildHistorialCostos } from '../src/costos.mjs';
 import { packLines } from '../src/buyer.mjs';
 import { createHandler, encode } from '../neon/buyer/handler.mjs';
-import { recortarCentral, leerFuentes } from '../src/fuentes-sync.mjs';
+import { recortarCentral, leerFuentes, respuestaPuente } from '../src/fuentes-sync.mjs';
 
 const libro={archivo:'Prueba.xlsx',hojas:{'Ventas - Gastos fijos':{celdas:{}},'Ventas Meli y Tienda':{celdas:{}}}};
 const g=libro.hojas['Ventas - Gastos fijos'].celdas,o=libro.hojas['Ventas Meli y Tienda'].celdas;
@@ -90,6 +90,16 @@ assert.equal((await request('/sincronizar','finance',{id:'4'})).status,200);asse
 const failed=createHandler(sql,{leerFuentes:async()=>{throw new Error('Google sin acceso');}});
 assert.equal((await failed(new Request('https://test/sincronizar',{method:'PUT',headers:{'x-naku-clave':'finance'},body:JSON.stringify({datos:encode({id:'fail'})})}))).status,502);assert.equal(writes,1,'Un fallo de Google no pisa la última versión');
 await assert.rejects(()=>leerFuentes({url:'https://script.google.com/macros/s/example/exec',token:'private',fetcher:async(url,opts)=>{assert.ok(!url.href.includes('private'));assert.equal(opts.method,'POST');return new Response('no autorizado',{status:401});}}),/401/);
+const solicitudes=[];
+const puente=await respuestaPuente('https://script.google.com/macros/s/example/exec','private',async(url,opts)=>{
+ solicitudes.push({url:url.href,...opts});
+ if(opts.method==='POST')return new Response(null,{status:302,headers:{location:'https://script.googleusercontent.com/macros/echo?once='+solicitudes.length}});
+ assert.equal(opts.body,undefined,'La credencial no se reenvía en el redirect');
+ return solicitudes.length===2?new Response('caducó',{status:404}):Response.json({ok:true});
+});
+assert.ok(puente.ok);assert.equal(solicitudes.length,4);
+assert.notEqual(solicitudes[0].url,solicitudes[2].url,'Un redirect vencido requiere una solicitud nueva');
+await assert.rejects(()=>respuestaPuente('https://script.google.com/macros/s/example/exec','private',async()=>new Response(null,{status:302,headers:{location:'https://otro.example'}})),/autorización/);
 
 // Verificación opcional con la copia del usuario; nunca contiene datos privados en git.
 if(process.env.NAKU_GESTION_TEST){

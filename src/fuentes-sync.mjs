@@ -1,5 +1,5 @@
 import * as XLSX from 'xlsx';
-import { createHash } from 'node:crypto';
+import { createHash, randomUUID } from 'node:crypto';
 import { libroDesdeXlsx } from './gestion.mjs';
 import { buildHistorialCostos } from './costos.mjs';
 
@@ -46,11 +46,34 @@ export async function leerFuentes({url=process.env.NAKU_FUENTES_URL,token=proces
   if(!url||!token)throw Object.assign(new Error('La conexión de las tres planillas todavía no está configurada.'),{status:503});
   const u=new URL(url);
   if(u.protocol!=='https:'||u.hostname!=='script.google.com'||!u.pathname.endsWith('/exec'))throw new Error('URL de fuentes inválida.');
-  const r=await fetcher(u,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({token,action:'todo'}),redirect:'follow',signal:AbortSignal.timeout(120000)});
-  if(!r.ok)throw new Error('Google no respondió al sincronizar las planillas ('+r.status+').');
-  let data;try{data=await r.json();}catch{throw new Error('Google no devolvió datos. Revisá la autorización del puente.');}
+  const data=await respuestaPuente(u,token,fetcher);
   if(!data.ok)throw new Error(data.error||'No se pudieron leer las planillas.');
   const normalized=normalizarFuentes(data);
   const revision=createHash('sha256').update(JSON.stringify(normalized)+new Date().toISOString().slice(0,7)).digest('hex');
   return {...normalized,sincronizacion:{revision,actualizado:new Date().toISOString(),origen:'Google · tres planillas'}};
+}
+
+// ContentService entrega una URL de un solo uso. Cada intento inicia una
+// solicitud nueva; nunca reutiliza el redirect ni reenvía la credencial al GET.
+// https://developers.google.com/apps-script/guides/content#redirects
+export async function respuestaPuente(url,token,fetcher=fetch) {
+  const deadline=Date.now()+120000;
+  for(let intento=0;intento<2;intento++) {
+    const u=new URL(url);u.searchParams.set('requestId',randomUUID());
+    const signal=AbortSignal.timeout(Math.max(1,deadline-Date.now()));
+    let r=await fetcher(u,{method:'POST',headers:{'content-type':'application/json','cache-control':'no-store'},body:JSON.stringify({token,action:'todo'}),redirect:'manual',cache:'no-store',signal});
+    let redirigida=false;
+    if([301,302,303].includes(r.status)) {
+      const destino=new URL(r.headers.get('location')||'',u);
+      if(destino.protocol!=='https:'||destino.hostname!=='script.googleusercontent.com')throw new Error('Google requiere revisar la autorización del puente.');
+      redirigida=true;
+      r=await fetcher(destino,{method:'GET',redirect:'error',cache:'no-store',signal});
+    }
+    if(!r.ok) {
+      if(intento===0&&(r.status===429||r.status>=500||(redirigida&&r.status===404)))continue;
+      throw new Error('Google no respondió al sincronizar las planillas ('+r.status+').');
+    }
+    try{return await r.json();}
+    catch{if(intento===0)continue;throw new Error('Google no devolvió datos. Revisá la autorización del puente.');}
+  }
 }

@@ -16,7 +16,7 @@ export const CATEGORIAS_GASTOS = [
   {id:'logistica',nombre:'Logística e importación',detalle:'Depósito, preparación, entregas y descargas'},
   {id:'administracion',nombre:'Administración y asesoría',detalle:'Honorarios, consultoría y seguros'},
   {id:'impuestos',nombre:'Impuestos',detalle:'Tributos, tasas e Ingresos Brutos'},
-  {id:'pendiente',nombre:'Por clasificar',detalle:'Conceptos cuyo destino falta confirmar'},
+  {id:'pendiente',nombre:'Sin mapear',detalle:'Conceptos cuyo destino falta confirmar'},
 ];
 
 // Las equivalencias propias del cliente se guardan en la base privada, nunca
@@ -41,7 +41,7 @@ export function categoriaGasto(concepto,mapa={}) {
     ['instalaciones',/\b(alquiler|expensas|mantenimiento|reparaciones)\b/],
     ['tecnologia',/\b(software|licencias|sistemas|hosting)\b/],
     ['marketing',/\b(pauta|publicidad|marketing|comisiones|agencia)\b/],
-    ['logistica',/\b(deposito|logistica|entregas|descargas|fletes|picking|contenedores)\b/],
+    ['logistica',/\b(logistica|entregas|descargas|fletes|picking|contenedores)\b/],
     ['administracion',/\b(honorarios|consultoria|asesoria|seguros)\b/],
     ['impuestos',/\b(iibb|abl|impuestos|tributos|tasas)\b/],
   ];
