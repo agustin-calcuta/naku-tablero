@@ -35,7 +35,8 @@ es de 30 MB; una restricción del propietario se respeta y se informa como error
 1. Configurar `NAKU_FUENTES_URL` (URL `/exec`) y `NAKU_FUENTES_TOKEN` como secretos
    de la función Buyer. La llamada habitual usa POST, sin token en la URL.
 2. Ejecutar `desactivarSincronizacionProgramada` una vez para quitar el disparador
-   horario anterior. Hasta entonces, `sincronizarProgramado` no hace consultas.
+   horario anterior. Si no se ejecuta manualmente, se elimina solo en su
+   próxima ejecución. No hace consultas a Google ni Neon.
    Los tableros consultan Google al abrirse.
 3. Abrir los tableros y comprobar la vista mensual, la conciliación y la fecha
    de actualización.

@@ -183,9 +183,9 @@ function desactivarSincronizacionProgramada() {
 }
 
 function sincronizarProgramado() {
-  // Compatibilidad con el disparador horario anterior hasta que se elimine.
+  // El disparador anterior se elimina a sí mismo al ejecutarse una vez más.
   // No consulta Google ni Neon.
-  return;
+  desactivarSincronizacionProgramada();
 }
 
 function json(obj) {

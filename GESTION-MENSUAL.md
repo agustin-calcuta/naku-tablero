@@ -106,7 +106,7 @@ hora y actualización desde el navegador. Una segunda lectura sin cambios conser
 la revisión y las clasificaciones privadas.
 
 La actualización se hace al abrir un tablero. El disparador horario anterior
-debe eliminarse; mientras exista, su función ya no hace consultas. Tampoco hay
+se elimina en su próxima ejecución; mientras exista, no hace consultas. Tampoco hay
 consultas periódicas en pestañas abiertas. No requiere nuevos deploys para cada mes.
 
 ## Preparar y comprobar sin publicar
@@ -137,7 +137,8 @@ el endpoint financiero antiguo. `--sin-publicar` prevalece sobre `--publicar`.
 3. Configurar `NAKU_FUENTES_URL` y `NAKU_FUENTES_TOKEN` como secretos de la función
    Buyer. Desplegar esa función, que ahora empaqueta también el lector XLSX.
 4. Ejecutar `desactivarSincronizacionProgramada` una vez para quitar el
-   disparador horario anterior. Hasta entonces, su función no hace consultas.
+   disparador horario anterior. Si no se ejecuta manualmente, se elimina solo
+   en su próxima ejecución, sin consultar planillas ni Neon.
 5. Ejecutar una sincronización, verificar fuentes/cortes y comparar la conciliación.
    La prueba con archivos locales no confirma permisos ni ejecución remota.
 6. Publicar los HTML/JS generados. Comprobar los dos accesos, la sincronización
