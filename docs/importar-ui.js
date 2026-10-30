@@ -143,28 +143,6 @@
   /* La misma clave que abre Dirección permite sincronizar y actualizar exports. */
   const recordado = (k) => window.NakuClave.leer(k);
 
-  // Las pestañas abiertas acompañan las cargas del Buyer sin pisar una vista previa.
-  let polling=false;
-  async function syncFinance(){
-    if(polling||publishing||document.hidden||!recordado('clave')||!$('entrar').hidden)return;
-    polling=true;
-    try{
-      const headers={'x-naku-clave':recordado('clave')};
-      const state=await fetch(window.NakuAPI+'/estado',{headers,cache:'no-store',signal:AbortSignal.timeout(20000)});
-      if(!state.ok)return;
-      const meta=await state.json();
-      if(meta.actualizado!==window.NakuPublicado?.publicado){
-        const res=await fetch(window.NakuAPI+'/',{headers,cache:'no-store',signal:AbortSignal.timeout(30000)});
-        if(!res.ok)return;
-        const data=await res.json();
-        if(publishing||Date.parse(data.publicado)<Date.parse(window.NakuPublicado?.publicado))return;
-        window.NakuDatos=data.datos;
-        window.NakuPublicado={publicado:data.publicado,quien:data.quien};window.NakuPintar(data.datos);
-      }
-    }catch{/* conserva la última vista confirmada */}finally{polling=false;}
-  }
-  setInterval(syncFinance,30000);window.addEventListener('focus',syncFinance);
-
   /* ---------------------------------------------------------------- cablear */
   $('btnActualizar').hidden = false;
   $('btnActualizar').addEventListener('click', abrir);

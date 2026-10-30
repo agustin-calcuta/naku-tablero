@@ -18,10 +18,12 @@ export function createHandler(sql, { leerFuentes } = {}) {
       if(request.method==='GET' && ['/', '/estado'].includes(route)) {
         const {fuentes,...data}=await read(key,route==='/estado');return response(data);
       }
-      if(request.method!=='PUT' || !['/','/finanzas','/preview','/sincronizar'].includes(route)) return response({error:'Ruta no disponible.'},404);
+      if(request.method!=='PUT' || !['/','/finanzas','/preview','/sincronizar','/actualizar'].includes(route)) return response({error:'Ruta no disponible.'},404);
       // Autenticar antes de descomprimir o procesar datos.
-      await read(key,true);
-      if(route!=='/' && !(await sql('select puede_leer($1) as ok',[key])).rows[0].ok) return response({error:'Esta clave sólo permite actualizar el Buyer y las ventas.'},403);
+      const authenticated=await read(key,true);
+      // /actualizar sólo lee las planillas configuradas en el servidor y nunca
+      // acepta archivos del navegador ni devuelve los datos privados de Finanzas.
+      if(route!=='/'&&route!=='/actualizar'&&!(await sql('select puede_leer($1) as ok',[key])).rows[0].ok) return response({error:'Esta clave sólo permite actualizar el Buyer y las ventas.'},403);
       const chunks=[]; let size=0;
       for await(const chunk of request.body) {
         size+=chunk.length;
@@ -33,20 +35,27 @@ export function createHandler(sql, { leerFuentes } = {}) {
       catch { return response({error:'No se pudo leer la carga.'},400); }
       if(!operation || typeof operation.id!=='string' || operation.id.length>100) return response({error:'Falta el identificador de carga.'},400);
       if(route==='/'&&(operation.costos||operation.central||operation.gestion||operation.sincronizacion||operation.gastosCategorias!==undefined))return response({error:'Las planillas se actualizan desde Finanzas.'},403);
-      if(route==='/sincronizar'){
+      if(route==='/sincronizar'||route==='/actualizar'){
         if(!leerFuentes)return response({error:'La conexión de planillas todavía no está configurada.'},503);
         try{operation={id:operation.id,nombre:'Sincronización de planillas',...await leerFuentes()};}
         catch(e){return response({error:e.message},e.status||502);}
+        // La sincronización horaria no debe traer varios MB de Buyer, fuentes y
+        // Finanzas cuando las planillas siguen en la misma revisión.
+        if(operation.sincronizacion?.revision){
+          const revision=(await sql("select datos #>> '{sincronizacion,revision}' as revision from tablero where id='direccion'",[])).rows[0]?.revision;
+          if(revision===operation.sincronizacion.revision)
+            return response({sinCambios:true,actualizado:authenticated.actualizado});
+        }
       }
       for(let attempt=0;attempt<4;attempt++) {
         const current=await read(key);
         const data=current.datos ? decode(current.datos) : {ventas:packLines([]),maestro:'',manifest:[]};
-        if(data.receipts?.[operation.id]) { const {fuentes,...visible}=current;return response({...visible,result:data.receipts[operation.id]}); }
+        if(data.receipts?.[operation.id]) { if(route==='/actualizar')return response({sinCambios:true,revision:current.revision});const {fuentes,...visible}=current;return response({...visible,result:data.receipts[operation.id]}); }
         if(operation.maestro && operation.maestroRevision !== current.revision) return response({error:'El histórico cambió mientras editabas el maestro. Actualizá la vista y volvé a aplicar el archivo.'},409);
-        const financial=(await sql("select datos,actualizado from tablero where id='direccion'",[])).rows[0];
         const currentSources=current.fuentes?decode(current.fuentes):{};
-        if(route==='/sincronizar'&&operation.sincronizacion?.revision&&operation.sincronizacion.revision===currentSources.sincronizacion?.revision)
-          return response({sinCambios:true,finance:financial?.datos,actualizado:current.actualizado});
+        if(['/sincronizar','/actualizar'].includes(route)&&operation.sincronizacion?.revision&&operation.sincronizacion.revision===currentSources.sincronizacion?.revision)
+          return response({sinCambios:true,actualizado:current.actualizado});
+        const financial=(await sql("select datos,actualizado from tablero where id='direccion'",[])).rows[0];
         let merged;
         try {
           if(operation.maestro) parseMaestro(operation.maestro);
@@ -57,6 +66,7 @@ export function createHandler(sql, { leerFuentes } = {}) {
         const packed=encode(merged.buyer);
         try {
           const saved=(await sql('select buyer_guardar($1,$2,$3,$4,$5::jsonb,$6::timestamptz) as r',[key,current.revision,packed,encode(merged.sources),JSON.stringify(merged.finance),financial?.actualizado||null])).rows[0].r;
+          if(route==='/actualizar')return response({revision:saved.revision,actualizado:saved.actualizado});
           return response({...saved,datos:packed,result:merged.result,...(['/finanzas','/sincronizar'].includes(route)?{finance:merged.finance}:{})});
         } catch(e) { if(e.status!==409 || attempt===3) throw e; }
       }

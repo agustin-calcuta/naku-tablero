@@ -90,7 +90,8 @@ la API compartida. El JSON queda en `datos/`, que git ignora.
 
 Los exports son opcionales para ampliar el detalle comercial y los compradores.
 Se cargan desde cualquiera de los tableros. El cierre mensual no depende de ellos.
-La conexión automática requiere activar el puente y su disparador horario.
+La conexión automática requiere activar el puente. Al abrir un tablero se
+comprueban las tres planillas; no hay sincronización horaria de fondo.
 
 El puente se instala una sola vez con dos comandos:
 
@@ -269,8 +270,8 @@ motores. Desde Buyer, **Procesar ventas** publica directamente. Desde Finanzas,
 y ventas** procesa los exports cargados y guarda ambos tableros en una transacción.
 Los exports repetidos no duplican órdenes.
 
-Todos consultan el estado compartido al abrir y cada 30 segundos mientras la
-pestaña está visible. El Buyer acepta maestros CSV con coma o punto y coma y
+Todos consultan el estado compartido al abrir y comprueban las planillas de
+Google una vez. El Buyer acepta maestros CSV con coma o punto y coma y
 aplica los cambios al histórico. Los costos y la central llegan desde
 la sincronización de Google; las cargas de ventas reutilizan los últimos costos
 guardados.

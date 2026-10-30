@@ -775,6 +775,11 @@ renderLede();renderKPIs();renderRank();renderDetail();renderCov();renderChart();
     try{
       acceptShared(await sync.request('/'));
       $('buyer-login').hidden=true;document.body.style.overflow=originalOverflow;
+      // Consultar Google una vez al abrir; no mantener una sincronización horaria.
+      syncStatus.textContent='Comprobando planillas…';
+      sync.request('/actualizar',{id:crypto.randomUUID()})
+        .then(r=>{if(r.sinCambios)syncStatus.textContent='Compartido · al día';else return refreshShared(true);})
+        .catch(e=>{syncStatus.textContent='Se muestran los últimos datos guardados. No se pudo actualizar desde Google: '+e.message;});
     }catch(e){showLogin(e.message);}
     finally{$('buyer-login-btn').disabled=false;}
   }
@@ -1119,9 +1124,6 @@ renderLede();renderKPIs();renderRank();renderDetail();renderCov();renderChart();
 
   $('buyer-login-form').addEventListener('submit',e=>{e.preventDefault();sync.setKey($('buyer-key').value.trim());enter();});
   $('buyer-refresh').addEventListener('click',()=>refreshShared(true));
-  window.addEventListener('focus',()=>refreshShared());
-  document.addEventListener('visibilitychange',()=>{if(!document.hidden)refreshShared();});
-  setInterval(()=>{if(!document.hidden&&$('buyer-login').hidden)refreshShared();},30000);
   (async function init(){
     try{
       const [lines,maestro]=await Promise.all([idbGet('lines'),idbGet('maestro')]);

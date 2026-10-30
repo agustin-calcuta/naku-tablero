@@ -879,7 +879,25 @@ async function traerDatos(clave) {
   return { D: j.datos, publicado: j.publicado, quien: j.quien };
 }
 
-function mostrarTablero({ D, publicado, quien }) {
+let actualizacionAlAbrirIniciada = false;
+function actualizarAlAbrir(clave) {
+  if (actualizacionAlAbrirIniciada) return;
+  actualizacionAlAbrirIniciada = true;
+  const consultar = async () => {
+    try {
+      window.NakuBuyerSync.setKey(clave);
+      const r = await window.NakuBuyerSync.request('/actualizar', { id: crypto.randomUUID() });
+      if (!r.sinCambios) {
+        const nueva = await traerDatos(clave);
+        if (!nueva.noEntra) mostrarTablero(nueva, clave);
+      }
+    } catch (e) { console.warn('No se pudo actualizar desde Google:', e.message); }
+  };
+  if (document.readyState === 'complete') consultar();
+  else window.addEventListener('load', consultar, { once: true });
+}
+
+function mostrarTablero({ D, publicado, quien }, clave) {
   $('entrar').hidden = true;
   document.body.style.overflow = '';
   window.scrollTo(0, 0);   // el fondo pudo haber scrolleado detrás de la pantalla de clave
@@ -888,6 +906,7 @@ function mostrarTablero({ D, publicado, quien }) {
   window.NakuPintar = pintar;
   window.NakuPublicado = { publicado, quien };
   pintar(D);
+  actualizarAlAbrir(clave);
 }
 
 function pedirClave(mensaje) {
@@ -909,7 +928,7 @@ $('entrarForm').addEventListener('submit', async (ev) => {
     const r = await traerDatos(clave);
     if (r.noEntra) { pedirClave('Esa clave no es.'); return; }
     window.NakuClave.guardar('clave', clave);
-    mostrarTablero(r);
+    mostrarTablero(r, clave);
   } catch (e) {
     pedirClave('No pude entrar: ' + e.message);
   } finally {
@@ -923,7 +942,7 @@ $('entrarForm').addEventListener('submit', async (ev) => {
   try {
     const r = await traerDatos(guardada);
     if (r.noEntra) { pedirClave('La clave guardada ya no sirve.'); return; }
-    mostrarTablero(r);
+    mostrarTablero(r, guardada);
   } catch (e) {
     pedirClave('No pude leer el tablero: ' + e.message);
   }
@@ -1738,7 +1757,7 @@ decidirMarca();
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <script src="importar.js?v=20260911"></script>
 <script src="gestion-ui.js?v=20260911c"></script>
-<script src="ventas-shared.js?v=20260911"></script>
-<script src="importar-ui.js?v=20260911b"></script>
+<script src="ventas-shared.js?v=20261030"></script>
+<script src="importar-ui.js?v=20261030"></script>
 </body>
 </html>

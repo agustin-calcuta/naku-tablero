@@ -176,13 +176,10 @@ function leerGestion_() {
   return {archivo:meta.archivo,actualizado:meta.actualizado,hojas:hojas};
 }
 
-// Ejecutar una vez al activar. La cuenta debe tener acceso lector a las fuentes.
-// API_URL y API_CLAVE se guardan en Propiedades del script, nunca en el tablero.
-function instalarSincronizacion() {
-  const props=PropertiesService.getScriptProperties();
-  if(!props.getProperty('API_URL')||!props.getProperty('API_CLAVE'))throw new Error('Faltan API_URL y API_CLAVE en Propiedades del script.');
+// La consulta a Google se inicia al abrir el tablero. Eliminar el disparador
+// horario existente para no leer ni publicar datos cuando nadie lo usa.
+function desactivarSincronizacionProgramada() {
   ScriptApp.getProjectTriggers().filter(t=>t.getHandlerFunction()==='sincronizarProgramado').forEach(t=>ScriptApp.deleteTrigger(t));
-  ScriptApp.newTrigger('sincronizarProgramado').timeBased().everyHours(1).create();
 }
 
 function sincronizarProgramado() {

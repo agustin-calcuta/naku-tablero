@@ -96,16 +96,17 @@ no se guardan en el repositorio público.
 4. Un cambio de mes o de contenido recalcula el resultado. Sin cambios no se escribe.
    Un fallo de cualquier fuente conserva la última publicación. El botón muestra el
    error y los fallos automáticos quedan en Apps Script.
-5. La clave Buyer puede cargar exports/maestro. No puede cargar gestión, costos,
-   central, sincronizar fuentes ni recibir información financiera.
+5. La clave Buyer puede cargar exports/maestro y pedir la lectura de las planillas
+   configuradas al abrir. No puede cargar gestión, costos ni central desde el navegador,
+   ni recibir información financiera.
 
 Activación verificada el 11/09/2026: lectura real de las tres fuentes, guardado
 compartido, ejecución manual de `sincronizarProgramado`, un único disparador cada
 hora y actualización desde el navegador. Una segunda lectura sin cambios conserva
 la revisión y las clasificaciones privadas.
 
-La actualización programada es horaria. Las pestañas abiertas
-consultan publicaciones cada 30 segundos. No requiere nuevos deploys para cada mes.
+La actualización se hace al abrir un tablero. No hay disparador horario ni
+consultas periódicas en pestañas abiertas. No requiere nuevos deploys para cada mes.
 
 ## Preparar y comprobar sin publicar
 
@@ -135,12 +136,12 @@ el endpoint financiero antiguo. `--sin-publicar` prevalece sobre `--publicar`.
 3. Configurar `NAKU_FUENTES_URL` y `NAKU_FUENTES_TOKEN` como secretos de la función
    Buyer. Desplegar esa función, que ahora empaqueta también el lector XLSX.
 4. Guardar en Propiedades del script `API_URL` (la función Buyer, sin barra final)
-   y `API_CLAVE` (clave financiera). Ejecutar `instalarSincronizacion` una vez.
-   Reinstalar reemplaza solamente el disparador propio, no otros disparadores.
+   y `API_CLAVE` (clave financiera). Ejecutar `desactivarSincronizacionProgramada`
+   una vez para quitar el disparador horario anterior.
 5. Ejecutar una sincronización, verificar fuentes/cortes y comparar la conciliación.
    La prueba con archivos locales no confirma permisos ni ejecución remota.
-6. Publicar los HTML/JS generados. Comprobar los dos accesos, el botón de sincronización,
-   el disparador horario y la ejecución de `sincronizarProgramado`. Los cambios
+6. Publicar los HTML/JS generados. Comprobar los dos accesos, la sincronización
+   al abrir y el botón manual. Los cambios
    retroactivos se reemplazan por mes; no se acumulan sobre la lectura anterior.
 
 Las versiones anteriores se mantienen en el historial compartido y financiero.

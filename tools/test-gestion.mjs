@@ -87,8 +87,31 @@ assert.equal((await request('/','buyer',{id:'categorias',gastosCategorias:{Sueld
 assert.equal((await request('/sincronizar','buyer',{id:'2'})).status,403);assert.equal(reads,0);
 assert.equal((await request('/preview','finance',{id:'3',gestion:libro})).status,200);assert.equal(writes,0);
 assert.equal((await request('/sincronizar','finance',{id:'4'})).status,200);assert.equal(writes,1);
+const opened=await request('/actualizar','buyer',{id:'abrir'});
+assert.equal(opened.status,200,'Abrir el tablero admite la clave de lectura para consultar Google');
+assert.deepEqual(Object.keys(await opened.json()).sort(),['actualizado','revision'],'La respuesta no expone Finanzas ni fuentes');
+assert.equal(writes,2);
+const fastQueries=[];
+const fastHandler=createHandler(async(query,params)=>{
+  fastQueries.push(query);
+  if(query.includes('buyer_leer')){
+    assert.equal(params[1],true,'La revisión sólo requiere el estado de Buyer');
+    return {rows:[{r:{revision:2,actualizado:'2026-09-11T01:00:00Z'}}]};
+  }
+  if(query.includes('puede_leer'))return {rows:[{ok:true}]};
+  if(query.includes("datos #>> '{sincronizacion,revision}'"))return {rows:[{revision:'sin-cambios'}]};
+  throw new Error('La sincronización sin cambios no debe descargar datos completos');
+},{leerFuentes:async()=>({sincronizacion:{revision:'sin-cambios'}})});
+const fast=await fastHandler(new Request('https://test/sincronizar',{method:'PUT',headers:{'x-naku-clave':'finance'},body:JSON.stringify({datos:encode({id:'sin-cambios'})})}));
+assert.equal(fast.status,200);
+assert.equal((await fast.json()).sinCambios,true);
+assert.equal(fastQueries.length,3);
+fastQueries.length=0;
+const openedUnchanged=await fastHandler(new Request('https://test/actualizar',{method:'PUT',headers:{'x-naku-clave':'buyer'},body:JSON.stringify({datos:encode({id:'abrir-sin-cambios'})})}));
+assert.equal((await openedUnchanged.json()).sinCambios,true);
+assert.equal(fastQueries.length,2,'Abrir sin cambios evita descargar Buyer y Finanzas');
 const failed=createHandler(sql,{leerFuentes:async()=>{throw new Error('Google sin acceso');}});
-assert.equal((await failed(new Request('https://test/sincronizar',{method:'PUT',headers:{'x-naku-clave':'finance'},body:JSON.stringify({datos:encode({id:'fail'})})}))).status,502);assert.equal(writes,1,'Un fallo de Google no pisa la última versión');
+assert.equal((await failed(new Request('https://test/sincronizar',{method:'PUT',headers:{'x-naku-clave':'finance'},body:JSON.stringify({datos:encode({id:'fail'})})}))).status,502);assert.equal(writes,2,'Un fallo de Google no pisa la última versión');
 await assert.rejects(()=>leerFuentes({url:'https://script.google.com/macros/s/example/exec',token:'private',fetcher:async(url,opts)=>{assert.ok(!url.href.includes('private'));assert.equal(opts.method,'POST');return new Response('no autorizado',{status:401});}}),/401/);
 const solicitudes=[];
 const puente=await respuestaPuente('https://script.google.com/macros/s/example/exec','private',async(url,opts)=>{
