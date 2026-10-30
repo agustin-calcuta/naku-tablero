@@ -34,15 +34,13 @@ es de 30 MB; una restricción del propietario se respeta y se informa como error
 
 1. Configurar `NAKU_FUENTES_URL` (URL `/exec`) y `NAKU_FUENTES_TOKEN` como secretos
    de la función Buyer. La llamada habitual usa POST, sin token en la URL.
-2. Configurar en Propiedades del script `API_URL` (función Buyer, sin barra final)
-   y `API_CLAVE` (clave financiera).
-3. Ejecutar `desactivarSincronizacionProgramada` una vez para quitar el disparador
-   horario anterior. Los tableros consultan Google al abrirse.
-4. Abrir los tableros y comprobar la vista mensual, la conciliación y la fecha
-   de actualización. `sincronizarProgramado` queda disponible para una prueba manual.
+2. Ejecutar `desactivarSincronizacionProgramada` una vez para quitar el disparador
+   horario anterior. Hasta entonces, `sincronizarProgramado` no hace consultas.
+   Los tableros consultan Google al abrirse.
+3. Abrir los tableros y comprobar la vista mensual, la conciliación y la fecha
+   de actualización.
 
 El botón **Sincronizar las tres planillas** llama al mismo endpoint del servidor.
-`ULTIMA_SINCRONIZACION` y `ERROR_SINCRONIZACION` quedan en Propiedades del script.
 Los errores conservan los últimos datos guardados. Google registra las ejecuciones
 manuales en el proyecto; el tablero muestra su última versión válida.
 

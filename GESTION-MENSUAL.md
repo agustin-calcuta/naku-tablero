@@ -105,7 +105,8 @@ compartido, ejecución manual de `sincronizarProgramado`, un único disparador c
 hora y actualización desde el navegador. Una segunda lectura sin cambios conserva
 la revisión y las clasificaciones privadas.
 
-La actualización se hace al abrir un tablero. No hay disparador horario ni
+La actualización se hace al abrir un tablero. El disparador horario anterior
+debe eliminarse; mientras exista, su función ya no hace consultas. Tampoco hay
 consultas periódicas en pestañas abiertas. No requiere nuevos deploys para cada mes.
 
 ## Preparar y comprobar sin publicar
@@ -135,9 +136,8 @@ el endpoint financiero antiguo. `--sin-publicar` prevalece sobre `--publicar`.
    No cambiar los permisos de las planillas a público.
 3. Configurar `NAKU_FUENTES_URL` y `NAKU_FUENTES_TOKEN` como secretos de la función
    Buyer. Desplegar esa función, que ahora empaqueta también el lector XLSX.
-4. Guardar en Propiedades del script `API_URL` (la función Buyer, sin barra final)
-   y `API_CLAVE` (clave financiera). Ejecutar `desactivarSincronizacionProgramada`
-   una vez para quitar el disparador horario anterior.
+4. Ejecutar `desactivarSincronizacionProgramada` una vez para quitar el
+   disparador horario anterior. Hasta entonces, su función no hace consultas.
 5. Ejecutar una sincronización, verificar fuentes/cortes y comparar la conciliación.
    La prueba con archivos locales no confirma permisos ni ejecución remota.
 6. Publicar los HTML/JS generados. Comprobar los dos accesos, la sincronización

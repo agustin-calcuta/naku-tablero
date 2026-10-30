@@ -183,17 +183,9 @@ function desactivarSincronizacionProgramada() {
 }
 
 function sincronizarProgramado() {
-  const lock=LockService.getScriptLock();if(!lock.tryLock(1000))return;
-  const props=PropertiesService.getScriptProperties();
-  try {
-    const url=props.getProperty('API_URL'),key=props.getProperty('API_CLAVE');
-    if(!/^https:\/\/.+\.neon\.tech$/.test(url||'')||!key)throw new Error('Falta configurar la API compartida.');
-    const packed=Utilities.base64Encode(Utilities.gzip(Utilities.newBlob(JSON.stringify({id:Utilities.getUuid()}))).getBytes());
-    const res=UrlFetchApp.fetch(url+'/sincronizar',{method:'put',contentType:'application/json',headers:{'x-naku-clave':key},payload:JSON.stringify({datos:packed}),muteHttpExceptions:true});
-    if(res.getResponseCode()!==200)throw new Error('Falló la sincronización ('+res.getResponseCode()+'). Se conserva la última versión.');
-    props.setProperty('ULTIMA_SINCRONIZACION',new Date().toISOString());props.deleteProperty('ERROR_SINCRONIZACION');
-  } catch(e) {props.setProperty('ERROR_SINCRONIZACION',String(e.message));throw e;}
-  finally{lock.releaseLock();}
+  // Compatibilidad con el disparador horario anterior hasta que se elimine.
+  // No consulta Google ni Neon.
+  return;
 }
 
 function json(obj) {
